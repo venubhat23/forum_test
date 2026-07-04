@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= content_for(:title) || "Business Network Forum" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <!-- Apply theme immediately to prevent flash -->
+    <script>
+      (function() {
+        var t = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', t);
+      })();
+    </script>
+
+    <%= yield :head %>
+
+    <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
+    <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
+
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icon.png">
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <%# Includes all stylesheet files in app/assets/stylesheets %>
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body>
+    <% if user_signed_in? %>
+      <header class="app-header">
+        <div class="container-fluid h-100">
+          <div class="d-flex justify-content-between align-items-center h-100 px-3">
+            <div class="d-flex align-items-center">
+              <button class="mobile-toggle d-lg-none" type="button" id="mobileSidebarToggle">
+                <i class="bi bi-list"></i>
+              </button>
+
+              <button class="desktop-sidebar-toggle d-none d-lg-block" type="button" id="desktopSidebarToggle">
+                <i class="bi bi-list"></i>
+              </button>
+
+              <span class="brand-header-text">Business Network</span>
+            </div>
+
+            <div class="d-flex align-items-center">
+              <button class="theme-toggle-btn" id="themeToggleBtn" type="button" title="Toggle dark/light mode" onclick="toggleTheme()">
+                <i class="bi bi-sun-fill sun-icon"></i>
+                <i class="bi bi-moon-stars-fill moon-icon"></i>
+              </button>
+
+              <div class="dropdown">
+                <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                  <i class="bi bi-person-circle me-2"></i>
+                  <span class="d-none d-sm-inline"><%= current_user.email %></span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                  <li><%= link_to destroy_user_session_path, class: "dropdown-item", data: { turbo_method: :delete } do %>
+                    <i class="bi bi-box-arrow-right me-2"></i>Logout
+                  <% end %></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <%= render "layouts/sidebar" %>
+
+      <main class="main-content">
+        <% if notice %>
+          <div id="toast-notification" class="toast-notification toast-success">
+            <div class="toast-notification-content">
+              <div class="d-flex align-items-center">
+                <i class="bi bi-check-circle-fill me-2"></i>
+                <span><%= notice %></span>
+              </div>
+              <button type="button" class="btn-close ms-3" onclick="closeToast()"></button>
+            </div>
+          </div>
+        <% end %>
+
+        <% if alert.present? %>
+          <div id="toast-notification" class="toast-notification toast-danger">
+            <div class="toast-notification-content">
+              <div class="d-flex align-items-center">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                <span><%= alert %></span>
+              </div>
+              <button type="button" class="btn-close ms-3" onclick="closeToast()"></button>
+            </div>
+          </div>
+        <% end %>
+
+        <%= yield %>
+      </main>
+    <% else %>
+      <%= yield %>
+    <% end %>
+
+    <script>
+      // ── Desktop sidebar collapse ──────────────────────────────────
+      function initDesktopSidebarToggle() {
+        var desktopToggle = document.getElementById('desktopSidebarToggle');
+        var sidebar = document.getElementById('sidebar');
+        var body = document.body;
+        if (!desktopToggle || !sidebar) return;
+
+        function applyDesktopState() {
+          if (window.innerWidth >= 992) {
+            var collapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+            sidebar.classList.toggle('collapsed', collapsed);
+            body.classList.toggle('sidebar-collapsed', collapsed);
+          } else {
+            sidebar.classList.remove('collapsed');
+            body.classList.remove('sidebar-collapsed');
+          }
+        }
+
+        applyDesktopState();
+
+        desktopToggle.addEventListener('click', function() {
+          if (window.innerWidth < 992) return;
+          var collapsed = !sidebar.classList.contains('collapsed');
+          sidebar.classList.toggle('collapsed', collapsed);
+          body.classList.toggle('sidebar-collapsed', collapsed);
+          localStorage.setItem('sidebarCollapsed', collapsed);
+        });
+
+        window.addEventListener('resize', applyDesktopState);
+      }
+
+      // ── Mobile sidebar overlay ────────────────────────────────────
+      function initMobileSidebarToggle() {
+        var mobileToggle = document.getElementById('mobileSidebarToggle');
+        var sidebar = document.getElementById('sidebar');
+        if (!mobileToggle || !sidebar) return;
+
+        function closeMobileSidebar() {
+          sidebar.classList.remove('show');
+          var backdrop = document.querySelector('.sidebar-backdrop');
+          if (backdrop) backdrop.remove();
+        }
+
+        mobileToggle.addEventListener('click', function() {
+          if (sidebar.classList.contains('show')) {
+            closeMobileSidebar();
+          } else {
+            sidebar.classList.add('show');
+            var backdrop = document.createElement('div');
+            backdrop.className = 'sidebar-backdrop';
+            backdrop.addEventListener('click', closeMobileSidebar);
+            document.body.appendChild(backdrop);
+          }
+        });
+      }
+
+      document.addEventListener('turbo:load', function() {
+        initDesktopSidebarToggle();
+        initMobileSidebarToggle();
+      });
+
+      // ── Dark / Light mode ──────────────────────────────────────────
+      function toggleTheme() {
+        var html = document.documentElement;
+        var next = (html.getAttribute('data-theme') || 'light') === 'dark' ? 'light' : 'dark';
+        html.setAttribute('data-theme', next);
+        localStorage.setItem('theme', next);
+      }
+
+      document.addEventListener('turbo:load', function() {
+        document.documentElement.setAttribute('data-theme', localStorage.getItem('theme') || 'light');
+      });
+
+      // ── Toast notifications ─────────────────────────────────────────
+      function closeToast() {
+        var toast = document.getElementById('toast-notification');
+        if (!toast) return;
+        toast.style.transform = 'translateX(120%)';
+        setTimeout(function() { toast.remove(); }, 300);
+      }
+
+      document.addEventListener('turbo:load', function() {
+        var toast = document.getElementById('toast-notification');
+        if (toast) {
+          setTimeout(function() { toast.style.transform = 'translateX(0)'; }, 100);
+          setTimeout(closeToast, 5000);
+        }
+      });
+    </script>
+  </body>
+</html>

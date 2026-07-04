@@ -1,0 +1,35 @@
+<div class="modern-sidebar" id="sidebar" data-controller="sidebar">
+  <div class="sidebar-brand">
+    <div class="sidebar-brand-icon">
+      <i class="bi bi-people-fill"></i>
+    </div>
+    <span class="sidebar-brand-text">Business Network</span>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-section-title">Main Menu</div>
+      <ul class="nav-menu">
+        <li class="nav-item">
+          <%= link_to dashboard_path, class: "nav-link-modern #{'active' if current_page?(dashboard_path)}", data: { tooltip: "Dashboard" } do %>
+            <div class="nav-icon-modern">
+              <div class="icon-bg gradient-blue">
+                <i class="bi bi-speedometer2"></i>
+              </div>
+            </div>
+            <span class="nav-text">Dashboard</span>
+          <% end %>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="sidebar-footer">
+    <%= link_to destroy_user_session_path, class: "logout-btn-modern", data: { turbo_method: :delete, tooltip: "Logout" } do %>
+      <div class="nav-icon-modern">
+        <i class="bi bi-box-arrow-right"></i>
+      </div>
+      <span class="nav-text">Logout</span>
+    <% end %>
+  </div>
+</div>
