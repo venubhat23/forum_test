@@ -45,6 +45,23 @@ body {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.app-header .container-fluid,
+.app-header .d-flex.justify-content-between,
+.app-header .d-flex.align-items-center {
+  min-width: 0;
+}
+
+@media (max-width: 576px) {
+  .brand-header-text {
+    font-size: 1.1rem;
+    max-width: 45vw;
+  }
 }
 
 .mobile-toggle,
@@ -57,6 +74,14 @@ body {
   border-radius: 8px;
   transition: all 0.3s ease;
   margin-right: 15px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 400px) {
+  .mobile-toggle {
+    padding: 8px 6px;
+    margin-right: 8px;
+  }
 }
 
 .mobile-toggle:hover,
@@ -389,11 +414,14 @@ body.sidebar-collapsed .main-content {
   position: fixed;
   top: calc(var(--header-height) + 10px);
   right: 20px;
+  left: 20px;
   z-index: 1080;
   width: 350px;
+  max-width: calc(100vw - 40px);
+  margin-left: auto;
   border-radius: 0.5rem;
   box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.15);
-  transform: translateX(120%);
+  transform: translateX(calc(100% + 20px));
   transition: transform 0.3s ease-in-out;
 }
 
@@ -406,3 +434,102 @@ body.sidebar-collapsed .main-content {
 
 .toast-success { background: #d1edda; border: 1px solid #c3e6cb; color: #155724; }
 .toast-danger  { background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
+
+/* ── Page header ── */
+.page-header {
+  margin-bottom: 1.5rem;
+}
+
+.page-title {
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.page-subtitle {
+  color: #64748b;
+}
+
+/* ── Stat cards ── */
+.stats-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  height: 100%;
+}
+
+.stats-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+}
+
+.stats-card .icon-bg {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  font-size: 1.25rem;
+  color: #ffffff;
+}
+
+.stats-value {
+  font-size: 1.6rem;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.stats-label {
+  color: #64748b;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+/* ── Status badges ── */
+.badge-status-active    { background: rgba(16, 185, 129, 0.12); color: #059669; }
+.badge-status-trial     { background: rgba(59, 130, 246, 0.12); color: #2563eb; }
+.badge-status-suspended { background: rgba(239, 68, 68, 0.12); color: #dc2626; }
+.badge-status-expired   { background: rgba(107, 114, 128, 0.12); color: #4b5563; }
+
+/* ── Auth pages (sign in) ── */
+.auth-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 420px;
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 2.5rem 2rem;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.25);
+}
+
+.auth-brand-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 1.5rem;
+  margin: 0 auto 1rem auto;
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.35);
+}
+
+@media (max-width: 480px) {
+  .auth-card {
+    padding: 2rem 1.25rem;
+    border-radius: 16px;
+  }
+}

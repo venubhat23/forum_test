@@ -1,0 +1,38 @@
+<div class="auth-wrapper">
+  <div class="auth-card">
+    <div class="text-center mb-4">
+      <div class="auth-brand-icon">
+        <i class="bi bi-people-fill"></i>
+      </div>
+      <h1 class="h4 fw-bold mb-1">Welcome back</h1>
+      <p class="text-muted mb-0">Sign in to your account</p>
+    </div>
+
+    <%= render "devise/shared/error_messages", resource: resource %>
+
+    <%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
+      <div class="mb-3">
+        <%= f.label :email, class: "form-label" %>
+        <%= f.email_field :email, autofocus: true, autocomplete: "email", class: "form-control form-control-lg", inputmode: "email" %>
+      </div>
+
+      <div class="mb-3">
+        <%= f.label :password, class: "form-label" %>
+        <%= f.password_field :password, autocomplete: "current-password", class: "form-control form-control-lg" %>
+      </div>
+
+      <% if devise_mapping.rememberable? %>
+        <div class="form-check mb-4">
+          <%= f.check_box :remember_me, class: "form-check-input" %>
+          <%= f.label :remember_me, class: "form-check-label" %>
+        </div>
+      <% end %>
+
+      <%= f.submit "Sign In", class: "btn btn-primary btn-lg w-100" %>
+    <% end %>
+
+    <div class="text-center mt-4">
+      <%= render "devise/shared/links" %>
+    </div>
+  </div>
+</div>

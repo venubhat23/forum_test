@@ -46,7 +46,7 @@
                 <i class="bi bi-list"></i>
               </button>
 
-              <span class="brand-header-text">Business Network</span>
+              <span class="brand-header-text"><%= brand_header_text %></span>
             </div>
 
             <div class="d-flex align-items-center">
@@ -71,7 +71,7 @@
         </div>
       </header>
 
-      <%= render "layouts/sidebar" %>
+      <%= render current_area == :super_admin ? "layouts/super_admin_sidebar" : "layouts/forum_sidebar" %>
 
       <main class="main-content">
         <% if notice %>
@@ -125,15 +125,18 @@
 
         applyDesktopState();
 
-        desktopToggle.addEventListener('click', function() {
+        // Assigning .onclick (rather than addEventListener) so re-running
+        // this initializer on every turbo:load overwrites the previous
+        // handler instead of stacking duplicate ones.
+        desktopToggle.onclick = function() {
           if (window.innerWidth < 992) return;
           var collapsed = !sidebar.classList.contains('collapsed');
           sidebar.classList.toggle('collapsed', collapsed);
           body.classList.toggle('sidebar-collapsed', collapsed);
           localStorage.setItem('sidebarCollapsed', collapsed);
-        });
+        };
 
-        window.addEventListener('resize', applyDesktopState);
+        window.onresize = applyDesktopState;
       }
 
       // ── Mobile sidebar overlay ────────────────────────────────────
@@ -148,17 +151,17 @@
           if (backdrop) backdrop.remove();
         }
 
-        mobileToggle.addEventListener('click', function() {
+        mobileToggle.onclick = function() {
           if (sidebar.classList.contains('show')) {
             closeMobileSidebar();
           } else {
             sidebar.classList.add('show');
             var backdrop = document.createElement('div');
             backdrop.className = 'sidebar-backdrop';
-            backdrop.addEventListener('click', closeMobileSidebar);
+            backdrop.onclick = closeMobileSidebar;
             document.body.appendChild(backdrop);
           }
-        });
+        };
       }
 
       document.addEventListener('turbo:load', function() {

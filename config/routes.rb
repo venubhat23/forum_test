@@ -10,6 +10,22 @@ Rails.application.routes.draw do
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
+  namespace :super_admin do
+    get "dashboard", to: "dashboard#show"
+    resources :forums, only: [ :index, :new, :create, :show ] do
+      member do
+        patch :suspend
+        patch :activate
+      end
+    end
+  end
+
+  scope "/f/:forum_slug", as: :forum do
+    get "dashboard", to: "forums/dashboard#show"
+    resources :chapters, controller: "forums/chapters", only: [ :index, :new, :create, :show ]
+  end
+
+  # Role-based dispatcher: sends signed-in users to their home area.
   get "dashboard", to: "home#dashboard"
 
   # Defines the root path route ("/")

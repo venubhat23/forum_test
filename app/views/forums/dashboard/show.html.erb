@@ -1,0 +1,68 @@
+<% content_for :title, "#{@current_forum.name} Dashboard" %>
+
+<div class="page-header">
+  <h1 class="page-title h4">Welcome back</h1>
+  <p class="page-subtitle mb-0">Here's how <%= @current_forum.name %> is doing.</p>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-6 col-lg-4">
+    <div class="stats-card">
+      <div class="icon-bg gradient-blue"><i class="bi bi-diagram-3"></i></div>
+      <div>
+        <div class="stats-value"><%= @chapters_count %></div>
+        <div class="stats-label">Chapters</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-4">
+    <div class="stats-card">
+      <div class="icon-bg gradient-green"><i class="bi bi-people"></i></div>
+      <div>
+        <div class="stats-value"><%= @members_count %></div>
+        <div class="stats-label">Members</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-4">
+    <div class="stats-card">
+      <div class="icon-bg gradient-cyan"><i class="bi bi-person-badge"></i></div>
+      <div>
+        <div class="stats-value"><%= @guests_count %></div>
+        <div class="stats-label">Guests</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <span class="fw-semibold">Chapters</span>
+    <%= link_to new_forum_chapter_path(forum_slug: @current_forum.slug), class: "btn btn-sm btn-primary" do %>
+      <i class="bi bi-plus-lg me-1"></i> New Chapter
+    <% end %>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Status</th>
+          <th>Created</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @recent_chapters.each do |chapter| %>
+          <tr>
+            <td><%= link_to chapter.name, forum_chapter_path(forum_slug: @current_forum.slug, id: chapter.id) %></td>
+            <td><span class="badge <%= chapter.active? ? 'badge-status-active' : 'badge-status-suspended' %>"><%= chapter.status.titleize %></span></td>
+            <td><%= chapter.created_at.strftime("%d %b %Y") %></td>
+          </tr>
+        <% end %>
+        <% if @recent_chapters.empty? %>
+          <tr><td colspan="3" class="text-center text-muted py-4">No chapters yet. Create your first chapter to get started.</td></tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

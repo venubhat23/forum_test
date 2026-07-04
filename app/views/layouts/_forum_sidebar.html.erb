@@ -3,7 +3,7 @@
     <div class="sidebar-brand-icon">
       <i class="bi bi-people-fill"></i>
     </div>
-    <span class="sidebar-brand-text">Business Network</span>
+    <span class="sidebar-brand-text"><%= @current_forum.name %></span>
   </div>
 
   <nav class="sidebar-nav">
@@ -11,13 +11,23 @@
       <div class="nav-section-title">Main Menu</div>
       <ul class="nav-menu">
         <li class="nav-item">
-          <%= link_to dashboard_path, class: "nav-link-modern #{'active' if current_page?(dashboard_path)}", data: { tooltip: "Dashboard" } do %>
+          <%= link_to forum_dashboard_path(forum_slug: @current_forum.slug), class: "nav-link-modern #{'active' if current_page?(forum_dashboard_path(forum_slug: @current_forum.slug))}", data: { tooltip: "Dashboard" } do %>
             <div class="nav-icon-modern">
               <div class="icon-bg gradient-blue">
                 <i class="bi bi-speedometer2"></i>
               </div>
             </div>
             <span class="nav-text">Dashboard</span>
+          <% end %>
+        </li>
+        <li class="nav-item">
+          <%= link_to forum_chapters_path(forum_slug: @current_forum.slug), class: "nav-link-modern #{'active' if request.path.start_with?(forum_chapters_path(forum_slug: @current_forum.slug))}", data: { tooltip: "Chapters" } do %>
+            <div class="nav-icon-modern">
+              <div class="icon-bg gradient-purple">
+                <i class="bi bi-diagram-3"></i>
+              </div>
+            </div>
+            <span class="nav-text">Chapters</span>
           <% end %>
         </li>
       </ul>

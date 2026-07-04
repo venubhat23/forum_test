@@ -1,0 +1,25 @@
+<% content_for :title, "New Chapter" %>
+
+<div class="page-header">
+  <h1 class="page-title h4">New Chapter</h1>
+  <p class="page-subtitle mb-0">Add a chapter under <%= @current_forum.name %>.</p>
+</div>
+
+<div class="row justify-content-center">
+  <div class="col-12 col-lg-6">
+    <div class="card">
+      <div class="card-body p-4">
+        <%= form_with model: @chapter, url: forum_chapters_path(forum_slug: @current_forum.slug), local: true do |f| %>
+          <div class="mb-4">
+            <%= f.label :name, "Chapter Name", class: "form-label" %>
+            <%= f.text_field :name, class: "form-control form-control-lg", placeholder: "e.g. Downtown Chapter", required: true %>
+          </div>
+          <div class="d-flex flex-wrap gap-2">
+            <%= f.submit "Create Chapter", class: "btn btn-primary btn-lg" %>
+            <%= link_to "Cancel", forum_chapters_path(forum_slug: @current_forum.slug), class: "btn btn-outline-secondary btn-lg" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

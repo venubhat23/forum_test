@@ -1,0 +1,72 @@
+<% content_for :title, @forum.name %>
+
+<div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+  <div>
+    <h1 class="page-title h4"><%= @forum.name %></h1>
+    <p class="page-subtitle mb-0">/f/<%= @forum.slug %></p>
+  </div>
+  <div class="d-flex gap-2">
+    <% if @forum.suspended? %>
+      <%= button_to "Activate", activate_super_admin_forum_path(@forum), method: :patch, class: "btn btn-success" %>
+    <% else %>
+      <%= button_to "Suspend", suspend_super_admin_forum_path(@forum), method: :patch, class: "btn btn-outline-danger",
+            data: { turbo_confirm: "Suspend #{@forum.name}? Its admin and members won't be able to access it." } %>
+    <% end %>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-6 col-lg-3">
+    <div class="stats-card">
+      <div class="icon-bg gradient-blue"><i class="bi bi-diagram-3"></i></div>
+      <div>
+        <div class="stats-value"><%= @forum.chapters.count %></div>
+        <div class="stats-label">Chapters</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="stats-card">
+      <div class="icon-bg gradient-green"><i class="bi bi-people"></i></div>
+      <div>
+        <div class="stats-value"><%= @forum.users.member.count %></div>
+        <div class="stats-label">Members</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="stats-card">
+      <div class="icon-bg gradient-purple"><i class="bi bi-shield-check"></i></div>
+      <div>
+        <div class="stats-value"><span class="badge badge-status-<%= @forum.status %>"><%= @forum.status.titleize %></span></div>
+        <div class="stats-label">Status</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="stats-card">
+      <div class="icon-bg gradient-indigo"><i class="bi bi-calendar3"></i></div>
+      <div>
+        <div class="stats-value h6 mb-0"><%= @forum.created_at.strftime("%d %b %Y") %></div>
+        <div class="stats-label">Created</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header fw-semibold">Forum Admin</div>
+  <div class="card-body">
+    <% if @forum.admin %>
+      <div class="d-flex align-items-center gap-3">
+        <div class="sidebar-brand-icon"><i class="bi bi-person-fill"></i></div>
+        <div>
+          <div class="fw-semibold"><%= @forum.admin.email %></div>
+          <div class="text-muted small">Forum Admin &middot; logs in at <code>/f/<%= @forum.slug %>/dashboard</code></div>
+        </div>
+      </div>
+    <% else %>
+      <p class="text-muted mb-0">No admin assigned.</p>
+    <% end %>
+  </div>
+</div>

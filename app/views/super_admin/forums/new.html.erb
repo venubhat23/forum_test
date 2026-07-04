@@ -1,0 +1,43 @@
+<% content_for :title, "Create Forum" %>
+
+<div class="page-header">
+  <h1 class="page-title h4">Create a New Forum</h1>
+  <p class="page-subtitle mb-0">Set up the forum and its admin login in one step.</p>
+</div>
+
+<div class="row justify-content-center">
+  <div class="col-12 col-lg-7">
+    <div class="card">
+      <div class="card-body p-4">
+        <%= form_with url: super_admin_forums_path, method: :post, local: true do |f| %>
+          <h2 class="h6 text-uppercase text-muted mb-3">Forum Details</h2>
+          <div class="mb-4">
+            <%= label_tag "forum[name]", "Forum Name", class: "form-label" %>
+            <%= text_field_tag "forum[name]", @forum&.name, class: "form-control form-control-lg", placeholder: "e.g. Krama Business Network", required: true %>
+          </div>
+
+          <h2 class="h6 text-uppercase text-muted mb-3">Forum Admin Login</h2>
+          <div class="mb-3">
+            <%= label_tag "admin[email]", "Admin Email", class: "form-label" %>
+            <%= email_field_tag "admin[email]", @admin&.email, class: "form-control", placeholder: "admin@example.com", required: true %>
+          </div>
+          <div class="row g-3 mb-4">
+            <div class="col-12 col-sm-6">
+              <%= label_tag "admin[password]", "Password", class: "form-label" %>
+              <%= password_field_tag "admin[password]", nil, class: "form-control", required: true, minlength: 6, autocomplete: "new-password" %>
+            </div>
+            <div class="col-12 col-sm-6">
+              <%= label_tag "admin[password_confirmation]", "Confirm Password", class: "form-label" %>
+              <%= password_field_tag "admin[password_confirmation]", nil, class: "form-control", required: true, minlength: 6, autocomplete: "new-password" %>
+            </div>
+          </div>
+
+          <div class="d-flex flex-wrap gap-2">
+            <%= submit_tag "Create Forum", class: "btn btn-primary btn-lg" %>
+            <%= link_to "Cancel", super_admin_forums_path, class: "btn btn-outline-secondary btn-lg" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

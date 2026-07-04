@@ -1,0 +1,102 @@
+<% content_for :title, "Super Admin Dashboard" %>
+
+<div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+  <div>
+    <h1 class="page-title h4">Platform Dashboard</h1>
+    <p class="page-subtitle mb-0">Overview of all networking forums on the platform.</p>
+  </div>
+  <%= link_to new_super_admin_forum_path, class: "btn btn-primary" do %>
+    <i class="bi bi-plus-lg me-1"></i> Create Forum
+  <% end %>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-6 col-lg-3">
+    <div class="stats-card">
+      <div class="icon-bg gradient-blue"><i class="bi bi-building"></i></div>
+      <div>
+        <div class="stats-value"><%= @total_forums %></div>
+        <div class="stats-label">Total Forums</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="stats-card">
+      <div class="icon-bg gradient-green"><i class="bi bi-check-circle"></i></div>
+      <div>
+        <div class="stats-value"><%= @active_forums %></div>
+        <div class="stats-label">Active Forums</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="stats-card">
+      <div class="icon-bg gradient-yellow"><i class="bi bi-hourglass-split"></i></div>
+      <div>
+        <div class="stats-value"><%= @trial_forums %></div>
+        <div class="stats-label">Trial Forums</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="stats-card">
+      <div class="icon-bg gradient-red"><i class="bi bi-pause-circle"></i></div>
+      <div>
+        <div class="stats-value"><%= @suspended_forums %></div>
+        <div class="stats-label">Suspended</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="stats-card">
+      <div class="icon-bg gradient-purple"><i class="bi bi-diagram-3"></i></div>
+      <div>
+        <div class="stats-value"><%= @total_chapters %></div>
+        <div class="stats-label">Total Chapters</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="stats-card">
+      <div class="icon-bg gradient-indigo"><i class="bi bi-person-badge"></i></div>
+      <div>
+        <div class="stats-value"><%= @total_forum_admins %></div>
+        <div class="stats-label">Forum Admins</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <span class="fw-semibold">Recently Created Forums</span>
+    <%= link_to "View all", super_admin_forums_path, class: "small" %>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Status</th>
+          <th>Created</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @recent_forums.each do |forum| %>
+          <tr>
+            <td><%= forum.name %></td>
+            <td><span class="badge badge-status-<%= forum.status %>"><%= forum.status.titleize %></span></td>
+            <td><%= forum.created_at.strftime("%d %b %Y") %></td>
+            <td class="text-end">
+              <%= link_to "View", super_admin_forum_path(forum), class: "btn btn-sm btn-outline-secondary" %>
+            </td>
+          </tr>
+        <% end %>
+        <% if @recent_forums.empty? %>
+          <tr><td colspan="4" class="text-center text-muted py-4">No forums yet. Create the first one to get started.</td></tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -1,0 +1,15 @@
+<% content_for :title, @chapter.name %>
+
+<div class="page-header">
+  <h1 class="page-title h4"><%= @chapter.name %></h1>
+  <p class="page-subtitle mb-0"><%= @current_forum.name %></p>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <p class="mb-1"><strong>Status:</strong> <span class="badge <%= @chapter.active? ? 'badge-status-active' : 'badge-status-suspended' %>"><%= @chapter.status.titleize %></span></p>
+    <p class="mb-0"><strong>Created:</strong> <%= @chapter.created_at.strftime("%d %b %Y") %></p>
+  </div>
+</div>
+
+<p class="text-muted mt-3">Members, guests, attendance, and fees for this chapter are coming soon.</p>
