@@ -1,0 +1,41 @@
+<% content_for :title, "Guests · #{@chapter.name}" %>
+
+<div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+  <div>
+    <h1 class="page-title h4">Guests</h1>
+    <p class="page-subtitle mb-0"><%= @chapter.name %> &middot; <%= @current_forum.name %></p>
+  </div>
+  <%= link_to new_forum_chapter_guest_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id), class: "btn btn-primary" do %>
+    <i class="bi bi-plus-lg me-1"></i> Add Guest
+  <% end %>
+</div>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Phone</th>
+          <th>Nature of Business</th>
+          <th>Invited By</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @guests.each do |guest| %>
+          <tr>
+            <td class="fw-semibold"><%= guest.full_name %></td>
+            <td><%= guest.email %></td>
+            <td><%= guest.phone %></td>
+            <td><%= guest.nature_of_business %></td>
+            <td><%= guest.invited_by&.display_name || "—" %></td>
+          </tr>
+        <% end %>
+        <% if @guests.empty? %>
+          <tr><td colspan="5" class="text-center text-muted py-4">No guests yet. Add the first one to get started.</td></tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

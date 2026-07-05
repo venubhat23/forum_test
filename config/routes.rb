@@ -16,6 +16,7 @@ Rails.application.routes.draw do
       member do
         patch :suspend
         patch :activate
+        patch :update_plan
       end
     end
   end
@@ -23,7 +24,21 @@ Rails.application.routes.draw do
   scope "/f/:forum_slug", as: :forum do
     root to: "forums/dashboard#show"
     get "dashboard", to: "forums/dashboard#show"
-    resources :chapters, controller: "forums/chapters", only: [ :index, :new, :create, :show ]
+    resources :chapters, controller: "forums/chapters", only: [ :index, :new, :create, :show ] do
+      resources :members, controller: "forums/members", only: [ :index, :new, :create ]
+      resources :guests, controller: "forums/guests", only: [ :index, :new, :create ]
+      resources :committee_members, controller: "forums/committee_members", only: [ :index, :new, :create ]
+      resources :fee_payments, controller: "forums/fee_payments", only: [ :index, :new, :create ] do
+        member do
+          patch :mark_paid
+        end
+      end
+      resources :attendances, controller: "forums/attendances", only: [ :index, :new, :create ]
+      resources :referrals, controller: "forums/referrals", only: [ :index, :new, :create, :show ] do
+        resources :thanksgiving_slips, controller: "forums/thanksgiving_slips", only: [ :new, :create ]
+      end
+    end
+    resource :subscription, controller: "forums/subscriptions", only: [ :show ]
   end
 
   # Role-based dispatcher: sends signed-in users to their home area.

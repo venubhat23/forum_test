@@ -1,6 +1,6 @@
 module SuperAdmin
   class ForumsController < BaseController
-    before_action :set_forum, only: [ :show, :suspend, :activate ]
+    before_action :set_forum, only: [ :show, :suspend, :activate, :update_plan ]
 
     def index
       @forums = Forum.order(created_at: :desc)
@@ -48,6 +48,11 @@ module SuperAdmin
       redirect_to super_admin_forum_path(@forum), notice: "#{@forum.name} has been activated."
     end
 
+    def update_plan
+      @forum.update!(plan: params[:plan])
+      redirect_to super_admin_forum_path(@forum), notice: "#{@forum.name} is now on the #{@forum.plan_details[:label]} plan."
+    end
+
     private
 
     def set_forum
@@ -55,7 +60,7 @@ module SuperAdmin
     end
 
     def forum_params
-      params.require(:forum).permit(:name)
+      params.require(:forum).permit(:name, :plan)
     end
   end
 end

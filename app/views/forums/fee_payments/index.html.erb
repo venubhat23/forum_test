@@ -1,0 +1,49 @@
+<% content_for :title, "Fees · #{@chapter.name}" %>
+
+<div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+  <div>
+    <h1 class="page-title h4">Fees</h1>
+    <p class="page-subtitle mb-0"><%= @chapter.name %> &middot; <%= @current_forum.name %></p>
+  </div>
+  <%= link_to new_forum_chapter_fee_payment_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id), class: "btn btn-primary" do %>
+    <i class="bi bi-plus-lg me-1"></i> Record Fee
+  <% end %>
+</div>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th>Person</th>
+          <th>Fee Type</th>
+          <th>Amount</th>
+          <th>Due Date</th>
+          <th>Status</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @fee_payments.each do |fee| %>
+          <tr>
+            <td class="fw-semibold"><%= fee.user.display_name %> <span class="text-muted small">(<%= fee.user.role.titleize %>)</span></td>
+            <td><%= fee.fee_type.titleize %></td>
+            <td><%= number_to_currency(fee.amount) %></td>
+            <td><%= fee.due_date&.strftime("%d %b %Y") || "—" %></td>
+            <td>
+              <span class="badge <%= fee.paid? ? 'badge-status-active' : 'badge-status-trial' %>"><%= fee.status.titleize %></span>
+            </td>
+            <td class="text-end">
+              <% unless fee.paid? %>
+                <%= button_to "Mark Paid", mark_paid_forum_chapter_fee_payment_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: fee.id), method: :patch, class: "btn btn-sm btn-outline-success" %>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+        <% if @fee_payments.empty? %>
+          <tr><td colspan="6" class="text-center text-muted py-4">No fees recorded yet.</td></tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

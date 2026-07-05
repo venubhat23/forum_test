@@ -5,11 +5,141 @@
   <p class="page-subtitle mb-0"><%= @current_forum.name %></p>
 </div>
 
-<div class="card">
+<div class="card mb-4">
   <div class="card-body">
     <p class="mb-1"><strong>Status:</strong> <span class="badge <%= @chapter.active? ? 'badge-status-active' : 'badge-status-suspended' %>"><%= @chapter.status.titleize %></span></p>
     <p class="mb-0"><strong>Created:</strong> <%= @chapter.created_at.strftime("%d %b %Y") %></p>
   </div>
 </div>
 
-<p class="text-muted mt-3">Members, guests, attendance, and fees for this chapter are coming soon.</p>
+<div class="row g-3 mb-4">
+  <div class="col-6 col-lg-4">
+    <div class="stats-card">
+      <div class="icon-bg gradient-green"><i class="bi bi-people"></i></div>
+      <div>
+        <div class="stats-value"><%= @chapter.members.count %></div>
+        <div class="stats-label">Members</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-4">
+    <div class="stats-card">
+      <div class="icon-bg gradient-cyan"><i class="bi bi-person-badge"></i></div>
+      <div>
+        <div class="stats-value"><%= @chapter.guests.count %></div>
+        <div class="stats-label">Guests</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-4">
+    <div class="stats-card">
+      <div class="icon-bg gradient-purple"><i class="bi bi-award"></i></div>
+      <div>
+        <div class="stats-value"><%= @chapter.committee_members.count %></div>
+        <div class="stats-label">Committee</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-12 col-lg-4">
+    <div class="card h-100">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span class="fw-semibold">Members</span>
+        <%= link_to new_forum_chapter_member_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id), class: "btn btn-sm btn-primary" do %>
+          <i class="bi bi-plus-lg me-1"></i> Add
+        <% end %>
+      </div>
+      <div class="list-group list-group-flush">
+        <% @chapter.members.order(:full_name).limit(5).each do |member| %>
+          <div class="list-group-item"><%= member.full_name %> <span class="text-muted small"><%= member.email %></span></div>
+        <% end %>
+        <% if @chapter.members.empty? %>
+          <div class="list-group-item text-muted text-center py-4">No members yet.</div>
+        <% end %>
+      </div>
+      <div class="card-footer text-end">
+        <%= link_to "View all members", forum_chapter_members_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id), class: "small" %>
+      </div>
+    </div>
+  </div>
+  <div class="col-12 col-lg-4">
+    <div class="card h-100">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span class="fw-semibold">Guests</span>
+        <%= link_to new_forum_chapter_guest_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id), class: "btn btn-sm btn-primary" do %>
+          <i class="bi bi-plus-lg me-1"></i> Add
+        <% end %>
+      </div>
+      <div class="list-group list-group-flush">
+        <% @chapter.guests.order(:full_name).limit(5).each do |guest| %>
+          <div class="list-group-item"><%= guest.full_name %> <span class="text-muted small"><%= guest.email %></span></div>
+        <% end %>
+        <% if @chapter.guests.empty? %>
+          <div class="list-group-item text-muted text-center py-4">No guests yet.</div>
+        <% end %>
+      </div>
+      <div class="card-footer text-end">
+        <%= link_to "View all guests", forum_chapter_guests_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id), class: "small" %>
+      </div>
+    </div>
+  </div>
+  <div class="col-12 col-lg-4">
+    <div class="card h-100">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span class="fw-semibold">Committee</span>
+        <%= link_to new_forum_chapter_committee_member_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id), class: "btn btn-sm btn-primary" do %>
+          <i class="bi bi-plus-lg me-1"></i> Add
+        <% end %>
+      </div>
+      <div class="list-group list-group-flush">
+        <% @chapter.committee_members.order(:designation).limit(5).each do |cm| %>
+          <div class="list-group-item"><%= cm.full_name %> <span class="text-muted small"><%= cm.designation %></span></div>
+        <% end %>
+        <% if @chapter.committee_members.empty? %>
+          <div class="list-group-item text-muted text-center py-4">No committee members yet.</div>
+        <% end %>
+      </div>
+      <div class="card-footer text-end">
+        <%= link_to "View all committee members", forum_chapter_committee_members_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id), class: "small" %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3 mt-1">
+  <div class="col-12 col-lg-4">
+    <div class="card">
+      <div class="card-body d-flex justify-content-between align-items-center">
+        <div>
+          <div class="fw-semibold">Fees</div>
+          <div class="text-muted small">Record and track membership &amp; guest fees.</div>
+        </div>
+        <%= link_to "Manage Fees", forum_chapter_fee_payments_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id), class: "btn btn-sm btn-outline-primary" %>
+      </div>
+    </div>
+  </div>
+  <div class="col-12 col-lg-4">
+    <div class="card">
+      <div class="card-body d-flex justify-content-between align-items-center">
+        <div>
+          <div class="fw-semibold">Attendance</div>
+          <div class="text-muted small">Record meeting, training &amp; event attendance.</div>
+        </div>
+        <%= link_to "Manage Attendance", forum_chapter_attendances_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id), class: "btn btn-sm btn-outline-primary" %>
+      </div>
+    </div>
+  </div>
+  <div class="col-12 col-lg-4">
+    <div class="card">
+      <div class="card-body d-flex justify-content-between align-items-center">
+        <div>
+          <div class="fw-semibold">Referrals</div>
+          <div class="text-muted small">Track leads given between members &amp; thanksgivings.</div>
+        </div>
+        <%= link_to "Manage Referrals", forum_chapter_referrals_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id), class: "btn btn-sm btn-outline-primary" %>
+      </div>
+    </div>
+  </div>
+</div>

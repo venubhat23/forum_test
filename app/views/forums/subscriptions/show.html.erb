@@ -1,0 +1,53 @@
+<% content_for :title, "Subscription" %>
+
+<div class="page-header">
+  <h1 class="page-title h4">Subscription</h1>
+  <p class="page-subtitle mb-0">Your current plan and what it includes.</p>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-6 col-lg-4">
+    <div class="stats-card">
+      <div class="icon-bg gradient-purple"><i class="bi bi-gem"></i></div>
+      <div>
+        <div class="stats-value"><%= @current_forum.plan_details[:label] %></div>
+        <div class="stats-label">Current Plan</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-4">
+    <div class="stats-card">
+      <div class="icon-bg gradient-green"><i class="bi bi-people"></i></div>
+      <div>
+        <div class="stats-value"><%= @members_count %><%= "/#{@current_forum.member_limit}" if @current_forum.member_limit %></div>
+        <div class="stats-label">Members Used</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header fw-semibold">Available Plans</div>
+  <div class="card-body">
+    <div class="row g-3">
+      <% Forum::PLANS.each do |key, details| %>
+        <div class="col-12 col-md-4">
+          <div class="card h-100 p-3 <%= "border-primary" if @current_forum.plan.to_sym == key %>">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <span class="fw-semibold"><%= details[:label] %></span>
+              <% if @current_forum.plan.to_sym == key %>
+                <span class="badge bg-primary">Your Plan</span>
+              <% end %>
+            </div>
+            <ul class="list-unstyled small text-muted mb-0">
+              <% details[:features].each do |feature| %>
+                <li><i class="bi bi-check2 text-success me-1"></i><%= feature %></li>
+              <% end %>
+            </ul>
+          </div>
+        </div>
+      <% end %>
+    </div>
+    <p class="text-muted small mt-3 mb-0">To change your plan, contact your platform administrator.</p>
+  </div>
+</div>

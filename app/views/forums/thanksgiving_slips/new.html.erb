@@ -1,0 +1,32 @@
+<% content_for :title, "Add Thanksgiving Slip" %>
+
+<div class="page-header">
+  <h1 class="page-title h4">Add Thanksgiving Slip</h1>
+  <p class="page-subtitle mb-0">For referral: <%= @referral.prospect_name %> &middot; <%= @chapter.name %></p>
+</div>
+
+<div class="row justify-content-center">
+  <div class="col-12 col-lg-6">
+    <div class="card">
+      <div class="card-body p-4">
+        <p class="text-muted small">Given by <strong><%= @referral.receiver.display_name %></strong>, thanking <strong><%= @referral.giver.display_name %></strong> for the referral.</p>
+
+        <%= form_with model: @thanksgiving_slip, url: forum_chapter_referral_thanksgiving_slips_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, referral_id: @referral.id), local: true, scope: :thanksgiving_slip do |f| %>
+          <div class="mb-3">
+            <%= f.label :amount, "Business Value", class: "form-label" %>
+            <%= f.number_field :amount, step: "0.01", min: "0.01", class: "form-control", required: true %>
+          </div>
+          <div class="mb-4">
+            <%= f.label :notes, class: "form-label" %>
+            <%= f.text_area :notes, class: "form-control", rows: 3 %>
+          </div>
+
+          <div class="d-flex flex-wrap gap-2">
+            <%= f.submit "Add Thanksgiving Slip", class: "btn btn-primary btn-lg" %>
+            <%= link_to "Cancel", forum_chapter_referral_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: @referral.id), class: "btn btn-outline-secondary btn-lg" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

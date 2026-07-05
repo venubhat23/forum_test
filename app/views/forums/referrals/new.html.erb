@@ -1,0 +1,50 @@
+<% content_for :title, "Give Referral" %>
+
+<div class="page-header">
+  <h1 class="page-title h4">Give Referral</h1>
+  <p class="page-subtitle mb-0"><%= @chapter.name %> &middot; <%= @current_forum.name %></p>
+</div>
+
+<div class="row justify-content-center">
+  <div class="col-12 col-lg-7">
+    <div class="card">
+      <div class="card-body p-4">
+        <%= form_with model: @referral, url: forum_chapter_referrals_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id), local: true, scope: :referral do |f| %>
+          <div class="row g-3 mb-3">
+            <div class="col-12 col-sm-6">
+              <%= f.label :giver_id, "Given By (Member)", class: "form-label" %>
+              <%= f.collection_select :giver_id, @people, :id, :display_name, { include_blank: "Select a member" }, class: "form-select", required: true %>
+            </div>
+            <div class="col-12 col-sm-6">
+              <%= f.label :receiver_id, "Given To (Member)", class: "form-label" %>
+              <%= f.collection_select :receiver_id, @people, :id, :display_name, { include_blank: "Select a member" }, class: "form-select", required: true %>
+            </div>
+          </div>
+          <div class="mb-3">
+            <%= f.label :referral_type, "Referral Source", class: "form-label" %>
+            <%= f.select :referral_type, Referral.referral_types.keys.map { |k| [k.titleize, k] }, { include_blank: "Select a source" }, class: "form-select", required: true %>
+          </div>
+          <div class="row g-3 mb-3">
+            <div class="col-12 col-sm-6">
+              <%= f.label :prospect_name, "Prospect Name", class: "form-label" %>
+              <%= f.text_field :prospect_name, class: "form-control", required: true %>
+            </div>
+            <div class="col-12 col-sm-6">
+              <%= f.label :prospect_phone, "Prospect Phone", class: "form-label" %>
+              <%= f.telephone_field :prospect_phone, class: "form-control" %>
+            </div>
+          </div>
+          <div class="mb-4">
+            <%= f.label :notes, class: "form-label" %>
+            <%= f.text_area :notes, class: "form-control", rows: 3 %>
+          </div>
+
+          <div class="d-flex flex-wrap gap-2">
+            <%= f.submit "Give Referral", class: "btn btn-primary btn-lg" %>
+            <%= link_to "Cancel", forum_chapter_referrals_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id), class: "btn btn-outline-secondary btn-lg" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

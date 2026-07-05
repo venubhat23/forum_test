@@ -17,6 +17,7 @@
         <tr>
           <th>Name</th>
           <th>URL</th>
+          <th>Plan</th>
           <th>Status</th>
           <th>Chapters</th>
           <th>Created</th>
@@ -28,6 +29,7 @@
           <tr>
             <td class="fw-semibold"><%= forum.name %></td>
             <td><code>/f/<%= forum.slug %></code></td>
+            <td><span class="badge badge-plan-<%= forum.plan %>"><%= forum.plan_details[:label] %></span></td>
             <td><span class="badge badge-status-<%= forum.status %>"><%= forum.status.titleize %></span></td>
             <td><%= forum.chapters.count %></td>
             <td><%= forum.created_at.strftime("%d %b %Y") %></td>
@@ -37,7 +39,7 @@
           </tr>
         <% end %>
         <% if @forums.empty? %>
-          <tr><td colspan="6" class="text-center text-muted py-4">No forums yet. Create the first one to get started.</td></tr>
+          <tr><td colspan="7" class="text-center text-muted py-4">No forums yet. Create the first one to get started.</td></tr>
         <% end %>
       </tbody>
     </table>

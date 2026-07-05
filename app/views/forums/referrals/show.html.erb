@@ -1,0 +1,50 @@
+<% content_for :title, @referral.prospect_name %>
+
+<div class="page-header">
+  <h1 class="page-title h4"><%= @referral.prospect_name %></h1>
+  <p class="page-subtitle mb-0"><%= @chapter.name %> &middot; <%= @current_forum.name %></p>
+</div>
+
+<div class="card mb-4">
+  <div class="card-body">
+    <p class="mb-1"><strong>Given By:</strong> <%= @referral.giver.display_name %></p>
+    <p class="mb-1"><strong>Given To:</strong> <%= @referral.receiver.display_name %></p>
+    <p class="mb-1"><strong>Source:</strong> <span class="badge bg-secondary"><%= @referral.referral_type.titleize %></span></p>
+    <p class="mb-1"><strong>Prospect Phone:</strong> <%= @referral.prospect_phone.presence || "—" %></p>
+    <p class="mb-0"><strong>Notes:</strong> <%= @referral.notes.presence || "—" %></p>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <span class="fw-semibold">Thanksgiving Slips</span>
+    <%= link_to new_forum_chapter_referral_thanksgiving_slip_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, referral_id: @referral.id), class: "btn btn-sm btn-primary" do %>
+      <i class="bi bi-plus-lg me-1"></i> Add Thanksgiving Slip
+    <% end %>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th>Given By</th>
+          <th>Amount</th>
+          <th>Notes</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @referral.thanksgiving_slips.order(created_at: :desc).each do |slip| %>
+          <tr>
+            <td><%= slip.given_by.display_name %></td>
+            <td><%= number_to_currency(slip.amount) %></td>
+            <td><%= slip.notes.presence || "—" %></td>
+            <td><%= slip.created_at.strftime("%d %b %Y") %></td>
+          </tr>
+        <% end %>
+        <% if @referral.thanksgiving_slips.empty? %>
+          <tr><td colspan="4" class="text-center text-muted py-4">No thanksgiving slips yet.</td></tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

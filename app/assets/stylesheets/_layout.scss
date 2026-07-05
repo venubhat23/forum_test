@@ -494,6 +494,20 @@ body.sidebar-collapsed .main-content {
 .badge-status-suspended { background: rgba(239, 68, 68, 0.12); color: #dc2626; }
 .badge-status-expired   { background: rgba(107, 114, 128, 0.12); color: #4b5563; }
 
+/* ── Plan badges ── */
+.badge-plan-bronze  { background: rgba(180, 83, 9, 0.12); color: #b45309; }
+.badge-plan-gold    { background: rgba(202, 138, 4, 0.12); color: #ca8a04; }
+.badge-plan-diamond { background: rgba(8, 145, 178, 0.12); color: #0891b2; }
+
+.plan-option-card {
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+
+  &:has(input:checked) {
+    border-color: #6366f1;
+  }
+}
+
 /* ── Auth pages (sign in) ── */
 .auth-wrapper {
   min-height: 100vh;

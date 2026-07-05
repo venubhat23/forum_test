@@ -1,0 +1,43 @@
+<% content_for :title, "Members · #{@chapter.name}" %>
+
+<div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+  <div>
+    <h1 class="page-title h4">Members</h1>
+    <p class="page-subtitle mb-0"><%= @chapter.name %> &middot; <%= @current_forum.name %></p>
+  </div>
+  <%= link_to new_forum_chapter_member_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id), class: "btn btn-primary" do %>
+    <i class="bi bi-plus-lg me-1"></i> Add Member
+  <% end %>
+</div>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Phone</th>
+          <th>Business</th>
+          <th>Category</th>
+          <th>Speciality</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @members.each do |member| %>
+          <tr>
+            <td class="fw-semibold"><%= member.full_name %></td>
+            <td><%= member.email %></td>
+            <td><%= member.phone %></td>
+            <td><%= member.business_name %></td>
+            <td><%= member.business_category %></td>
+            <td><%= member.speciality %></td>
+          </tr>
+        <% end %>
+        <% if @members.empty? %>
+          <tr><td colspan="6" class="text-center text-muted py-4">No members yet. Add the first one to get started.</td></tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

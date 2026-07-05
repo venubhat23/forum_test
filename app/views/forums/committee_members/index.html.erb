@@ -1,0 +1,39 @@
+<% content_for :title, "Committee · #{@chapter.name}" %>
+
+<div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+  <div>
+    <h1 class="page-title h4">Committee Members</h1>
+    <p class="page-subtitle mb-0"><%= @chapter.name %> &middot; <%= @current_forum.name %></p>
+  </div>
+  <%= link_to new_forum_chapter_committee_member_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id), class: "btn btn-primary" do %>
+    <i class="bi bi-plus-lg me-1"></i> Add Committee Member
+  <% end %>
+</div>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Designation</th>
+          <th>Email</th>
+          <th>Phone</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @committee_members.each do |cm| %>
+          <tr>
+            <td class="fw-semibold"><%= cm.full_name %></td>
+            <td><span class="badge bg-primary"><%= cm.designation %></span></td>
+            <td><%= cm.email %></td>
+            <td><%= cm.phone %></td>
+          </tr>
+        <% end %>
+        <% if @committee_members.empty? %>
+          <tr><td colspan="4" class="text-center text-muted py-4">No committee members yet. Add the first one to get started.</td></tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

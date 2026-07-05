@@ -29,7 +29,7 @@
     <div class="stats-card">
       <div class="icon-bg gradient-green"><i class="bi bi-people"></i></div>
       <div>
-        <div class="stats-value"><%= @forum.users.member.count %></div>
+        <div class="stats-value"><%= @forum.users.member.count %><%= "/#{@forum.member_limit}" if @forum.member_limit %></div>
         <div class="stats-label">Members</div>
       </div>
     </div>
@@ -68,5 +68,33 @@
     <% else %>
       <p class="text-muted mb-0">No admin assigned.</p>
     <% end %>
+  </div>
+</div>
+
+<div class="card mt-4">
+  <div class="card-header fw-semibold">Subscription Plan</div>
+  <div class="card-body">
+    <div class="row g-3">
+      <% Forum::PLANS.each do |key, details| %>
+        <div class="col-12 col-md-4">
+          <div class="card h-100 p-3 <%= "border-primary" if @forum.plan.to_sym == key %>">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <span class="fw-semibold"><%= details[:label] %></span>
+              <% if @forum.plan.to_sym == key %>
+                <span class="badge bg-primary">Current</span>
+              <% end %>
+            </div>
+            <ul class="list-unstyled small text-muted mb-3">
+              <% details[:features].each do |feature| %>
+                <li><i class="bi bi-check2 text-success me-1"></i><%= feature %></li>
+              <% end %>
+            </ul>
+            <% unless @forum.plan.to_sym == key %>
+              <%= button_to "Switch to #{details[:label]}", update_plan_super_admin_forum_path(@forum), params: { plan: key }, method: :patch, class: "btn btn-sm btn-outline-primary mt-auto" %>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
   </div>
 </div>

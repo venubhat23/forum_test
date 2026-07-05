@@ -6,12 +6,45 @@ class User < ApplicationRecord
 
   enum :role, { super_admin: 0, forum_admin: 1, chapter_admin: 2, committee_member: 3, member: 4, guest: 5 }
 
+  DESIGNATIONS = [ "President", "Vice President", "Secretary", "Treasurer", "Coordinator" ].freeze
+
   belongs_to :forum, optional: true
   belongs_to :chapter, optional: true
+  belongs_to :invited_by, class_name: "User", optional: true
+  has_many :invitees, class_name: "User", foreign_key: :invited_by_id, dependent: :nullify, inverse_of: :invited_by
+  has_many :fee_payments, dependent: :destroy
+  has_many :attendances, dependent: :destroy
+  has_many :referrals_given, class_name: "Referral", foreign_key: :giver_id, dependent: :destroy, inverse_of: :giver
+  has_many :referrals_received, class_name: "Referral", foreign_key: :receiver_id, dependent: :destroy, inverse_of: :receiver
+  has_many :thanksgiving_slips_given, class_name: "ThanksgivingSlip", foreign_key: :given_by_id, dependent: :destroy, inverse_of: :given_by
 
   validates :forum, presence: true, unless: :super_admin?
+  validates :chapter, presence: true, if: -> { member? || guest? || committee_member? }
+  validates :full_name, presence: true, if: -> { member? || guest? || committee_member? }
+  validates :phone, presence: true, if: -> { member? || guest? || committee_member? }
+  validates :nature_of_business, presence: true, if: :guest?
+  validates :designation, presence: true, if: :committee_member?
+  validate :within_forum_member_limit, on: :create, if: :member?
+
+  before_validation :assign_placeholder_password, if: -> { guest? && password.blank? }
 
   def display_name
-    email.split("@").first
+    full_name.presence || email.split("@").first
+  end
+
+  private
+
+  def within_forum_member_limit
+    return unless forum
+
+    if forum.member_limit_reached?
+      errors.add(:base, "#{forum.name} has reached its #{forum.plan_details[:label]} plan limit of #{forum.member_limit} members. Ask your platform admin to upgrade the plan.")
+    end
+  end
+
+  def assign_placeholder_password
+    generated = SecureRandom.hex(12)
+    self.password = generated
+    self.password_confirmation = generated
   end
 end

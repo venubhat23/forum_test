@@ -1,0 +1,47 @@
+<% content_for :title, "Referrals · #{@chapter.name}" %>
+
+<div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+  <div>
+    <h1 class="page-title h4">Referrals</h1>
+    <p class="page-subtitle mb-0"><%= @chapter.name %> &middot; <%= @current_forum.name %></p>
+  </div>
+  <%= link_to new_forum_chapter_referral_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id), class: "btn btn-primary" do %>
+    <i class="bi bi-plus-lg me-1"></i> Give Referral
+  <% end %>
+</div>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th>Prospect</th>
+          <th>Given By</th>
+          <th>Given To</th>
+          <th>Type</th>
+          <th>Thanksgivings</th>
+          <th>Date</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @referrals.each do |referral| %>
+          <tr>
+            <td class="fw-semibold"><%= referral.prospect_name %></td>
+            <td><%= referral.giver.display_name %></td>
+            <td><%= referral.receiver.display_name %></td>
+            <td><span class="badge bg-secondary"><%= referral.referral_type.titleize %></span></td>
+            <td><%= referral.thanksgiving_slips.count %></td>
+            <td><%= referral.created_at.strftime("%d %b %Y") %></td>
+            <td class="text-end">
+              <%= link_to "View", forum_chapter_referral_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: referral.id), class: "btn btn-sm btn-outline-secondary" %>
+            </td>
+          </tr>
+        <% end %>
+        <% if @referrals.empty? %>
+          <tr><td colspan="7" class="text-center text-muted py-4">No referrals yet.</td></tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

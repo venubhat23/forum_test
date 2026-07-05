@@ -1,0 +1,39 @@
+<% content_for :title, "Attendance · #{@chapter.name}" %>
+
+<div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+  <div>
+    <h1 class="page-title h4">Attendance</h1>
+    <p class="page-subtitle mb-0"><%= @chapter.name %> &middot; <%= @current_forum.name %></p>
+  </div>
+  <%= link_to new_forum_chapter_attendance_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id), class: "btn btn-primary" do %>
+    <i class="bi bi-plus-lg me-1"></i> Record Attendance
+  <% end %>
+</div>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th>Person</th>
+          <th>Event</th>
+          <th>Date</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @attendances.each do |attendance| %>
+          <tr>
+            <td class="fw-semibold"><%= attendance.user.display_name %> <span class="text-muted small">(<%= attendance.user.role.titleize %>)</span></td>
+            <td><%= attendance.event_type.titleize %></td>
+            <td><%= attendance.occurred_on.strftime("%d %b %Y") %></td>
+            <td><span class="badge <%= attendance.present? ? 'badge-status-active' : 'badge-status-suspended' %>"><%= attendance.present? ? "Present" : "Absent" %></span></td>
+          </tr>
+        <% end %>
+        <% if @attendances.empty? %>
+          <tr><td colspan="4" class="text-center text-muted py-4">No attendance recorded yet.</td></tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

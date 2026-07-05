@@ -1,0 +1,71 @@
+<% content_for :title, "New Member" %>
+
+<div class="page-header">
+  <h1 class="page-title h4">Add Member</h1>
+  <p class="page-subtitle mb-0"><%= @chapter.name %> &middot; <%= @current_forum.name %></p>
+</div>
+
+<% if @current_forum.member_limit %>
+  <p class="text-muted small">
+    Members on the <%= @current_forum.plan_details[:label] %> plan: <%= @current_forum.users.member.count %>/<%= @current_forum.member_limit %>
+  </p>
+<% end %>
+
+<div class="row justify-content-center">
+  <div class="col-12 col-lg-7">
+    <div class="card">
+      <div class="card-body p-4">
+        <%= form_with model: @member, url: forum_chapter_members_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id), local: true, scope: :member do |f| %>
+          <h2 class="h6 text-uppercase text-muted mb-3">Profile</h2>
+          <div class="mb-3">
+            <%= f.label :full_name, "Full Name", class: "form-label" %>
+            <%= f.text_field :full_name, class: "form-control", required: true %>
+          </div>
+          <div class="row g-3 mb-3">
+            <div class="col-12 col-sm-6">
+              <%= f.label :email, class: "form-label" %>
+              <%= f.email_field :email, class: "form-control", required: true %>
+            </div>
+            <div class="col-12 col-sm-6">
+              <%= f.label :phone, "Phone Number", class: "form-label" %>
+              <%= f.telephone_field :phone, class: "form-control", required: true %>
+            </div>
+          </div>
+
+          <h2 class="h6 text-uppercase text-muted mb-3">Business Details</h2>
+          <div class="mb-3">
+            <%= f.label :business_name, "Business Name", class: "form-label" %>
+            <%= f.text_field :business_name, class: "form-control" %>
+          </div>
+          <div class="row g-3 mb-4">
+            <div class="col-12 col-sm-6">
+              <%= f.label :business_category, "Business Category", class: "form-label" %>
+              <%= f.text_field :business_category, class: "form-control" %>
+            </div>
+            <div class="col-12 col-sm-6">
+              <%= f.label :speciality, class: "form-label" %>
+              <%= f.text_field :speciality, class: "form-control" %>
+            </div>
+          </div>
+
+          <h2 class="h6 text-uppercase text-muted mb-3">Login</h2>
+          <div class="row g-3 mb-4">
+            <div class="col-12 col-sm-6">
+              <%= f.label :password, class: "form-label" %>
+              <%= f.password_field :password, class: "form-control", required: true, minlength: 6, autocomplete: "new-password" %>
+            </div>
+            <div class="col-12 col-sm-6">
+              <%= f.label :password_confirmation, "Confirm Password", class: "form-label" %>
+              <%= f.password_field :password_confirmation, class: "form-control", required: true, minlength: 6, autocomplete: "new-password" %>
+            </div>
+          </div>
+
+          <div class="d-flex flex-wrap gap-2">
+            <%= f.submit "Add Member", class: "btn btn-primary btn-lg" %>
+            <%= link_to "Cancel", forum_chapter_members_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id), class: "btn btn-outline-secondary btn-lg" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
