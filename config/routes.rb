@@ -21,6 +21,7 @@ Rails.application.routes.draw do
   end
 
   scope "/f/:forum_slug", as: :forum do
+    root to: "forums/dashboard#show"
     get "dashboard", to: "forums/dashboard#show"
     resources :chapters, controller: "forums/chapters", only: [ :index, :new, :create, :show ]
   end
