@@ -1,0 +1,24 @@
+<% content_for :title, "Attendance Report" %>
+
+<div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+  <h1 class="page-title h4">Attendance Report</h1>
+  <%= link_to "Export CSV", "#{attendance_super_admin_reports_path}.csv", class: "btn btn-outline-primary" %>
+</div>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead><tr><th>User</th><th>Event Type</th><th>Date</th><th>Present</th></tr></thead>
+      <tbody>
+        <% @attendances.each do |a| %>
+          <tr>
+            <td class="fw-semibold"><%= a.user.display_name %></td>
+            <td><%= a.event_type.titleize %></td>
+            <td><%= a.occurred_on.strftime("%d %b %Y") %></td>
+            <td><%= a.present? ? "Yes" : "No" %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

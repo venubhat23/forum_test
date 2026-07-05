@@ -10,7 +10,7 @@
     <div class="stats-card">
       <div class="icon-bg gradient-purple"><i class="bi bi-gem"></i></div>
       <div>
-        <div class="stats-value"><%= @current_forum.plan_details[:label] %></div>
+        <div class="stats-value"><%= @current_forum.plan.name %></div>
         <div class="stats-label">Current Plan</div>
       </div>
     </div>
@@ -30,17 +30,17 @@
   <div class="card-header fw-semibold">Available Plans</div>
   <div class="card-body">
     <div class="row g-3">
-      <% Forum::PLANS.each do |key, details| %>
+      <% Plan.ordered.active.each do |plan| %>
         <div class="col-12 col-md-4">
-          <div class="card h-100 p-3 <%= "border-primary" if @current_forum.plan.to_sym == key %>">
+          <div class="card h-100 p-3 <%= "border-primary" if @current_forum.plan_id == plan.id %>">
             <div class="d-flex justify-content-between align-items-center mb-2">
-              <span class="fw-semibold"><%= details[:label] %></span>
-              <% if @current_forum.plan.to_sym == key %>
+              <span class="fw-semibold"><%= plan.name %></span>
+              <% if @current_forum.plan_id == plan.id %>
                 <span class="badge bg-primary">Your Plan</span>
               <% end %>
             </div>
             <ul class="list-unstyled small text-muted mb-0">
-              <% details[:features].each do |feature| %>
+              <% plan.features.each do |feature| %>
                 <li><i class="bi bi-check2 text-success me-1"></i><%= feature %></li>
               <% end %>
             </ul>

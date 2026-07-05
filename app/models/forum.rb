@@ -1,12 +1,7 @@
 class Forum < ApplicationRecord
-  enum :status, { trial: 0, active: 1, suspended: 2, expired: 3 }, default: :active
-  enum :plan, { bronze: 0, gold: 1, diamond: 2 }, default: :bronze
+  enum :status, { trial: 0, active: 1, suspended: 2, expired: 3, archived: 4 }, default: :active
 
-  PLANS = {
-    bronze: { label: "Bronze", member_limit: 3, features: [ "Up to 3 members", "Unlimited chapters", "Community support" ] },
-    gold: { label: "Gold", member_limit: 6, features: [ "Up to 6 members", "Unlimited chapters", "Priority support" ] },
-    diamond: { label: "Diamond", member_limit: nil, features: [ "Unlimited members", "Unlimited chapters", "Dedicated support" ] }
-  }.freeze
+  belongs_to :plan
 
   has_many :chapters, dependent: :destroy
   has_many :users, dependent: :nullify
@@ -16,21 +11,29 @@ class Forum < ApplicationRecord
     format: { with: /\A[a-z0-9\-]+\z/, message: "can only contain lowercase letters, numbers, and hyphens" }
 
   before_validation :generate_slug, on: :create
+  before_validation :assign_default_plan, on: :create
+  before_validation :assign_subscription_dates, on: :create
 
   def admin
     users.find_by(role: :forum_admin)
   end
 
-  def plan_details
-    PLANS.fetch(plan.to_sym)
-  end
-
   def member_limit
-    plan_details[:member_limit]
+    plan&.member_limit
   end
 
   def member_limit_reached?
     member_limit.present? && users.member.count >= member_limit
+  end
+
+  def trial_days_left
+    return nil unless trial_ends_at
+    (trial_ends_at.to_date - Date.current).to_i
+  end
+
+  def days_to_renewal
+    return nil unless renews_on
+    (renews_on - Date.current).to_i
   end
 
   def to_param
@@ -51,5 +54,15 @@ class Forum < ApplicationRecord
       candidate = "#{base}-#{counter}"
     end
     self.slug = candidate
+  end
+
+  def assign_default_plan
+    self.plan ||= Plan.ordered.active.first
+  end
+
+  def assign_subscription_dates
+    self.started_at ||= Time.current
+    self.trial_ends_at ||= started_at + plan.trial_days.days if trial? && plan && plan.trial_days.to_i.positive?
+    self.renews_on ||= started_at.to_date + (plan&.annual? ? 1.year : 1.month)
   end
 end

@@ -1,0 +1,116 @@
+<% content_for :title, "Invoice #{@invoice.invoice_number}" %>
+
+<div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+  <div>
+    <h1 class="page-title h4"><%= @invoice.invoice_number %></h1>
+    <p class="page-subtitle mb-0"><%= @invoice.forum.name %></p>
+  </div>
+  <div class="d-flex gap-2">
+    <% if @invoice.paid? || @invoice.cancelled? %>
+      <span class="badge badge-status-<%= @invoice.status %> fs-6"><%= @invoice.status.titleize %></span>
+    <% else %>
+      <%= button_to "Cancel Invoice", void_super_admin_invoice_path(@invoice), method: :patch, class: "btn btn-outline-danger",
+            data: { turbo_confirm: "Cancel invoice #{@invoice.invoice_number}?" } %>
+    <% end %>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-6 col-lg-3">
+    <div class="stats-card">
+      <div class="icon-bg gradient-green"><i class="bi bi-cash-coin"></i></div>
+      <div>
+        <div class="stats-value">&#8377;<%= number_with_delimiter(@invoice.amount.to_i) %></div>
+        <div class="stats-label">Amount</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="stats-card">
+      <div class="icon-bg gradient-blue"><i class="bi bi-cash"></i></div>
+      <div>
+        <div class="stats-value">&#8377;<%= number_with_delimiter(@invoice.balance_due.to_i) %></div>
+        <div class="stats-label">Balance Due</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="stats-card">
+      <div class="icon-bg gradient-purple"><i class="bi bi-shield-check"></i></div>
+      <div>
+        <div class="stats-value"><span class="badge badge-status-<%= @invoice.status %>"><%= @invoice.status.titleize %></span></div>
+        <div class="stats-label">Status</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="stats-card">
+      <div class="icon-bg gradient-indigo"><i class="bi bi-calendar3"></i></div>
+      <div>
+        <div class="stats-value h6 mb-0"><%= @invoice.due_date.strftime("%d %b %Y") %></div>
+        <div class="stats-label">Due Date</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<% if @invoice.description.present? %>
+  <div class="card mb-4">
+    <div class="card-header fw-semibold">Description</div>
+    <div class="card-body"><%= @invoice.description %></div>
+  </div>
+<% end %>
+
+<% unless @invoice.paid? || @invoice.cancelled? %>
+  <div class="card mb-4">
+    <div class="card-header fw-semibold">Mark as Paid</div>
+    <div class="card-body">
+      <%= form_with url: mark_paid_super_admin_invoice_path(@invoice), method: :patch, local: true do %>
+        <div class="row g-3 align-items-end">
+          <div class="col-12 col-md-4">
+            <label class="form-label">Payment Method</label>
+            <%= select_tag :payment_method, options_for_select(Payment.payment_methods.keys.map { |k| [ k.titleize, k ] }), class: "form-select" %>
+          </div>
+          <div class="col-12 col-md-4">
+            <label class="form-label">Reference Number (optional)</label>
+            <%= text_field_tag :reference_number, nil, class: "form-control" %>
+          </div>
+          <div class="col-12 col-md-4">
+            <%= submit_tag "Mark Paid", class: "btn btn-success" %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+<% end %>
+
+<div class="card">
+  <div class="card-header fw-semibold">Payments</div>
+  <div class="table-responsive">
+    <table class="table align-middle mb-0">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Amount</th>
+          <th>Method</th>
+          <th>Reference</th>
+          <th>Recorded By</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @invoice.payments.order(paid_on: :desc).each do |payment| %>
+          <tr>
+            <td><%= payment.paid_on.strftime("%d %b %Y") %></td>
+            <td>&#8377;<%= number_with_delimiter(payment.amount.to_i) %></td>
+            <td><%= payment.payment_method.titleize %></td>
+            <td><%= payment.reference_number.presence || "&mdash;".html_safe %></td>
+            <td><%= payment.recorded_by.email %></td>
+          </tr>
+        <% end %>
+        <% if @invoice.payments.empty? %>
+          <tr><td colspan="5" class="text-center text-muted py-4">No payments recorded yet.</td></tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

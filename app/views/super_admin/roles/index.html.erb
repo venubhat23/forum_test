@@ -1,0 +1,78 @@
+<% content_for :title, "Roles & Permissions" %>
+
+<div class="page-header">
+  <h1 class="page-title h4">Roles &amp; Permissions</h1>
+  <p class="page-subtitle mb-0">
+    Live-evaluated against the actual <code>Ability</code> class (CanCanCan) &mdash; this reflects what's really enforced, not just documentation.
+  </p>
+</div>
+
+<div class="card mb-4">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th>Role</th>
+          <th>Super Admin Area</th>
+          <th>Own Forum (<%= @own_forum&.name %>)</th>
+          <th>Another Forum (<%= @other_forum&.name %>)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @roles.each do |role| %>
+          <% user = User.new(role: role, forum_id: @own_forum&.id) %>
+          <% ability = Ability.new(user) %>
+          <tr>
+            <td class="fw-semibold"><%= role.titleize %></td>
+            <td>
+              <% if ability.can?(:access, :super_admin_area) %>
+                <span class="badge bg-success"><i class="bi bi-check-lg"></i> Allowed</span>
+              <% else %>
+                <span class="badge bg-secondary"><i class="bi bi-x-lg"></i> Denied</span>
+              <% end %>
+            </td>
+            <td>
+              <% if @own_forum && ability.can?(:access, @own_forum) %>
+                <span class="badge bg-success"><i class="bi bi-check-lg"></i> Allowed</span>
+              <% else %>
+                <span class="badge bg-secondary"><i class="bi bi-x-lg"></i> Denied</span>
+              <% end %>
+            </td>
+            <td>
+              <% if @other_forum && ability.can?(:access, @other_forum) %>
+                <span class="badge bg-success"><i class="bi bi-check-lg"></i> Allowed</span>
+              <% else %>
+                <span class="badge bg-secondary"><i class="bi bi-x-lg"></i> Denied</span>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header fw-semibold">What Each Role Can Do</div>
+  <div class="card-body">
+    <dl class="row mb-0">
+      <dt class="col-sm-3">Super Admin</dt>
+      <dd class="col-sm-9">Full platform access: manage all forums, plans, billing, users, and settings.</dd>
+
+      <dt class="col-sm-3">Forum Admin</dt>
+      <dd class="col-sm-9">Full access to their own forum's chapters, members, guests, fees, and reports. No access to other forums or the Super Admin area.</dd>
+
+      <dt class="col-sm-3">Chapter Admin</dt>
+      <dd class="col-sm-9">Access scoped to their forum, same tenant boundary as Forum Admin (chapter-level restrictions are managed manually within the forum today).</dd>
+
+      <dt class="col-sm-3">Committee Member</dt>
+      <dd class="col-sm-9">Access scoped to their forum for meetings, attendance, and referrals.</dd>
+
+      <dt class="col-sm-3">Member</dt>
+      <dd class="col-sm-9">Access scoped to their forum: attendance, referrals, fees, thanksgiving slips, and their own profile.</dd>
+
+      <dt class="col-sm-3">Guest</dt>
+      <dd class="col-sm-9">Access scoped to their forum, limited to event invitations and their own basic profile.</dd>
+    </dl>
+  </div>
+</div>

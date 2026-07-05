@@ -1,0 +1,72 @@
+<% content_for :title, "Subscriptions" %>
+
+<div class="page-header">
+  <h1 class="page-title h4">Subscriptions</h1>
+  <p class="page-subtitle mb-0">Plan, trial, and renewal status for every forum.</p>
+</div>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th>Forum</th>
+          <th>Plan</th>
+          <th>Status</th>
+          <th>Started</th>
+          <th>Trial Ends</th>
+          <th>Renews On</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @forums.each do |forum| %>
+          <tr>
+            <td class="fw-semibold"><%= link_to forum.name, super_admin_forum_path(forum) %></td>
+            <td><span class="badge badge-plan-<%= forum.plan.key %>"><%= forum.plan.name %></span></td>
+            <td><span class="badge badge-status-<%= forum.status %>"><%= forum.status.titleize %></span></td>
+            <td><%= forum.started_at&.strftime("%d %b %Y") %></td>
+            <td>
+              <% if forum.trial_ends_at %>
+                <%= forum.trial_ends_at.strftime("%d %b %Y") %>
+                <span class="text-muted small">(<%= forum.trial_days_left %>d left)</span>
+              <% else %>
+                <span class="text-muted">&mdash;</span>
+              <% end %>
+            </td>
+            <td>
+              <% if forum.renews_on %>
+                <%= forum.renews_on.strftime("%d %b %Y") %>
+                <span class="text-muted small">(<%= forum.days_to_renewal %>d)</span>
+              <% end %>
+            </td>
+            <td class="text-end">
+              <div class="dropdown">
+                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">Manage</button>
+                <div class="dropdown-menu dropdown-menu-end p-3" style="min-width: 260px;">
+                  <%= form_with url: extend_trial_super_admin_subscription_path(forum), method: :patch, local: true, class: "mb-3" do %>
+                    <label class="form-label small">Extend trial by (days)</label>
+                    <div class="input-group input-group-sm">
+                      <%= number_field_tag :days, 7, class: "form-control", min: 1 %>
+                      <%= submit_tag "Extend", class: "btn btn-outline-primary" %>
+                    </div>
+                  <% end %>
+                  <%= form_with url: change_renewal_date_super_admin_subscription_path(forum), method: :patch, local: true do %>
+                    <label class="form-label small">Set renewal date</label>
+                    <div class="input-group input-group-sm">
+                      <%= date_field_tag :renews_on, forum.renews_on, class: "form-control" %>
+                      <%= submit_tag "Save", class: "btn btn-outline-primary" %>
+                    </div>
+                  <% end %>
+                </div>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+        <% if @forums.empty? %>
+          <tr><td colspan="7" class="text-center text-muted py-4">No forums yet.</td></tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

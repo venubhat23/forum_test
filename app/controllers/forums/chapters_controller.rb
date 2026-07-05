@@ -3,7 +3,7 @@ module Forums
     before_action :set_chapter, only: [ :show ]
 
     def index
-      @chapters = @current_forum.chapters.order(:name)
+      @chapters = @current_forum.chapters.order(:name).page(params[:page])
     end
 
     def show

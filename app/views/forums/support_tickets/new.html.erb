@@ -1,0 +1,32 @@
+<% content_for :title, "New Support Ticket" %>
+
+<div class="page-header">
+  <h1 class="page-title h4">Contact Support</h1>
+</div>
+
+<div class="row justify-content-center">
+  <div class="col-12 col-lg-8">
+    <div class="card">
+      <div class="card-body p-4">
+        <%= form_with model: @ticket, url: forum_support_tickets_path(forum_slug: @current_forum.slug), method: :post, local: true do |f| %>
+          <div class="mb-3">
+            <%= f.label :subject, class: "form-label" %>
+            <%= f.text_field :subject, class: "form-control", required: true %>
+          </div>
+          <div class="mb-3">
+            <%= f.label :priority, class: "form-label" %>
+            <%= f.select :priority, SupportTicket.priorities.keys.map { |p| [ p.titleize, p ] }, { selected: "medium" }, class: "form-select" %>
+          </div>
+          <div class="mb-4">
+            <%= f.label :body, "How can we help?", class: "form-label" %>
+            <%= f.text_area :body, class: "form-control", rows: 5, required: true %>
+          </div>
+          <div class="d-flex flex-wrap gap-2">
+            <%= f.submit "Submit Ticket", class: "btn btn-primary btn-lg" %>
+            <%= link_to "Cancel", forum_support_tickets_path(forum_slug: @current_forum.slug), class: "btn btn-outline-secondary btn-lg" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

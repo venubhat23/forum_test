@@ -40,6 +40,16 @@
             <span class="nav-text">Subscription</span>
           <% end %>
         </li>
+        <li class="nav-item">
+          <%= link_to forum_support_tickets_path(forum_slug: @current_forum.slug), class: "nav-link-modern #{'active' if request.path.start_with?(forum_support_tickets_path(forum_slug: @current_forum.slug))}", data: { tooltip: "Support" } do %>
+            <div class="nav-icon-modern">
+              <div class="icon-bg gradient-green">
+                <i class="bi bi-headset"></i>
+              </div>
+            </div>
+            <span class="nav-text">Support</span>
+          <% end %>
+        </li>
       </ul>
     </div>
   </nav>

@@ -74,6 +74,22 @@
       <%= render current_area == :super_admin ? "layouts/super_admin_sidebar" : "layouts/forum_sidebar" %>
 
       <main class="main-content">
+        <% if session[:impersonator_id].present? %>
+          <div class="alert alert-warning d-flex justify-content-between align-items-center mb-3" role="alert">
+            <span><i class="bi bi-incognito me-2"></i>You are viewing as <strong><%= current_user.email %></strong> (impersonation).</span>
+            <%= button_to "Return to Super Admin", impersonation_path, method: :delete, class: "btn btn-sm btn-dark" %>
+          </div>
+        <% end %>
+
+        <% if current_area == :forum && @active_announcements.present? %>
+          <% @active_announcements.each do |announcement| %>
+            <div class="alert alert-info mb-3" role="alert">
+              <div class="fw-semibold"><i class="bi bi-megaphone-fill me-2"></i><%= announcement.title %></div>
+              <div class="small mb-0"><%= announcement.body %></div>
+            </div>
+          <% end %>
+        <% end %>
+
         <% if notice %>
           <div id="toast-notification" class="toast-notification toast-success">
             <div class="toast-notification-content">

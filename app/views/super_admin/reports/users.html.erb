@@ -1,0 +1,32 @@
+<% content_for :title, "Users Report" %>
+
+<div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+  <h1 class="page-title h4">Users Report</h1>
+  <%= link_to "Export CSV", "#{users_super_admin_reports_path}.csv", class: "btn btn-outline-primary" %>
+</div>
+
+<%= form_with url: users_super_admin_reports_path, method: :get, local: true, class: "card mb-3" do %>
+  <div class="card-body d-flex flex-wrap gap-2">
+    <%= select_tag :role, options_for_select([ [ "All roles", "" ] ] + User.roles.keys.map { |r| [ r.titleize, r ] }, params[:role]), class: "form-select", style: "max-width: 200px;" %>
+    <%= submit_tag "Filter", class: "btn btn-outline-secondary" %>
+  </div>
+<% end %>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead><tr><th>Email</th><th>Role</th><th>Forum</th><th>Full Name</th><th>Joined</th></tr></thead>
+      <tbody>
+        <% @users.each do |u| %>
+          <tr>
+            <td class="fw-semibold"><%= u.email %></td>
+            <td><%= u.role.titleize %></td>
+            <td><%= u.forum&.name %></td>
+            <td><%= u.full_name %></td>
+            <td><%= u.created_at.strftime("%d %b %Y") %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

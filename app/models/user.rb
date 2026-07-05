@@ -27,18 +27,39 @@ class User < ApplicationRecord
   validate :within_forum_member_limit, on: :create, if: :member?
 
   before_validation :assign_placeholder_password, if: -> { guest? && password.blank? }
+  before_validation :ensure_session_token, on: :create
 
   def display_name
     full_name.presence || email.split("@").first
   end
 
+  def suspended?
+    suspended_at.present?
+  end
+
+  def suspend!
+    update_column(:suspended_at, Time.current)
+  end
+
+  def unsuspend!
+    update_column(:suspended_at, nil)
+  end
+
+  def force_logout!
+    update_column(:session_token, SecureRandom.hex(32))
+  end
+
   private
+
+  def ensure_session_token
+    self.session_token ||= SecureRandom.hex(32)
+  end
 
   def within_forum_member_limit
     return unless forum
 
     if forum.member_limit_reached?
-      errors.add(:base, "#{forum.name} has reached its #{forum.plan_details[:label]} plan limit of #{forum.member_limit} members. Ask your platform admin to upgrade the plan.")
+      errors.add(:base, "#{forum.name} has reached its #{forum.plan.name} plan limit of #{forum.member_limit} members. Ask your platform admin to upgrade the plan.")
     end
   end
 

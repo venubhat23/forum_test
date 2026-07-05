@@ -10,6 +10,15 @@
   <% end %>
 </div>
 
+<%= form_with url: super_admin_forums_path, method: :get, local: true, class: "card mb-3" do %>
+  <div class="card-body d-flex flex-wrap gap-2">
+    <%= text_field_tag :q, params[:q], class: "form-control", placeholder: "Search by name...", style: "max-width: 260px;" %>
+    <%= select_tag :status, options_for_select([ [ "All statuses", "" ] ] + Forum.statuses.keys.map { |s| [ s.titleize, s ] }, params[:status]), class: "form-select", style: "max-width: 200px;" %>
+    <%= submit_tag "Filter", class: "btn btn-outline-secondary" %>
+    <%= link_to "Reset", super_admin_forums_path, class: "btn btn-link" %>
+  </div>
+<% end %>
+
 <div class="card">
   <div class="table-responsive">
     <table class="table table-hover align-middle mb-0">
@@ -29,12 +38,19 @@
           <tr>
             <td class="fw-semibold"><%= forum.name %></td>
             <td><code>/f/<%= forum.slug %></code></td>
-            <td><span class="badge badge-plan-<%= forum.plan %>"><%= forum.plan_details[:label] %></span></td>
+            <td><span class="badge badge-plan-<%= forum.plan.key %>"><%= forum.plan.name %></span></td>
             <td><span class="badge badge-status-<%= forum.status %>"><%= forum.status.titleize %></span></td>
             <td><%= forum.chapters.count %></td>
             <td><%= forum.created_at.strftime("%d %b %Y") %></td>
             <td class="text-end">
-              <%= link_to "View", super_admin_forum_path(forum), class: "btn btn-sm btn-outline-secondary" %>
+              <div class="d-flex gap-1 justify-content-end">
+                <%= link_to "View", super_admin_forum_path(forum), class: "btn btn-sm btn-outline-secondary" %>
+                <%= link_to "Edit", edit_super_admin_forum_path(forum), class: "btn btn-sm btn-outline-secondary" %>
+                <% unless forum.archived? %>
+                  <%= button_to "Archive", super_admin_forum_path(forum), method: :delete, class: "btn btn-sm btn-outline-danger",
+                        data: { turbo_confirm: "Archive #{forum.name}? It will be hidden from active use but its data is kept." } %>
+                <% end %>
+              </div>
             </td>
           </tr>
         <% end %>
@@ -45,3 +61,5 @@
     </table>
   </div>
 </div>
+
+<%= paginate @forums %>

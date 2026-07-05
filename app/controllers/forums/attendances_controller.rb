@@ -3,7 +3,7 @@ module Forums
     before_action :set_chapter
 
     def index
-      @attendances = Attendance.joins(:user).where(users: { chapter_id: @chapter.id }).order(occurred_on: :desc)
+      @attendances = Attendance.joins(:user).where(users: { chapter_id: @chapter.id }).order(occurred_on: :desc).page(params[:page])
     end
 
     def new

@@ -1,0 +1,38 @@
+<% content_for :title, "Support Center" %>
+
+<div class="page-header">
+  <h1 class="page-title h4">Support Center</h1>
+  <p class="page-subtitle mb-0">Tickets raised across all forums.</p>
+</div>
+
+<%= form_with url: super_admin_support_tickets_path, method: :get, local: true, class: "card mb-3" do %>
+  <div class="card-body d-flex flex-wrap gap-2">
+    <%= select_tag :status, options_for_select([ [ "All statuses", "" ] ] + SupportTicket.statuses.keys.map { |s| [ s.titleize, s ] }, params[:status]), class: "form-select", style: "max-width: 200px;" %>
+    <%= submit_tag "Filter", class: "btn btn-outline-secondary" %>
+  </div>
+<% end %>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead><tr><th>Subject</th><th>Forum</th><th>Raised By</th><th>Priority</th><th>Status</th><th></th></tr></thead>
+      <tbody>
+        <% @tickets.each do |ticket| %>
+          <tr>
+            <td class="fw-semibold"><%= ticket.subject %></td>
+            <td><%= ticket.forum&.name %></td>
+            <td><%= ticket.raised_by.email %></td>
+            <td><%= ticket.priority.titleize %></td>
+            <td><span class="badge bg-secondary"><%= ticket.status.titleize %></span></td>
+            <td class="text-end">
+              <%= link_to "View", super_admin_support_ticket_path(ticket), class: "btn btn-sm btn-outline-secondary" %>
+            </td>
+          </tr>
+        <% end %>
+        <% if @tickets.empty? %>
+          <tr><td colspan="6" class="text-center text-muted py-4">No tickets yet.</td></tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

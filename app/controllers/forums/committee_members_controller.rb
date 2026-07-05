@@ -3,7 +3,7 @@ module Forums
     before_action :set_chapter
 
     def index
-      @committee_members = @chapter.committee_members.order(:designation, :full_name)
+      @committee_members = @chapter.committee_members.order(:designation, :full_name).page(params[:page])
     end
 
     def new

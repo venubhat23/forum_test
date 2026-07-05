@@ -12,22 +12,122 @@
       <ul class="nav-menu">
         <li class="nav-item">
           <%= link_to super_admin_dashboard_path, class: "nav-link-modern #{'active' if current_page?(super_admin_dashboard_path)}", data: { tooltip: "Dashboard" } do %>
-            <div class="nav-icon-modern">
-              <div class="icon-bg gradient-blue">
-                <i class="bi bi-speedometer2"></i>
-              </div>
-            </div>
+            <div class="nav-icon-modern"><div class="icon-bg gradient-blue"><i class="bi bi-speedometer2"></i></div></div>
             <span class="nav-text">Dashboard</span>
           <% end %>
         </li>
         <li class="nav-item">
-          <%= link_to super_admin_forums_path, class: "nav-link-modern #{'active' if request.path.start_with?(super_admin_forums_path)}", data: { tooltip: "Forums" } do %>
-            <div class="nav-icon-modern">
-              <div class="icon-bg gradient-purple">
-                <i class="bi bi-building"></i>
-              </div>
-            </div>
-            <span class="nav-text">Forums</span>
+          <%= link_to super_admin_forums_path, class: "nav-link-modern #{'active' if request.path.start_with?(super_admin_forums_path)}", data: { tooltip: "Forum Management" } do %>
+            <div class="nav-icon-modern"><div class="icon-bg gradient-purple"><i class="bi bi-building"></i></div></div>
+            <span class="nav-text">Forum Management</span>
+          <% end %>
+        </li>
+        <li class="nav-item">
+          <%= link_to super_admin_plans_path, class: "nav-link-modern #{'active' if request.path.start_with?(super_admin_plans_path)}", data: { tooltip: "Business Models" } do %>
+            <div class="nav-icon-modern"><div class="icon-bg gradient-green"><i class="bi bi-gem"></i></div></div>
+            <span class="nav-text">Business Models</span>
+          <% end %>
+        </li>
+        <li class="nav-item">
+          <%= link_to super_admin_subscriptions_path, class: "nav-link-modern #{'active' if request.path.start_with?(super_admin_subscriptions_path)}", data: { tooltip: "Subscriptions" } do %>
+            <div class="nav-icon-modern"><div class="icon-bg gradient-indigo"><i class="bi bi-arrow-repeat"></i></div></div>
+            <span class="nav-text">Subscriptions</span>
+          <% end %>
+        </li>
+      </ul>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Billing</div>
+      <ul class="nav-menu">
+        <li class="nav-item">
+          <%= link_to super_admin_invoices_path, class: "nav-link-modern #{'active' if request.path.start_with?(super_admin_invoices_path)}", data: { tooltip: "Invoices" } do %>
+            <div class="nav-icon-modern"><div class="icon-bg gradient-purple"><i class="bi bi-file-earmark-text"></i></div></div>
+            <span class="nav-text">Invoices</span>
+          <% end %>
+        </li>
+        <li class="nav-item">
+          <%= link_to super_admin_payments_path, class: "nav-link-modern #{'active' if request.path.start_with?(super_admin_payments_path)}", data: { tooltip: "Payments" } do %>
+            <div class="nav-icon-modern"><div class="icon-bg gradient-green"><i class="bi bi-cash-stack"></i></div></div>
+            <span class="nav-text">Payments</span>
+          <% end %>
+        </li>
+        <li class="nav-item">
+          <%= link_to super_admin_coupons_path, class: "nav-link-modern #{'active' if request.path.start_with?(super_admin_coupons_path)}", data: { tooltip: "Coupons" } do %>
+            <div class="nav-icon-modern"><div class="icon-bg gradient-indigo"><i class="bi bi-tag"></i></div></div>
+            <span class="nav-text">Coupons</span>
+          <% end %>
+        </li>
+      </ul>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">People</div>
+      <ul class="nav-menu">
+        <li class="nav-item">
+          <%= link_to super_admin_users_path, class: "nav-link-modern #{'active' if request.path.start_with?(super_admin_users_path)}", data: { tooltip: "Users" } do %>
+            <div class="nav-icon-modern"><div class="icon-bg gradient-blue"><i class="bi bi-people"></i></div></div>
+            <span class="nav-text">Users</span>
+          <% end %>
+        </li>
+        <li class="nav-item">
+          <%= link_to super_admin_roles_path, class: "nav-link-modern #{'active' if current_page?(super_admin_roles_path)}", data: { tooltip: "Roles & Permissions" } do %>
+            <div class="nav-icon-modern"><div class="icon-bg gradient-purple"><i class="bi bi-shield-lock"></i></div></div>
+            <span class="nav-text">Roles &amp; Permissions</span>
+          <% end %>
+        </li>
+        <li class="nav-item">
+          <%= link_to super_admin_forum_requests_path, class: "nav-link-modern #{'active' if request.path.start_with?(super_admin_forum_requests_path)}", data: { tooltip: "Forum Requests" } do %>
+            <div class="nav-icon-modern"><div class="icon-bg gradient-green"><i class="bi bi-inbox"></i></div></div>
+            <span class="nav-text">Forum Requests</span>
+          <% end %>
+        </li>
+      </ul>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Engagement</div>
+      <ul class="nav-menu">
+        <li class="nav-item">
+          <%= link_to super_admin_announcements_path, class: "nav-link-modern #{'active' if request.path.start_with?(super_admin_announcements_path)}", data: { tooltip: "Announcements" } do %>
+            <div class="nav-icon-modern"><div class="icon-bg gradient-blue"><i class="bi bi-megaphone"></i></div></div>
+            <span class="nav-text">Announcements</span>
+          <% end %>
+        </li>
+        <li class="nav-item">
+          <%= link_to super_admin_support_tickets_path, class: "nav-link-modern #{'active' if request.path.start_with?(super_admin_support_tickets_path)}", data: { tooltip: "Support Center" } do %>
+            <div class="nav-icon-modern"><div class="icon-bg gradient-purple"><i class="bi bi-headset"></i></div></div>
+            <span class="nav-text">Support Center</span>
+          <% end %>
+        </li>
+      </ul>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Insights</div>
+      <ul class="nav-menu">
+        <li class="nav-item">
+          <%= link_to super_admin_reports_path, class: "nav-link-modern #{'active' if request.path.start_with?(super_admin_reports_path)}", data: { tooltip: "Reports" } do %>
+            <div class="nav-icon-modern"><div class="icon-bg gradient-green"><i class="bi bi-file-earmark-bar-graph"></i></div></div>
+            <span class="nav-text">Reports</span>
+          <% end %>
+        </li>
+        <li class="nav-item">
+          <%= link_to super_admin_analytics_path, class: "nav-link-modern #{'active' if current_page?(super_admin_analytics_path)}", data: { tooltip: "Analytics" } do %>
+            <div class="nav-icon-modern"><div class="icon-bg gradient-indigo"><i class="bi bi-graph-up"></i></div></div>
+            <span class="nav-text">Analytics</span>
+          <% end %>
+        </li>
+      </ul>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">System</div>
+      <ul class="nav-menu">
+        <li class="nav-item">
+          <%= link_to edit_super_admin_billing_path, class: "nav-link-modern #{'active' if request.path.start_with?('/super_admin/billing')}", data: { tooltip: "Settings" } do %>
+            <div class="nav-icon-modern"><div class="icon-bg gradient-blue"><i class="bi bi-gear"></i></div></div>
+            <span class="nav-text">Settings</span>
           <% end %>
         </li>
       </ul>

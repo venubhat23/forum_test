@@ -1,0 +1,25 @@
+<% content_for :title, "Business Generated Report" %>
+
+<div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+  <h1 class="page-title h4">Business Generated (Thanksgiving Slips)</h1>
+  <%= link_to "Export CSV", "#{referrals_business_super_admin_reports_path}.csv", class: "btn btn-outline-primary" %>
+</div>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead><tr><th>Given By</th><th>Referral Giver</th><th>Referral Receiver</th><th>Amount</th><th>Date</th></tr></thead>
+      <tbody>
+        <% @slips.each do |s| %>
+          <tr>
+            <td class="fw-semibold"><%= s.given_by.display_name %></td>
+            <td><%= s.referral.giver.display_name %></td>
+            <td><%= s.referral.receiver.display_name %></td>
+            <td>&#8377;<%= number_with_delimiter(s.amount.to_i) %></td>
+            <td><%= s.created_at.strftime("%d %b %Y") %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

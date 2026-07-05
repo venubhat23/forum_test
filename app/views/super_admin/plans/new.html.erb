@@ -1,0 +1,15 @@
+<% content_for :title, "Create Plan" %>
+
+<div class="page-header">
+  <h1 class="page-title h4">Create a New Plan</h1>
+</div>
+
+<div class="row justify-content-center">
+  <div class="col-12 col-lg-8">
+    <div class="card">
+      <div class="card-body p-4">
+        <%= render "form", plan: @plan, url: super_admin_plans_path, method: :post %>
+      </div>
+    </div>
+  </div>
+</div>

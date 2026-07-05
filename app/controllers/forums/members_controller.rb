@@ -3,7 +3,7 @@ module Forums
     before_action :set_chapter
 
     def index
-      @members = @chapter.members.order(:full_name)
+      @members = @chapter.members.order(:full_name).page(params[:page])
     end
 
     def new

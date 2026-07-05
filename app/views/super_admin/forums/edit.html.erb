@@ -1,0 +1,26 @@
+<% content_for :title, "Edit #{@forum.name}" %>
+
+<div class="page-header">
+  <h1 class="page-title h4">Edit <%= @forum.name %></h1>
+  <p class="page-subtitle mb-0">/f/<%= @forum.slug %> &middot; slug can't be changed here.</p>
+</div>
+
+<div class="row justify-content-center">
+  <div class="col-12 col-lg-7">
+    <div class="card">
+      <div class="card-body p-4">
+        <%= form_with model: @forum, url: super_admin_forum_path(@forum), method: :patch, local: true do |f| %>
+          <div class="mb-4">
+            <%= f.label :name, "Forum Name", class: "form-label" %>
+            <%= f.text_field :name, class: "form-control form-control-lg", required: true %>
+          </div>
+
+          <div class="d-flex flex-wrap gap-2">
+            <%= f.submit "Save Changes", class: "btn btn-primary btn-lg" %>
+            <%= link_to "Cancel", super_admin_forum_path(@forum), class: "btn btn-outline-secondary btn-lg" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

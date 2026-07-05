@@ -5,7 +5,7 @@ module Forums
 
     def index
       @referrals = Referral.joins("INNER JOIN users givers ON givers.id = referrals.giver_id")
-        .where(givers: { chapter_id: @chapter.id }).order(created_at: :desc)
+        .where(givers: { chapter_id: @chapter.id }).order(created_at: :desc).page(params[:page])
     end
 
     def show

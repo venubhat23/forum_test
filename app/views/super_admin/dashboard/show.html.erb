@@ -67,6 +67,84 @@
   </div>
 </div>
 
+<div class="row g-3 mb-4">
+  <div class="col-6 col-lg-3">
+    <div class="stats-card">
+      <div class="icon-bg gradient-green"><i class="bi bi-cash-coin"></i></div>
+      <div>
+        <div class="stats-value">&#8377;<%= number_with_delimiter(@revenue_collected.to_i) %></div>
+        <div class="stats-label">Revenue Collected</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="stats-card">
+      <div class="icon-bg gradient-blue"><i class="bi bi-graph-up-arrow"></i></div>
+      <div>
+        <div class="stats-value">&#8377;<%= number_with_delimiter(@business_generated.to_i) %></div>
+        <div class="stats-label">Business Generated</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="stats-card">
+      <div class="icon-bg gradient-purple"><i class="bi bi-arrow-left-right"></i></div>
+      <div>
+        <div class="stats-value"><%= @total_referrals %></div>
+        <div class="stats-label">Referrals</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="stats-card">
+      <div class="icon-bg gradient-indigo"><i class="bi bi-calendar-check"></i></div>
+      <div>
+        <div class="stats-value"><%= @todays_attendance %></div>
+        <div class="stats-label">Today's Attendance</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-6 col-lg-3">
+    <div class="stats-card">
+      <div class="icon-bg gradient-yellow"><i class="bi bi-arrow-repeat"></i></div>
+      <div>
+        <div class="stats-value"><%= link_to @upcoming_renewals, super_admin_subscriptions_path %></div>
+        <div class="stats-label">Renewals in 30 Days</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="stats-card">
+      <div class="icon-bg gradient-red"><i class="bi bi-exclamation-triangle"></i></div>
+      <div>
+        <div class="stats-value"><%= link_to @overdue_invoices, super_admin_invoices_path(status: :overdue) %></div>
+        <div class="stats-label">Overdue Invoices</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="stats-card">
+      <div class="icon-bg gradient-purple"><i class="bi bi-inbox"></i></div>
+      <div>
+        <div class="stats-value"><%= link_to @pending_forum_requests, super_admin_forum_requests_path %></div>
+        <div class="stats-label">Pending Forum Requests</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="stats-card">
+      <div class="icon-bg gradient-blue"><i class="bi bi-headset"></i></div>
+      <div>
+        <div class="stats-value"><%= link_to @open_support_tickets, super_admin_support_tickets_path %></div>
+        <div class="stats-label">Open Support Tickets</div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="card">
   <div class="card-header d-flex justify-content-between align-items-center">
     <span class="fw-semibold">Recently Created Forums</span>

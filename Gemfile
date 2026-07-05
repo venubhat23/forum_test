@@ -25,6 +25,16 @@ gem "bcrypt", "~> 3.1.7"
 # Authentication
 gem "devise"
 
+# Authorization
+gem "cancancan"
+
+# Pagination
+gem "kaminari"
+
+# Analytics charts
+gem "groupdate"
+gem "chartkick"
+
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[ windows jruby ]
 

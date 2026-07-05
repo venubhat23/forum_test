@@ -1,0 +1,35 @@
+<% content_for :title, @ticket.subject %>
+
+<div class="page-header">
+  <h1 class="page-title h4"><%= @ticket.subject %></h1>
+  <p class="page-subtitle mb-0">
+    <span class="badge bg-secondary"><%= @ticket.status.titleize %></span>
+    &middot; <%= @ticket.priority.titleize %> priority
+  </p>
+</div>
+
+<div class="card mb-4">
+  <div class="card-header fw-semibold">You &middot; <%= @ticket.created_at.strftime("%d %b %Y") %></div>
+  <div class="card-body"><%= @ticket.body %></div>
+</div>
+
+<% @ticket.replies.order(:created_at).each do |reply| %>
+  <div class="card mb-3">
+    <div class="card-header fw-semibold"><%= reply.user.display_name %> &middot; <%= reply.created_at.strftime("%d %b %Y %H:%M") %></div>
+    <div class="card-body"><%= reply.body %></div>
+  </div>
+<% end %>
+
+<% unless @ticket.closed? %>
+  <div class="card">
+    <div class="card-header fw-semibold">Add a Reply</div>
+    <div class="card-body">
+      <%= form_with url: reply_forum_support_ticket_path(forum_slug: @current_forum.slug, id: @ticket.id), method: :post, local: true do %>
+        <div class="mb-3">
+          <%= text_area_tag :body, nil, class: "form-control", rows: 3, required: true %>
+        </div>
+        <%= submit_tag "Reply", class: "btn btn-primary" %>
+      <% end %>
+    </div>
+  </div>
+<% end %>

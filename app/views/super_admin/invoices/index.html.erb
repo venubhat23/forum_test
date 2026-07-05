@@ -1,0 +1,55 @@
+<% content_for :title, "Invoices" %>
+
+<div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+  <div>
+    <h1 class="page-title h4">Invoices</h1>
+    <p class="page-subtitle mb-0">Billing records across all forums.</p>
+  </div>
+  <%= link_to new_super_admin_invoice_path, class: "btn btn-primary" do %>
+    <i class="bi bi-plus-lg me-1"></i> Create Invoice
+  <% end %>
+</div>
+
+<%= form_with url: super_admin_invoices_path, method: :get, local: true, class: "card mb-3" do %>
+  <div class="card-body d-flex flex-wrap gap-2">
+    <%= select_tag :status, options_for_select([ [ "All statuses", "" ] ] + Invoice.statuses.keys.map { |s| [ s.titleize, s ] }, params[:status]), class: "form-select", style: "max-width: 200px;" %>
+    <%= submit_tag "Filter", class: "btn btn-outline-secondary" %>
+    <%= link_to "Reset", super_admin_invoices_path, class: "btn btn-link" %>
+  </div>
+<% end %>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th>Invoice #</th>
+          <th>Forum</th>
+          <th>Amount</th>
+          <th>Status</th>
+          <th>Due</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @invoices.each do |invoice| %>
+          <tr>
+            <td class="fw-semibold"><%= link_to invoice.invoice_number, super_admin_invoice_path(invoice) %></td>
+            <td><%= invoice.forum.name %></td>
+            <td>&#8377;<%= number_with_delimiter(invoice.amount.to_i) %></td>
+            <td><span class="badge badge-status-<%= invoice.status %>"><%= invoice.status.titleize %></span></td>
+            <td><%= invoice.due_date.strftime("%d %b %Y") %></td>
+            <td class="text-end">
+              <%= link_to "View", super_admin_invoice_path(invoice), class: "btn btn-sm btn-outline-secondary" %>
+            </td>
+          </tr>
+        <% end %>
+        <% if @invoices.empty? %>
+          <tr><td colspan="6" class="text-center text-muted py-4">No invoices yet.</td></tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<%= paginate @invoices %>

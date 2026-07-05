@@ -1,0 +1,66 @@
+<% content_for :title, "Users" %>
+
+<div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+  <div>
+    <h1 class="page-title h4">Users</h1>
+    <p class="page-subtitle mb-0">Every user across every forum on the platform.</p>
+  </div>
+  <%= link_to new_super_admin_user_path, class: "btn btn-primary" do %>
+    <i class="bi bi-plus-lg me-1"></i> Create User
+  <% end %>
+</div>
+
+<%= form_with url: super_admin_users_path, method: :get, local: true, class: "card mb-3" do %>
+  <div class="card-body d-flex flex-wrap gap-2">
+    <%= text_field_tag :q, params[:q], class: "form-control", placeholder: "Search by email...", style: "max-width: 240px;" %>
+    <%= select_tag :role, options_for_select([ [ "All roles", "" ] ] + User.roles.keys.map { |r| [ r.titleize, r ] }, params[:role]), class: "form-select", style: "max-width: 200px;" %>
+    <%= select_tag :forum_id, options_for_select([ [ "All forums", "" ] ] + @forums.map { |f| [ f.name, f.id ] }, params[:forum_id]), class: "form-select", style: "max-width: 220px;" %>
+    <%= submit_tag "Filter", class: "btn btn-outline-secondary" %>
+    <%= link_to "Reset", super_admin_users_path, class: "btn btn-link" %>
+  </div>
+<% end %>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Forum</th>
+          <th>Status</th>
+          <th>Joined</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @users.each do |user| %>
+          <tr>
+            <td class="fw-semibold"><%= user.email %></td>
+            <td><span class="badge bg-secondary"><%= user.role.titleize %></span></td>
+            <td><%= user.forum&.name || "&mdash;".html_safe %></td>
+            <td>
+              <% if user.suspended? %>
+                <span class="badge bg-danger">Suspended</span>
+              <% else %>
+                <span class="badge bg-success">Active</span>
+              <% end %>
+            </td>
+            <td><%= user.created_at.strftime("%d %b %Y") %></td>
+            <td class="text-end">
+              <div class="d-flex gap-1 justify-content-end">
+                <%= link_to "View", super_admin_user_path(user), class: "btn btn-sm btn-outline-secondary" %>
+                <%= link_to "Edit", edit_super_admin_user_path(user), class: "btn btn-sm btn-outline-secondary" %>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+        <% if @users.empty? %>
+          <tr><td colspan="6" class="text-center text-muted py-4">No users found.</td></tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<%= paginate @users %>

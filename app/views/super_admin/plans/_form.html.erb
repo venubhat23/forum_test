@@ -1,0 +1,42 @@
+<%= form_with model: plan, url: url, method: method, local: true do |f| %>
+  <div class="row g-3 mb-3">
+    <div class="col-12 col-md-6">
+      <%= f.label :name, class: "form-label" %>
+      <%= f.text_field :name, class: "form-control", required: true %>
+    </div>
+    <div class="col-12 col-md-6">
+      <%= f.label :key, "Key (unique, lowercase)", class: "form-label" %>
+      <%= f.text_field :key, class: "form-control", required: true, disabled: plan.persisted? %>
+    </div>
+  </div>
+
+  <div class="row g-3 mb-3">
+    <div class="col-12 col-md-4">
+      <%= f.label :price, "Price (INR)", class: "form-label" %>
+      <%= f.number_field :price, class: "form-control", step: "0.01", min: 0, required: true %>
+    </div>
+    <div class="col-12 col-md-4">
+      <%= f.label :billing_cycle, class: "form-label" %>
+      <%= f.select :billing_cycle, Plan.billing_cycles.keys.map { |k| [ k.titleize, k ] }, {}, class: "form-select" %>
+    </div>
+    <div class="col-12 col-md-4">
+      <%= f.label :trial_days, class: "form-label" %>
+      <%= f.number_field :trial_days, class: "form-control", min: 0, required: true %>
+    </div>
+  </div>
+
+  <div class="mb-3">
+    <%= f.label :member_limit, "Member limit (blank = unlimited)", class: "form-label" %>
+    <%= f.number_field :member_limit, class: "form-control", min: 1 %>
+  </div>
+
+  <div class="mb-4">
+    <%= f.label :features, "Features (one per line)", class: "form-label" %>
+    <%= text_area_tag "plan[features]", Array(plan.features).join("\n"), class: "form-control", rows: 4 %>
+  </div>
+
+  <div class="d-flex flex-wrap gap-2">
+    <%= f.submit class: "btn btn-primary btn-lg" %>
+    <%= link_to "Cancel", super_admin_plans_path, class: "btn btn-outline-secondary btn-lg" %>
+  </div>
+<% end %>

@@ -1,0 +1,48 @@
+<div class="auth-wrapper">
+  <div class="auth-card">
+    <div class="text-center mb-4">
+      <div class="auth-brand-icon">
+        <i class="bi bi-building-add"></i>
+      </div>
+      <h1 class="h4 fw-bold mb-1">Start Your Networking Forum</h1>
+      <p class="text-muted mb-0">Tell us about your organization and we'll get in touch.</p>
+    </div>
+
+    <% if @forum_request.errors.any? %>
+      <div class="alert alert-danger"><%= @forum_request.errors.full_messages.to_sentence %></div>
+    <% end %>
+
+    <%= form_with model: @forum_request, url: forum_requests_path, local: true do |f| %>
+      <div class="mb-3">
+        <%= f.label :company_name, "Organization Name", class: "form-label" %>
+        <%= f.text_field :company_name, class: "form-control form-control-lg", required: true %>
+      </div>
+
+      <div class="mb-3">
+        <%= f.label :name, "Your Name", class: "form-label" %>
+        <%= f.text_field :name, class: "form-control form-control-lg", required: true %>
+      </div>
+
+      <div class="mb-3">
+        <%= f.label :email, class: "form-label" %>
+        <%= f.email_field :email, class: "form-control form-control-lg", required: true %>
+      </div>
+
+      <div class="mb-3">
+        <%= f.label :phone, class: "form-label" %>
+        <%= f.text_field :phone, class: "form-control form-control-lg" %>
+      </div>
+
+      <div class="mb-4">
+        <%= f.label :message, "Tell us more (optional)", class: "form-label" %>
+        <%= f.text_area :message, class: "form-control", rows: 3 %>
+      </div>
+
+      <%= f.submit "Submit Request", class: "btn btn-primary btn-lg w-100" %>
+    <% end %>
+
+    <div class="text-center mt-4">
+      <%= link_to "Already have an account? Sign in", new_user_session_path %>
+    </div>
+  </div>
+</div>

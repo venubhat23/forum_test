@@ -1,0 +1,26 @@
+<% content_for :title, "Forums Report" %>
+
+<div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+  <h1 class="page-title h4">Forums Report</h1>
+  <%= link_to "Export CSV", "#{forums_super_admin_reports_path}.csv", class: "btn btn-outline-primary" %>
+</div>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead><tr><th>Name</th><th>Slug</th><th>Plan</th><th>Status</th><th>Chapters</th><th>Created</th></tr></thead>
+      <tbody>
+        <% @forums.each do |f| %>
+          <tr>
+            <td class="fw-semibold"><%= f.name %></td>
+            <td><code><%= f.slug %></code></td>
+            <td><%= f.plan.name %></td>
+            <td><%= f.status.titleize %></td>
+            <td><%= f.chapters.count %></td>
+            <td><%= f.created_at.strftime("%d %b %Y") %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

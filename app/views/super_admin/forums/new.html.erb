@@ -18,15 +18,15 @@
 
           <h2 class="h6 text-uppercase text-muted mb-3">Subscription Plan</h2>
           <div class="row g-3 mb-4">
-            <% Forum::PLANS.each do |key, details| %>
+            <% @plans.each_with_index do |plan, index| %>
               <div class="col-12 col-md-4">
                 <label class="card h-100 p-3 plan-option-card">
                   <div class="form-check mb-2">
-                    <%= radio_button_tag "forum[plan]", key, key == :bronze, class: "form-check-input" %>
-                    <%= label_tag "forum_plan_#{key}", details[:label], class: "form-check-label fw-semibold" %>
+                    <%= radio_button_tag "forum[plan_id]", plan.id, index.zero?, class: "form-check-input" %>
+                    <%= label_tag "forum_plan_id_#{plan.id}", "#{plan.name} (&#8377;#{number_with_delimiter(plan.price.to_i)})".html_safe, class: "form-check-label fw-semibold" %>
                   </div>
                   <ul class="list-unstyled small text-muted mb-0">
-                    <% details[:features].each do |feature| %>
+                    <% plan.features.each do |feature| %>
                       <li><i class="bi bi-check2 text-success me-1"></i><%= feature %></li>
                     <% end %>
                   </ul>

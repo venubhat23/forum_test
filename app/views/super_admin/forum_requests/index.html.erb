@@ -1,0 +1,49 @@
+<% content_for :title, "Forum Requests" %>
+
+<div class="page-header">
+  <h1 class="page-title h4">Forum Requests</h1>
+  <p class="page-subtitle mb-0">Inbound requests from prospects wanting to start a forum.</p>
+</div>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th>Organization</th>
+          <th>Contact</th>
+          <th>Email</th>
+          <th>Status</th>
+          <th>Submitted</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @forum_requests.each do |req| %>
+          <tr>
+            <td class="fw-semibold"><%= req.company_name %></td>
+            <td><%= req.name %></td>
+            <td><%= req.email %></td>
+            <td>
+              <% case req.status
+                 when "pending" %>
+                <span class="badge bg-warning text-dark">Pending</span>
+              <% when "approved" %>
+                <span class="badge bg-success">Approved</span>
+              <% else %>
+                <span class="badge bg-secondary">Rejected</span>
+              <% end %>
+            </td>
+            <td><%= req.created_at.strftime("%d %b %Y") %></td>
+            <td class="text-end">
+              <%= link_to "Review", super_admin_forum_request_path(req), class: "btn btn-sm btn-outline-secondary" %>
+            </td>
+          </tr>
+        <% end %>
+        <% if @forum_requests.empty? %>
+          <tr><td colspan="6" class="text-center text-muted py-4">No requests yet.</td></tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

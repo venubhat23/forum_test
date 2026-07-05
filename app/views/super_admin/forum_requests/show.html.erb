@@ -1,0 +1,76 @@
+<% content_for :title, @forum_request.company_name %>
+
+<div class="page-header">
+  <h1 class="page-title h4"><%= @forum_request.company_name %></h1>
+  <p class="page-subtitle mb-0">Submitted <%= @forum_request.created_at.strftime("%d %b %Y") %></p>
+</div>
+
+<div class="card mb-4">
+  <div class="card-header fw-semibold">Request Details</div>
+  <div class="card-body">
+    <dl class="row mb-0">
+      <dt class="col-sm-3">Contact Name</dt><dd class="col-sm-9"><%= @forum_request.name %></dd>
+      <dt class="col-sm-3">Email</dt><dd class="col-sm-9"><%= @forum_request.email %></dd>
+      <dt class="col-sm-3">Phone</dt><dd class="col-sm-9"><%= @forum_request.phone.presence || "&mdash;".html_safe %></dd>
+      <dt class="col-sm-3">Message</dt><dd class="col-sm-9"><%= @forum_request.message.presence || "&mdash;".html_safe %></dd>
+      <dt class="col-sm-3">Status</dt>
+      <dd class="col-sm-9">
+        <% case @forum_request.status
+           when "pending" %>
+          <span class="badge bg-warning text-dark">Pending</span>
+        <% when "approved" %>
+          <span class="badge bg-success">Approved</span>
+          <% if @forum_request.forum %>
+            &middot; <%= link_to "View Forum", super_admin_forum_path(@forum_request.forum) %>
+          <% end %>
+        <% else %>
+          <span class="badge bg-secondary">Rejected</span>
+          <% if @forum_request.review_note.present? %>
+            <div class="text-muted small mt-1"><%= @forum_request.review_note %></div>
+          <% end %>
+        <% end %>
+      </dd>
+    </dl>
+  </div>
+</div>
+
+<% if @forum_request.pending? %>
+  <div class="row g-3">
+    <div class="col-12 col-lg-6">
+      <div class="card h-100">
+        <div class="card-header fw-semibold">Approve &amp; Create Forum</div>
+        <div class="card-body">
+          <%= form_with url: approve_super_admin_forum_request_path(@forum_request), method: :patch, local: true do %>
+            <div class="mb-3">
+              <label class="form-label">Plan</label>
+              <%= select_tag "plan_id", options_from_collection_for_select(@plans, :id, :name), class: "form-select" %>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Admin Email</label>
+              <%= text_field_tag "admin[email]", @forum_request.email, class: "form-control", required: true %>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Admin Password</label>
+              <%= password_field_tag "admin[password]", nil, class: "form-control", required: true, minlength: 6 %>
+            </div>
+            <%= submit_tag "Approve & Create Forum", class: "btn btn-success" %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 col-lg-6">
+      <div class="card h-100">
+        <div class="card-header fw-semibold">Reject</div>
+        <div class="card-body">
+          <%= form_with url: reject_super_admin_forum_request_path(@forum_request), method: :patch, local: true do %>
+            <div class="mb-3">
+              <label class="form-label">Reason (optional)</label>
+              <%= text_area_tag "review_note", nil, class: "form-control", rows: 3 %>
+            </div>
+            <%= submit_tag "Reject Request", class: "btn btn-outline-danger" %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>

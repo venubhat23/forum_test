@@ -1,0 +1,31 @@
+<% content_for :title, "Reports" %>
+
+<div class="page-header">
+  <h1 class="page-title h4">Reports</h1>
+  <p class="page-subtitle mb-0">Platform-wide exportable data.</p>
+</div>
+
+<div class="row g-3">
+  <% [
+       [ "Forums", forums_super_admin_reports_path, "bi-building" ],
+       [ "Users", users_super_admin_reports_path, "bi-people" ],
+       [ "Invoices & Payments", invoices_payments_super_admin_reports_path, "bi-receipt" ],
+       [ "Attendance", attendance_super_admin_reports_path, "bi-calendar-check" ],
+       [ "Business Generated (Thanksgiving Slips)", referrals_business_super_admin_reports_path, "bi-cash-coin" ]
+     ].each do |title, path, icon| %>
+    <div class="col-12 col-md-6 col-lg-4">
+      <div class="card h-100">
+        <div class="card-body d-flex align-items-center gap-3">
+          <div class="icon-bg gradient-blue"><i class="bi <%= icon %>"></i></div>
+          <div class="flex-grow-1">
+            <div class="fw-semibold"><%= title %></div>
+            <div class="d-flex gap-2 mt-2">
+              <%= link_to "View", path, class: "btn btn-sm btn-outline-secondary" %>
+              <%= link_to "Export CSV", "#{path}.csv", class: "btn btn-sm btn-outline-primary" %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>

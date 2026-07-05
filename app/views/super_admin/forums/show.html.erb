@@ -5,12 +5,17 @@
     <h1 class="page-title h4"><%= @forum.name %></h1>
     <p class="page-subtitle mb-0">/f/<%= @forum.slug %></p>
   </div>
-  <div class="d-flex gap-2">
+  <div class="d-flex flex-wrap gap-2">
+    <%= link_to "Edit", edit_super_admin_forum_path(@forum), class: "btn btn-outline-secondary" %>
     <% if @forum.suspended? %>
       <%= button_to "Activate", activate_super_admin_forum_path(@forum), method: :patch, class: "btn btn-success" %>
     <% else %>
       <%= button_to "Suspend", suspend_super_admin_forum_path(@forum), method: :patch, class: "btn btn-outline-danger",
             data: { turbo_confirm: "Suspend #{@forum.name}? Its admin and members won't be able to access it." } %>
+    <% end %>
+    <% unless @forum.archived? %>
+      <%= button_to "Archive", super_admin_forum_path(@forum), method: :delete, class: "btn btn-outline-danger",
+            data: { turbo_confirm: "Archive #{@forum.name}? It will be hidden from active use but its data is kept." } %>
     <% end %>
   </div>
 </div>
@@ -58,11 +63,20 @@
   <div class="card-header fw-semibold">Forum Admin</div>
   <div class="card-body">
     <% if @forum.admin %>
-      <div class="d-flex align-items-center gap-3">
-        <div class="sidebar-brand-icon"><i class="bi bi-person-fill"></i></div>
-        <div>
-          <div class="fw-semibold"><%= @forum.admin.email %></div>
-          <div class="text-muted small">Forum Admin &middot; logs in at <code>/f/<%= @forum.slug %>/dashboard</code></div>
+      <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+        <div class="d-flex align-items-center gap-3">
+          <div class="sidebar-brand-icon"><i class="bi bi-person-fill"></i></div>
+          <div>
+            <div class="fw-semibold"><%= @forum.admin.email %></div>
+            <div class="text-muted small">Forum Admin &middot; logs in at <code>/f/<%= @forum.slug %>/dashboard</code></div>
+          </div>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+          <%= button_to "Login as Admin", impersonate_super_admin_forum_path(@forum), method: :post, class: "btn btn-sm btn-outline-primary" %>
+          <%= button_to "Reset Password", reset_admin_password_super_admin_forum_path(@forum), method: :post, class: "btn btn-sm btn-outline-warning",
+                data: { turbo_confirm: "Generate a new password for #{@forum.admin.email}?" } %>
+          <%= button_to "Force Logout", force_logout_admin_super_admin_forum_path(@forum), method: :post, class: "btn btn-sm btn-outline-danger",
+                data: { turbo_confirm: "Sign #{@forum.admin.email} out of all active sessions?" } %>
         </div>
       </div>
     <% else %>
@@ -75,22 +89,22 @@
   <div class="card-header fw-semibold">Subscription Plan</div>
   <div class="card-body">
     <div class="row g-3">
-      <% Forum::PLANS.each do |key, details| %>
+      <% Plan.ordered.active.each do |plan| %>
         <div class="col-12 col-md-4">
-          <div class="card h-100 p-3 <%= "border-primary" if @forum.plan.to_sym == key %>">
+          <div class="card h-100 p-3 <%= "border-primary" if @forum.plan_id == plan.id %>">
             <div class="d-flex justify-content-between align-items-center mb-2">
-              <span class="fw-semibold"><%= details[:label] %></span>
-              <% if @forum.plan.to_sym == key %>
+              <span class="fw-semibold"><%= plan.name %></span>
+              <% if @forum.plan_id == plan.id %>
                 <span class="badge bg-primary">Current</span>
               <% end %>
             </div>
             <ul class="list-unstyled small text-muted mb-3">
-              <% details[:features].each do |feature| %>
+              <% plan.features.each do |feature| %>
                 <li><i class="bi bi-check2 text-success me-1"></i><%= feature %></li>
               <% end %>
             </ul>
-            <% unless @forum.plan.to_sym == key %>
-              <%= button_to "Switch to #{details[:label]}", update_plan_super_admin_forum_path(@forum), params: { plan: key }, method: :patch, class: "btn btn-sm btn-outline-primary mt-auto" %>
+            <% unless @forum.plan_id == plan.id %>
+              <%= button_to "Switch to #{plan.name}", update_plan_super_admin_forum_path(@forum), params: { plan_id: plan.id }, method: :patch, class: "btn btn-sm btn-outline-primary mt-auto" %>
             <% end %>
           </div>
         </div>

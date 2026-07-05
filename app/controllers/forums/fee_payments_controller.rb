@@ -4,7 +4,7 @@ module Forums
     before_action :set_fee_payment, only: [ :mark_paid ]
 
     def index
-      @fee_payments = FeePayment.joins(:user).where(users: { chapter_id: @chapter.id }).order(created_at: :desc)
+      @fee_payments = FeePayment.joins(:user).where(users: { chapter_id: @chapter.id }).order(created_at: :desc).page(params[:page])
     end
 
     def new

@@ -1,0 +1,40 @@
+<% content_for :title, "Payments" %>
+
+<div class="page-header">
+  <h1 class="page-title h4">Payments</h1>
+  <p class="page-subtitle mb-0">All recorded payments across the platform.</p>
+</div>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Forum</th>
+          <th>Invoice</th>
+          <th>Amount</th>
+          <th>Method</th>
+          <th>Recorded By</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @payments.each do |payment| %>
+          <tr>
+            <td><%= payment.paid_on.strftime("%d %b %Y") %></td>
+            <td><%= payment.invoice.forum.name %></td>
+            <td><%= link_to payment.invoice.invoice_number, super_admin_invoice_path(payment.invoice) %></td>
+            <td>&#8377;<%= number_with_delimiter(payment.amount.to_i) %></td>
+            <td><%= payment.payment_method.titleize %></td>
+            <td><%= payment.recorded_by.email %></td>
+          </tr>
+        <% end %>
+        <% if @payments.empty? %>
+          <tr><td colspan="6" class="text-center text-muted py-4">No payments recorded yet.</td></tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<%= paginate @payments %>

@@ -1,0 +1,26 @@
+<% content_for :title, "Invoices & Payments Report" %>
+
+<div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+  <h1 class="page-title h4">Invoices &amp; Payments Report</h1>
+  <%= link_to "Export CSV", "#{invoices_payments_super_admin_reports_path}.csv", class: "btn btn-outline-primary" %>
+</div>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead><tr><th>Invoice #</th><th>Forum</th><th>Amount</th><th>Status</th><th>Due</th><th>Paid On</th></tr></thead>
+      <tbody>
+        <% @invoices.each do |i| %>
+          <tr>
+            <td class="fw-semibold"><%= i.invoice_number %></td>
+            <td><%= i.forum.name %></td>
+            <td>&#8377;<%= number_with_delimiter(i.amount.to_i) %></td>
+            <td><span class="badge badge-status-<%= i.status %>"><%= i.status.titleize %></span></td>
+            <td><%= i.due_date.strftime("%d %b %Y") %></td>
+            <td><%= i.paid_on&.strftime("%d %b %Y") %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -1,0 +1,58 @@
+<% content_for :title, "Coupons" %>
+
+<div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+  <div>
+    <h1 class="page-title h4">Coupons</h1>
+    <p class="page-subtitle mb-0">Discount codes applicable to invoices.</p>
+  </div>
+  <%= link_to new_super_admin_coupon_path, class: "btn btn-primary" do %>
+    <i class="bi bi-plus-lg me-1"></i> Create Coupon
+  <% end %>
+</div>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th>Code</th>
+          <th>Discount</th>
+          <th>Expires</th>
+          <th>Redemptions</th>
+          <th>Status</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @coupons.each do |coupon| %>
+          <tr>
+            <td class="fw-semibold"><code><%= coupon.code %></code></td>
+            <td><%= coupon.percentage? ? "#{coupon.discount_value.to_i}%" : "&#8377;#{number_with_delimiter(coupon.discount_value.to_i)}".html_safe %></td>
+            <td><%= coupon.expires_on&.strftime("%d %b %Y") || "Never" %></td>
+            <td><%= coupon.times_redeemed %><%= "/#{coupon.max_redemptions}" if coupon.max_redemptions %></td>
+            <td>
+              <% if coupon.active? %>
+                <span class="badge bg-success">Active</span>
+              <% else %>
+                <span class="badge bg-secondary">Inactive</span>
+              <% end %>
+            </td>
+            <td class="text-end">
+              <div class="d-flex gap-1 justify-content-end">
+                <%= link_to "Edit", edit_super_admin_coupon_path(coupon), class: "btn btn-sm btn-outline-secondary" %>
+                <% if coupon.active? %>
+                  <%= button_to "Deactivate", archive_super_admin_coupon_path(coupon), method: :patch, class: "btn btn-sm btn-outline-danger" %>
+                <% else %>
+                  <%= button_to "Activate", activate_super_admin_coupon_path(coupon), method: :patch, class: "btn btn-sm btn-outline-success" %>
+                <% end %>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+        <% if @coupons.empty? %>
+          <tr><td colspan="6" class="text-center text-muted py-4">No coupons yet.</td></tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -1,0 +1,35 @@
+<% content_for :title, "Support" %>
+
+<div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+  <div>
+    <h1 class="page-title h4">Support</h1>
+    <p class="page-subtitle mb-0">Your support tickets.</p>
+  </div>
+  <%= link_to new_forum_support_ticket_path(forum_slug: @current_forum.slug), class: "btn btn-primary" do %>
+    <i class="bi bi-plus-lg me-1"></i> New Ticket
+  <% end %>
+</div>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead><tr><th>Subject</th><th>Priority</th><th>Status</th><th>Opened</th><th></th></tr></thead>
+      <tbody>
+        <% @tickets.each do |ticket| %>
+          <tr>
+            <td class="fw-semibold"><%= ticket.subject %></td>
+            <td><%= ticket.priority.titleize %></td>
+            <td><span class="badge bg-secondary"><%= ticket.status.titleize %></span></td>
+            <td><%= ticket.created_at.strftime("%d %b %Y") %></td>
+            <td class="text-end">
+              <%= link_to "View", forum_support_ticket_path(forum_slug: @current_forum.slug, id: ticket.id), class: "btn btn-sm btn-outline-secondary" %>
+            </td>
+          </tr>
+        <% end %>
+        <% if @tickets.empty? %>
+          <tr><td colspan="5" class="text-center text-muted py-4">No tickets yet.</td></tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

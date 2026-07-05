@@ -18,6 +18,22 @@ end
 
 SAMPLE_PASSWORD = ENV.fetch("SAMPLE_USER_PASSWORD", "SamplePass123!")
 
+default_plans = [
+  { key: "bronze", name: "Bronze", price: 999, member_limit: 3, position: 0,
+    features: [ "Up to 3 members", "Unlimited chapters", "Community support" ] },
+  { key: "gold", name: "Gold", price: 2499, member_limit: 6, position: 1,
+    features: [ "Up to 6 members", "Unlimited chapters", "Priority support" ] },
+  { key: "diamond", name: "Diamond", price: 4999, member_limit: nil, position: 2,
+    features: [ "Unlimited members", "Unlimited chapters", "Dedicated support" ] }
+]
+
+default_plans.each do |attrs|
+  plan = Plan.find_or_initialize_by(key: attrs[:key])
+  plan.assign_attributes(attrs.except(:key)) if plan.new_record?
+  plan.save!
+end
+puts "Plans ready: #{Plan.ordered.pluck(:key).join(', ')}"
+
 sample_forums = [
   {
     name: "Riverside Traders Association",

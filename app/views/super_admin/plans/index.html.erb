@@ -1,0 +1,62 @@
+<% content_for :title, "Business Models" %>
+
+<div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+  <div>
+    <h1 class="page-title h4">Business Models</h1>
+    <p class="page-subtitle mb-0">Subscription plans available to forums.</p>
+  </div>
+  <%= link_to new_super_admin_plan_path, class: "btn btn-primary" do %>
+    <i class="bi bi-plus-lg me-1"></i> Create Plan
+  <% end %>
+</div>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Key</th>
+          <th>Price</th>
+          <th>Billing</th>
+          <th>Member Limit</th>
+          <th>Status</th>
+          <th>Forums</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @plans.each do |plan| %>
+          <tr>
+            <td class="fw-semibold"><%= plan.name %></td>
+            <td><code><%= plan.key %></code></td>
+            <td>&#8377;<%= number_with_delimiter(plan.price.to_i) %></td>
+            <td><%= plan.billing_cycle.titleize %></td>
+            <td><%= plan.unlimited_members? ? "Unlimited" : plan.member_limit %></td>
+            <td>
+              <% if plan.active? %>
+                <span class="badge bg-success">Active</span>
+              <% else %>
+                <span class="badge bg-secondary">Archived</span>
+              <% end %>
+            </td>
+            <td><%= plan.forums.count %></td>
+            <td class="text-end">
+              <div class="d-flex gap-1 justify-content-end">
+                <%= link_to "Edit", edit_super_admin_plan_path(plan), class: "btn btn-sm btn-outline-secondary" %>
+                <% if plan.active? %>
+                  <%= button_to "Archive", archive_super_admin_plan_path(plan), method: :patch, class: "btn btn-sm btn-outline-danger" %>
+                <% else %>
+                  <%= button_to "Activate", activate_super_admin_plan_path(plan), method: :patch, class: "btn btn-sm btn-outline-success" %>
+                <% end %>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+        <% if @plans.empty? %>
+          <tr><td colspan="8" class="text-center text-muted py-4">No plans yet.</td></tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

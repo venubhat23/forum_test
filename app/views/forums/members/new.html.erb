@@ -7,7 +7,7 @@
 
 <% if @current_forum.member_limit %>
   <p class="text-muted small">
-    Members on the <%= @current_forum.plan_details[:label] %> plan: <%= @current_forum.users.member.count %>/<%= @current_forum.member_limit %>
+    Members on the <%= @current_forum.plan.name %> plan: <%= @current_forum.users.member.count %>/<%= @current_forum.member_limit %>
   </p>
 <% end %>
 
