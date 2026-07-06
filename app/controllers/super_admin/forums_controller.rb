@@ -4,6 +4,11 @@ module SuperAdmin
                                        :impersonate, :reset_admin_password, :force_logout_admin ]
 
     def index
+      @total_forums = Forum.count
+      @active_forums = Forum.active.count
+      @trial_forums = Forum.trial.count
+      @suspended_forums = Forum.suspended.count
+
       @forums = Forum.all
       @forums = @forums.where("name ILIKE ?", "%#{params[:q]}%") if params[:q].present?
       @forums = @forums.where(status: params[:status]) if params[:status].present?

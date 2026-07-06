@@ -267,3 +267,18 @@
 [data-theme="dark"] nav.pagination span.page.gap {
   color: var(--text-muted);
 }
+
+[data-theme="dark"] .mini-stat-card {
+  background: var(--bg-primary);
+  border-color: var(--border-light);
+}
+
+[data-theme="dark"] .mini-stat-label {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .icon-btn {
+  background: var(--bg-primary);
+  border-color: var(--border-light);
+  color: var(--text-secondary);
+}

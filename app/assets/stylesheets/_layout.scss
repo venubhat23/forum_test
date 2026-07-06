@@ -721,3 +721,95 @@ nav.pagination span.page.gap {
   color: #94a3b8;
   min-width: auto;
 }
+
+/* ── Mini stat cards (compact KPI tiles above index tables) ── */
+.mini-stat-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 1.1rem 1.35rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+  height: 100%;
+}
+
+.mini-stat-label {
+  color: #64748b;
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.mini-stat-value {
+  font-size: 1.6rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.mini-stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.mini-stat-icon-primary { background: rgba(99, 102, 241, 0.12); color: #6366f1; }
+.mini-stat-icon-success { background: rgba(16, 185, 129, 0.12); color: #059669; }
+.mini-stat-icon-info    { background: rgba(6, 182, 212, 0.12);  color: #0891b2; }
+.mini-stat-icon-warning { background: rgba(245, 158, 11, 0.12); color: #d97706; }
+.mini-stat-icon-danger  { background: rgba(239, 68, 68, 0.12);  color: #dc2626; }
+
+/* ── Row avatar (table leading initial circle) ── */
+.row-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: #ffffff;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, #94a3b8 0%, #64748b 100%);
+}
+
+.row-avatar-active    { background: linear-gradient(135deg, #34d399 0%, #059669 100%); }
+.row-avatar-trial     { background: linear-gradient(135deg, #60a5fa 0%, #2563eb 100%); }
+.row-avatar-suspended { background: linear-gradient(135deg, #f87171 0%, #dc2626 100%); }
+.row-avatar-expired   { background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%); }
+.row-avatar-archived  { background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%); }
+
+/* ── Icon action buttons (table row actions) ── */
+.icon-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  color: #64748b;
+  transition: all 0.15s ease;
+  font-size: 0.9rem;
+  padding: 0;
+  appearance: none;
+}
+
+.icon-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  color: #64748b;
+}
+
+.icon-btn-view:hover   { border-color: #6366f1; color: #6366f1; background: rgba(99, 102, 241, 0.08); }
+.icon-btn-edit:hover   { border-color: #2563eb; color: #2563eb; background: rgba(37, 99, 235, 0.08); }
+.icon-btn-danger:hover { border-color: #dc2626; color: #dc2626; background: rgba(220, 38, 38, 0.08); }
