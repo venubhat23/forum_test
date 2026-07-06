@@ -157,6 +157,7 @@ body {
 .sidebar-brand {
   display: flex;
   align-items: center;
+  justify-content: center;
   padding: 18px 20px 14px 20px;
   border-bottom: 1px solid #e2e8f0;
   gap: 10px;
@@ -601,4 +602,122 @@ body.sidebar-collapsed .main-content {
 .badge {
   font-weight: 600;
   letter-spacing: 0.02em;
+}
+
+/* ── Page header divider ── */
+.page-header {
+  padding-bottom: 1.1rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+/* ── Header: notification bell ── */
+.notif-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 2px solid #e2e8f0;
+  background: transparent;
+  color: #64748b;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+}
+
+.notif-btn:hover {
+  border-color: #6366f1;
+  color: #6366f1;
+  background: rgba(99, 102, 241, 0.08);
+}
+
+/* ── Header: user menu ── */
+.user-menu-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 999px;
+  padding: 0.3rem 0.9rem 0.3rem 0.3rem;
+  transition: all 0.2s ease;
+}
+
+.user-menu-btn:hover {
+  background: #eef2ff;
+  border-color: #c7d2fe;
+}
+
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+.user-email {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #334155;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Pagination (Kaminari) ── */
+nav.pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 1.5rem 0 0 0;
+}
+
+nav.pagination span {
+  display: inline-flex;
+}
+
+nav.pagination a,
+nav.pagination span.page.current {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.25rem;
+  height: 2.25rem;
+  padding: 0 0.6rem;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #475569;
+  text-decoration: none;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  transition: all 0.15s ease;
+}
+
+nav.pagination a:hover {
+  background: rgba(99, 102, 241, 0.08);
+  border-color: #6366f1;
+  color: #6366f1;
+}
+
+nav.pagination span.page.current {
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+  border-color: transparent;
+  color: #ffffff;
+}
+
+nav.pagination span.page.gap {
+  border: none;
+  background: none;
+  color: #94a3b8;
+  min-width: auto;
 }

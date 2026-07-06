@@ -52,7 +52,7 @@
             <div class="d-flex align-items-center">
               <% if current_area == :forum %>
                 <% unread_count = current_user.notifications.unread.count %>
-                <%= link_to forum_notifications_path(forum_slug: @current_forum.slug), class: "btn btn-outline-secondary btn-sm position-relative me-2", title: "Notifications" do %>
+                <%= link_to forum_notifications_path(forum_slug: @current_forum.slug), class: "notif-btn position-relative me-2", title: "Notifications" do %>
                   <i class="bi bi-bell"></i>
                   <% if unread_count.positive? %>
                     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"><%= unread_count %></span>
@@ -66,9 +66,9 @@
               </button>
 
               <div class="dropdown">
-                <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                  <i class="bi bi-person-circle me-2"></i>
-                  <span class="d-none d-sm-inline"><%= current_user.email %></span>
+                <button class="user-menu-btn dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                  <span class="user-avatar"><%= current_user.email.first.upcase %></span>
+                  <span class="d-none d-sm-inline user-email"><%= current_user.email %></span>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end">
                   <li><%= link_to destroy_user_session_path, class: "dropdown-item", data: { turbo_method: :delete } do %>

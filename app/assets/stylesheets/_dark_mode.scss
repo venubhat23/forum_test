@@ -222,3 +222,48 @@
   border: 1px solid rgba(239, 68, 68, 0.4);
   color: #fca5a5;
 }
+
+[data-theme="dark"] .page-header {
+  border-color: var(--border-light);
+}
+
+[data-theme="dark"] .notif-btn {
+  border-color: var(--border-light);
+  color: rgba(255, 255, 255, 0.6);
+}
+
+[data-theme="dark"] .notif-btn:hover {
+  border-color: #a78bfa;
+  color: #a78bfa;
+  background: rgba(167, 139, 250, 0.12);
+}
+
+[data-theme="dark"] .user-menu-btn {
+  background: var(--bg-accent);
+  border-color: var(--border-light);
+}
+
+[data-theme="dark"] .user-menu-btn:hover {
+  background: rgba(102, 126, 234, 0.15);
+  border-color: #818cf8;
+}
+
+[data-theme="dark"] .user-email {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] nav.pagination a {
+  background: var(--bg-primary);
+  border-color: var(--border-light);
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] nav.pagination a:hover {
+  background: rgba(102, 126, 234, 0.15);
+  border-color: #818cf8;
+  color: #c7d2fe;
+}
+
+[data-theme="dark"] nav.pagination span.page.gap {
+  color: var(--text-muted);
+}
