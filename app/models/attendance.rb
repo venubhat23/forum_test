@@ -7,6 +7,7 @@ class Attendance < ApplicationRecord
   }.freeze
 
   belongs_to :user
+  belongs_to :meeting, optional: true
 
   validates :event_type, presence: true
   validates :occurred_on, presence: true

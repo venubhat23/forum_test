@@ -1,0 +1,11 @@
+<%= form_with model: category, url: url, method: method, local: true do |f| %>
+  <%= f.hidden_field :parent_id %>
+  <div class="mb-4">
+    <%= f.label :name, category.parent_id? ? "Speciality Name" : "Category Name", class: "form-label" %>
+    <%= f.text_field :name, class: "form-control form-control-lg", required: true %>
+  </div>
+  <div class="d-flex flex-wrap gap-2">
+    <%= f.submit class: "btn btn-primary btn-lg" %>
+    <%= link_to "Cancel", forum_business_categories_path(forum_slug: @current_forum.slug), class: "btn btn-outline-secondary btn-lg" %>
+  </div>
+<% end %>

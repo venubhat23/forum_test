@@ -1,0 +1,29 @@
+<% content_for :title, @presentation.topic %>
+
+<div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+  <div>
+    <h1 class="page-title h4"><%= @presentation.topic %></h1>
+    <p class="page-subtitle mb-0"><%= @presentation.member.display_name %> &middot; <%= @presentation.scheduled_on.strftime("%d %b %Y") %></p>
+  </div>
+  <% if can? :update, @presentation %>
+    <div class="d-flex flex-wrap gap-2">
+      <%= link_to "Edit", edit_forum_chapter_weekly_presentation_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: @presentation.id), class: "btn btn-outline-secondary" %>
+      <%= button_to "Delete", forum_chapter_weekly_presentation_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: @presentation.id), method: :delete, class: "btn btn-outline-danger",
+            data: { turbo_confirm: "Delete this presentation?" } %>
+    </div>
+  <% end %>
+</div>
+
+<% if @presentation.deck.attached? %>
+  <div class="card mb-4">
+    <div class="card-header fw-semibold">Slide Deck</div>
+    <div class="card-body"><%= link_to @presentation.deck.filename, rails_blob_path(@presentation.deck, disposition: "attachment") %></div>
+  </div>
+<% end %>
+
+<% if @presentation.feedback.present? %>
+  <div class="card">
+    <div class="card-header fw-semibold">Feedback</div>
+    <div class="card-body"><%= simple_format(@presentation.feedback) %></div>
+  </div>
+<% end %>

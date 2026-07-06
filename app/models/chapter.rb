@@ -6,6 +6,8 @@ class Chapter < ApplicationRecord
   has_many :members, -> { where(role: :member) }, class_name: "User"
   has_many :guests, -> { where(role: :guest) }, class_name: "User"
   has_many :committee_members, -> { where(role: :committee_member) }, class_name: "User"
+  has_many :meetings, dependent: :destroy
+  has_many :weekly_presentations, dependent: :destroy
 
   validates :name, presence: true, uniqueness: { scope: :forum_id }
 end

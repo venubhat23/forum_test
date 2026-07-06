@@ -50,6 +50,16 @@
             <span class="nav-text">Support</span>
           <% end %>
         </li>
+        <li class="nav-item">
+          <%= link_to forum_business_categories_path(forum_slug: @current_forum.slug), class: "nav-link-modern #{'active' if request.path.start_with?(forum_business_categories_path(forum_slug: @current_forum.slug))}", data: { tooltip: "Business Categories" } do %>
+            <div class="nav-icon-modern">
+              <div class="icon-bg gradient-blue">
+                <i class="bi bi-tags"></i>
+              </div>
+            </div>
+            <span class="nav-text">Business Categories</span>
+          <% end %>
+        </li>
       </ul>
     </div>
   </nav>

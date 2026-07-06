@@ -1,0 +1,23 @@
+<% content_for :title, "One-to-One Meeting" %>
+
+<div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+  <div>
+    <h1 class="page-title h4"><%= @meeting.requester.display_name %> &rarr; <%= @meeting.requested_with.display_name %></h1>
+    <p class="page-subtitle mb-0"><%= @meeting.scheduled_at.strftime("%d %b %Y %H:%M") %> &middot; <span class="badge bg-secondary"><%= @meeting.status.titleize %></span></p>
+  </div>
+  <% if can?(:update, @meeting) && @meeting.requested?  %>
+    <div class="d-flex flex-wrap gap-2">
+      <%= button_to "Accept", accept_forum_one_to_one_meeting_path(forum_slug: @current_forum.slug, id: @meeting.id), method: :patch, class: "btn btn-success" %>
+      <%= button_to "Reject", reject_forum_one_to_one_meeting_path(forum_slug: @current_forum.slug, id: @meeting.id), method: :patch, class: "btn btn-outline-danger" %>
+    </div>
+  <% elsif can?(:update, @meeting) && @meeting.accepted? %>
+    <%= button_to "Mark Completed", complete_forum_one_to_one_meeting_path(forum_slug: @current_forum.slug, id: @meeting.id), method: :patch, class: "btn btn-primary" %>
+  <% end %>
+</div>
+
+<% if @meeting.notes.present? %>
+  <div class="card">
+    <div class="card-header fw-semibold">Notes</div>
+    <div class="card-body"><%= simple_format(@meeting.notes) %></div>
+  </div>
+<% end %>

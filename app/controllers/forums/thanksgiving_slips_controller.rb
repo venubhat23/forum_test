@@ -4,12 +4,14 @@ module Forums
     before_action :set_referral
 
     def new
+      authorize! :create, ThanksgivingSlip
       @thanksgiving_slip = @referral.thanksgiving_slips.new(given_by: @referral.receiver)
     end
 
     def create
       @thanksgiving_slip = @referral.thanksgiving_slips.new(thanksgiving_slip_params)
       @thanksgiving_slip.given_by = @referral.receiver
+      authorize! :create, @thanksgiving_slip
 
       if @thanksgiving_slip.save
         redirect_to forum_chapter_referral_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: @referral.id), notice: "Thanksgiving slip recorded."

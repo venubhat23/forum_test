@@ -1,0 +1,45 @@
+<% content_for :title, "Weekly Presentations · #{@chapter.name}" %>
+
+<div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+  <div>
+    <h1 class="page-title h4">Weekly Presentations</h1>
+    <p class="page-subtitle mb-0"><%= @chapter.name %></p>
+  </div>
+  <% if can? :create, WeeklyPresentation %>
+    <%= link_to new_forum_chapter_weekly_presentation_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id), class: "btn btn-primary" do %>
+      <i class="bi bi-plus-lg me-1"></i> Schedule Presentation
+    <% end %>
+  <% end %>
+</div>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th>Member</th>
+          <th>Topic</th>
+          <th>Date</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @presentations.each do |p| %>
+          <tr>
+            <td class="fw-semibold"><%= p.member.display_name %></td>
+            <td><%= p.topic %></td>
+            <td><%= p.scheduled_on.strftime("%d %b %Y") %></td>
+            <td class="text-end">
+              <%= link_to "View", forum_chapter_weekly_presentation_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: p.id), class: "btn btn-sm btn-outline-secondary" %>
+            </td>
+          </tr>
+        <% end %>
+        <% if @presentations.empty? %>
+          <tr><td colspan="4" class="text-center text-muted py-4">No presentations scheduled yet.</td></tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<%= paginate @presentations %>

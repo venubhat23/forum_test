@@ -19,6 +19,7 @@
           <th>Designation</th>
           <th>Email</th>
           <th>Phone</th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
@@ -28,10 +29,13 @@
             <td><span class="badge bg-primary"><%= cm.designation %></span></td>
             <td><%= cm.email %></td>
             <td><%= cm.phone %></td>
+            <td class="text-end">
+              <%= link_to "View", forum_chapter_committee_member_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: cm.id), class: "btn btn-sm btn-outline-secondary" %>
+            </td>
           </tr>
         <% end %>
         <% if @committee_members.empty? %>
-          <tr><td colspan="4" class="text-center text-muted py-4">No committee members yet. Add the first one to get started.</td></tr>
+          <tr><td colspan="5" class="text-center text-muted py-4">No committee members yet. Add the first one to get started.</td></tr>
         <% end %>
       </tbody>
     </table>

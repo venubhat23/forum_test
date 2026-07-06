@@ -1,0 +1,43 @@
+<% content_for :title, "Office Darshan" %>
+
+<div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+  <div>
+    <h1 class="page-title h4">Office Darshan</h1>
+    <p class="page-subtitle mb-0"><%= @current_forum.name %></p>
+  </div>
+  <% if can? :create, OfficeDarshan %>
+    <%= link_to new_forum_office_darshan_path(forum_slug: @current_forum.slug), class: "btn btn-primary" do %>
+      <i class="bi bi-plus-lg me-1"></i> Schedule Visit
+    <% end %>
+  <% end %>
+</div>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th>Member</th>
+          <th>Visit Date</th>
+          <th>Status</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @darshans.each do |d| %>
+          <tr>
+            <td class="fw-semibold"><%= d.member.display_name %></td>
+            <td><%= d.visit_date.strftime("%d %b %Y") %></td>
+            <td><span class="badge bg-secondary"><%= d.status.titleize %></span></td>
+            <td class="text-end">
+              <%= link_to "View", forum_office_darshan_path(forum_slug: @current_forum.slug, id: d.id), class: "btn btn-sm btn-outline-secondary" %>
+            </td>
+          </tr>
+        <% end %>
+        <% if @darshans.empty? %>
+          <tr><td colspan="4" class="text-center text-muted py-4">No office visits scheduled yet.</td></tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

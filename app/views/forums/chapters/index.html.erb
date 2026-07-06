@@ -5,8 +5,10 @@
     <h1 class="page-title h4">Chapters</h1>
     <p class="page-subtitle mb-0">Chapters under <%= @current_forum.name %>.</p>
   </div>
-  <%= link_to new_forum_chapter_path(forum_slug: @current_forum.slug), class: "btn btn-primary" do %>
-    <i class="bi bi-plus-lg me-1"></i> New Chapter
+  <% if can? :create, Chapter %>
+    <%= link_to new_forum_chapter_path(forum_slug: @current_forum.slug), class: "btn btn-primary" do %>
+      <i class="bi bi-plus-lg me-1"></i> New Chapter
+    <% end %>
   <% end %>
 </div>
 

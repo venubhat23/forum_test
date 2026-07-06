@@ -1,0 +1,31 @@
+<% content_for :title, @committee_member.display_name %>
+
+<div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+  <div>
+    <h1 class="page-title h4"><%= @committee_member.display_name %></h1>
+    <p class="page-subtitle mb-0"><%= @chapter.name %> &middot; <span class="badge bg-primary"><%= @committee_member.designation %></span></p>
+  </div>
+  <% if can? :update, @committee_member %>
+    <div class="d-flex flex-wrap gap-2">
+      <%= link_to "Edit", edit_forum_chapter_committee_member_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: @committee_member.id), class: "btn btn-outline-secondary" %>
+      <%= button_to "Remove from Committee", forum_chapter_committee_member_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: @committee_member.id), method: :delete, class: "btn btn-outline-danger",
+            data: { turbo_confirm: "Remove #{@committee_member.display_name} from the committee? They'll remain a member." } %>
+    </div>
+  <% end %>
+</div>
+
+<div class="card">
+  <div class="card-header fw-semibold">Details</div>
+  <div class="card-body">
+    <dl class="row mb-0">
+      <dt class="col-sm-3">Email</dt><dd class="col-sm-9"><%= @committee_member.email %></dd>
+      <dt class="col-sm-3">Phone</dt><dd class="col-sm-9"><%= @committee_member.phone %></dd>
+      <dt class="col-sm-3">Term</dt>
+      <dd class="col-sm-9">
+        <%= @committee_member.term_starts_on&.strftime("%d %b %Y") || "&mdash;".html_safe %> &ndash;
+        <%= @committee_member.term_ends_on&.strftime("%d %b %Y") || "&mdash;".html_safe %>
+      </dd>
+      <dt class="col-sm-3">Responsibilities</dt><dd class="col-sm-9"><%= @committee_member.responsibilities.presence || "&mdash;".html_safe %></dd>
+    </dl>
+  </div>
+</div>

@@ -5,6 +5,9 @@ class Forum < ApplicationRecord
 
   has_many :chapters, dependent: :destroy
   has_many :users, dependent: :nullify
+  has_many :business_categories, dependent: :destroy
+  has_many :one_to_one_meetings, dependent: :destroy
+  has_many :office_darshans, dependent: :destroy
 
   validates :name, presence: true
   validates :slug, presence: true, uniqueness: true,

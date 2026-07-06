@@ -4,20 +4,24 @@ module Forums
     before_action :set_referral, only: [ :show ]
 
     def index
+      authorize! :read, Referral
       @referrals = Referral.joins("INNER JOIN users givers ON givers.id = referrals.giver_id")
         .where(givers: { chapter_id: @chapter.id }).order(created_at: :desc).page(params[:page])
     end
 
     def show
+      authorize! :read, @referral
     end
 
     def new
+      authorize! :create, Referral
       @referral = Referral.new
       @people = chapter_members
     end
 
     def create
       @referral = Referral.new(referral_params)
+      authorize! :create, @referral
 
       if @referral.giver && @referral.giver.chapter_id == @chapter.id && @referral.save
         redirect_to forum_chapter_referral_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: @referral.id), notice: "Referral recorded."

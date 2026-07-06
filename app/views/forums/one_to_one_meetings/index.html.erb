@@ -1,0 +1,45 @@
+<% content_for :title, "One-to-One Meetings" %>
+
+<div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+  <div>
+    <h1 class="page-title h4">One-to-One Meetings</h1>
+    <p class="page-subtitle mb-0"><%= @current_forum.name %></p>
+  </div>
+  <% if can? :create, OneToOneMeeting %>
+    <%= link_to new_forum_one_to_one_meeting_path(forum_slug: @current_forum.slug), class: "btn btn-primary" do %>
+      <i class="bi bi-plus-lg me-1"></i> Request Meeting
+    <% end %>
+  <% end %>
+</div>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th>Requester</th>
+          <th>With</th>
+          <th>Date</th>
+          <th>Status</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @meetings.each do |m| %>
+          <tr>
+            <td class="fw-semibold"><%= m.requester.display_name %></td>
+            <td><%= m.requested_with.display_name %></td>
+            <td><%= m.scheduled_at.strftime("%d %b %Y %H:%M") %></td>
+            <td><span class="badge bg-secondary"><%= m.status.titleize %></span></td>
+            <td class="text-end">
+              <%= link_to "View", forum_one_to_one_meeting_path(forum_slug: @current_forum.slug, id: m.id), class: "btn btn-sm btn-outline-secondary" %>
+            </td>
+          </tr>
+        <% end %>
+        <% if @meetings.empty? %>
+          <tr><td colspan="5" class="text-center text-muted py-4">No one-to-one meetings yet.</td></tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

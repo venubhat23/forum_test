@@ -1,0 +1,84 @@
+<% content_for :title, "#{@meeting.meeting_type.titleize} Meeting" %>
+
+<div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+  <div>
+    <h1 class="page-title h4"><%= @meeting.meeting_type.titleize %> Meeting</h1>
+    <p class="page-subtitle mb-0"><%= @chapter.name %> &middot; <%= @meeting.scheduled_at.strftime("%d %b %Y %H:%M") %></p>
+  </div>
+  <% if can? :update, @meeting %>
+    <div class="d-flex flex-wrap gap-2">
+      <%= link_to "Edit", edit_forum_chapter_meeting_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: @meeting.id), class: "btn btn-outline-secondary" %>
+      <%= button_to "Delete", forum_chapter_meeting_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: @meeting.id), method: :delete, class: "btn btn-outline-danger",
+            data: { turbo_confirm: "Delete this meeting?" } %>
+    </div>
+  <% end %>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-6 col-lg-4">
+    <div class="stats-card">
+      <div class="icon-bg gradient-blue"><i class="bi bi-geo-alt"></i></div>
+      <div>
+        <div class="stats-value h6 mb-0"><%= @meeting.venue.presence || "&mdash;".html_safe %></div>
+        <div class="stats-label">Venue</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-4">
+    <div class="stats-card">
+      <div class="icon-bg gradient-purple"><i class="bi bi-mic"></i></div>
+      <div>
+        <div class="stats-value h6 mb-0"><%= @meeting.speaker.presence || "&mdash;".html_safe %></div>
+        <div class="stats-label">Speaker</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-4">
+    <div class="stats-card">
+      <div class="icon-bg gradient-green"><i class="bi bi-graph-up"></i></div>
+      <div>
+        <div class="stats-value"><%= @meeting.attendance_percentage %>%</div>
+        <div class="stats-label">Attendance</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<% if @meeting.agenda.present? %>
+  <div class="card mb-4">
+    <div class="card-header fw-semibold">Agenda</div>
+    <div class="card-body"><%= simple_format(@meeting.agenda) %></div>
+  </div>
+<% end %>
+
+<% if @meeting.minutes.present? %>
+  <div class="card mb-4">
+    <div class="card-header fw-semibold">Minutes</div>
+    <div class="card-body"><%= simple_format(@meeting.minutes) %></div>
+  </div>
+<% end %>
+
+<% if @meeting.documents.attached? %>
+  <div class="card mb-4">
+    <div class="card-header fw-semibold">Documents</div>
+    <div class="list-group list-group-flush">
+      <% @meeting.documents.each do |doc| %>
+        <div class="list-group-item"><%= link_to doc.filename, rails_blob_path(doc, disposition: "attachment") %></div>
+      <% end %>
+    </div>
+  </div>
+<% end %>
+
+<% if can? :update, @meeting %>
+  <div class="card">
+    <div class="card-header fw-semibold">Defaulters (no attendance recorded)</div>
+    <div class="list-group list-group-flush">
+      <% @meeting.defaulters.each do |member| %>
+        <div class="list-group-item"><%= member.display_name %> <span class="text-muted small"><%= member.email %></span></div>
+      <% end %>
+      <% if @meeting.defaulters.empty? %>
+        <div class="list-group-item text-muted text-center py-3">Everyone attended, or no attendance recorded yet.</div>
+      <% end %>
+    </div>
+  </div>
+<% end %>

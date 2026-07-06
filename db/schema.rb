@@ -10,9 +10,37 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_05_145508) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_06_013645) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "active_storage_attachments", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "record_type", null: false
+    t.bigint "record_id", null: false
+    t.bigint "blob_id", null: false
+    t.datetime "created_at", null: false
+    t.index ["blob_id"], name: "index_active_storage_attachments_on_blob_id"
+    t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
+  end
+
+  create_table "active_storage_blobs", force: :cascade do |t|
+    t.string "key", null: false
+    t.string "filename", null: false
+    t.string "content_type"
+    t.text "metadata"
+    t.string "service_name", null: false
+    t.bigint "byte_size", null: false
+    t.string "checksum"
+    t.datetime "created_at", null: false
+    t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
+  end
+
+  create_table "active_storage_variant_records", force: :cascade do |t|
+    t.bigint "blob_id", null: false
+    t.string "variation_digest", null: false
+    t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
 
   create_table "announcements", force: :cascade do |t|
     t.string "title", null: false
@@ -36,7 +64,19 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_05_145508) do
     t.boolean "present", default: true, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "meeting_id"
+    t.index ["meeting_id"], name: "index_attendances_on_meeting_id"
     t.index ["user_id"], name: "index_attendances_on_user_id"
+  end
+
+  create_table "business_categories", force: :cascade do |t|
+    t.bigint "forum_id", null: false
+    t.string "name", null: false
+    t.bigint "parent_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["forum_id"], name: "index_business_categories_on_forum_id"
+    t.index ["parent_id"], name: "index_business_categories_on_parent_id"
   end
 
   create_table "chapters", force: :cascade do |t|
@@ -121,6 +161,46 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_05_145508) do
     t.index ["forum_id"], name: "index_invoices_on_forum_id"
     t.index ["invoice_number"], name: "index_invoices_on_invoice_number", unique: true
     t.index ["plan_id"], name: "index_invoices_on_plan_id"
+  end
+
+  create_table "meetings", force: :cascade do |t|
+    t.bigint "chapter_id", null: false
+    t.integer "meeting_type", default: 0, null: false
+    t.datetime "scheduled_at", null: false
+    t.string "venue"
+    t.string "speaker"
+    t.text "agenda"
+    t.text "minutes"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["chapter_id"], name: "index_meetings_on_chapter_id"
+  end
+
+  create_table "office_darshans", force: :cascade do |t|
+    t.bigint "forum_id", null: false
+    t.bigint "member_id", null: false
+    t.date "visit_date", null: false
+    t.integer "status", default: 0, null: false
+    t.text "notes"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["forum_id"], name: "index_office_darshans_on_forum_id"
+    t.index ["member_id"], name: "index_office_darshans_on_member_id"
+  end
+
+  create_table "one_to_one_meetings", force: :cascade do |t|
+    t.bigint "forum_id", null: false
+    t.bigint "requester_id", null: false
+    t.bigint "requested_with_id", null: false
+    t.datetime "scheduled_at", null: false
+    t.integer "status", default: 0, null: false
+    t.text "notes"
+    t.date "follow_up_on"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["forum_id"], name: "index_one_to_one_meetings_on_forum_id"
+    t.index ["requested_with_id"], name: "index_one_to_one_meetings_on_requested_with_id"
+    t.index ["requester_id"], name: "index_one_to_one_meetings_on_requester_id"
   end
 
   create_table "payments", force: :cascade do |t|
@@ -231,17 +311,53 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_05_145508) do
     t.string "designation"
     t.string "session_token", null: false
     t.datetime "suspended_at"
+    t.string "gst_number"
+    t.string "pan_number"
+    t.string "aadhaar_number"
+    t.string "website"
+    t.text "address"
+    t.integer "experience_years"
+    t.date "date_of_birth"
+    t.integer "membership_status", default: 0, null: false
+    t.date "renews_on"
+    t.bigint "business_category_id"
+    t.datetime "converted_at"
+    t.date "term_starts_on"
+    t.date "term_ends_on"
+    t.text "responsibilities"
+    t.bigint "membership_plan_id"
+    t.index ["business_category_id"], name: "index_users_on_business_category_id"
     t.index ["chapter_id"], name: "index_users_on_chapter_id"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["forum_id"], name: "index_users_on_forum_id"
     t.index ["invited_by_id"], name: "index_users_on_invited_by_id"
+    t.index ["membership_plan_id"], name: "index_users_on_membership_plan_id"
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  create_table "weekly_presentations", force: :cascade do |t|
+    t.bigint "chapter_id", null: false
+    t.bigint "member_id", null: false
+    t.bigint "meeting_id"
+    t.string "topic", null: false
+    t.date "scheduled_on", null: false
+    t.text "feedback"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["chapter_id"], name: "index_weekly_presentations_on_chapter_id"
+    t.index ["meeting_id"], name: "index_weekly_presentations_on_meeting_id"
+    t.index ["member_id"], name: "index_weekly_presentations_on_member_id"
+  end
+
+  add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "announcements", "forums"
   add_foreign_key "announcements", "plans"
   add_foreign_key "announcements", "users", column: "created_by_id"
+  add_foreign_key "attendances", "meetings"
   add_foreign_key "attendances", "users"
+  add_foreign_key "business_categories", "business_categories", column: "parent_id"
+  add_foreign_key "business_categories", "forums"
   add_foreign_key "chapters", "forums"
   add_foreign_key "fee_payments", "users"
   add_foreign_key "forum_requests", "forums"
@@ -250,6 +366,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_05_145508) do
   add_foreign_key "invoices", "coupons"
   add_foreign_key "invoices", "forums"
   add_foreign_key "invoices", "plans"
+  add_foreign_key "meetings", "chapters"
+  add_foreign_key "office_darshans", "forums"
+  add_foreign_key "office_darshans", "users", column: "member_id"
+  add_foreign_key "one_to_one_meetings", "forums"
+  add_foreign_key "one_to_one_meetings", "users", column: "requested_with_id"
+  add_foreign_key "one_to_one_meetings", "users", column: "requester_id"
   add_foreign_key "payments", "invoices"
   add_foreign_key "payments", "users", column: "recorded_by_id"
   add_foreign_key "platform_settings", "plans", column: "default_plan_id"
@@ -261,7 +383,11 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_05_145508) do
   add_foreign_key "support_tickets", "users", column: "raised_by_id"
   add_foreign_key "thanksgiving_slips", "referrals"
   add_foreign_key "thanksgiving_slips", "users", column: "given_by_id"
+  add_foreign_key "users", "business_categories"
   add_foreign_key "users", "chapters"
   add_foreign_key "users", "forums"
   add_foreign_key "users", "users", column: "invited_by_id"
+  add_foreign_key "weekly_presentations", "chapters"
+  add_foreign_key "weekly_presentations", "meetings"
+  add_foreign_key "weekly_presentations", "users", column: "member_id"
 end

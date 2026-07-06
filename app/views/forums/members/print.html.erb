@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ID Card - <%= @member.display_name %></title>
+  <style>
+    body { font-family: -apple-system, sans-serif; padding: 24px; }
+    .id-card { width: 340px; border: 2px solid #333; border-radius: 12px; padding: 20px; text-align: center; }
+    .id-card h2 { margin: 8px 0 0; font-size: 18px; }
+    .id-card .role { color: #666; font-size: 13px; margin-bottom: 12px; }
+    .id-card dl { text-align: left; font-size: 13px; margin-top: 12px; }
+    .id-card dt { font-weight: 600; float: left; width: 40%; }
+    .id-card dd { margin-left: 40%; }
+    @media print { body { padding: 0; } }
+  </style>
+</head>
+<body>
+  <div class="id-card">
+    <div class="fw-bold"><%= @current_forum.name %></div>
+    <h2><%= @member.display_name %></h2>
+    <div class="role"><%= @chapter.name %> &middot; Member</div>
+    <dl>
+      <dt>Email</dt><dd><%= @member.email %></dd>
+      <dt>Phone</dt><dd><%= @member.phone %></dd>
+      <dt>Business</dt><dd><%= @member.business_name %></dd>
+      <dt>Member Since</dt><dd><%= @member.created_at.strftime("%b %Y") %></dd>
+    </dl>
+  </div>
+  <script>window.onload = () => window.print();</script>
+</body>
+</html>

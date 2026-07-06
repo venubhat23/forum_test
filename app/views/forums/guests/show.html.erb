@@ -1,0 +1,59 @@
+<% content_for :title, @guest.display_name %>
+
+<div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+  <div>
+    <h1 class="page-title h4"><%= @guest.display_name %></h1>
+    <p class="page-subtitle mb-0"><%= @chapter.name %> &middot; <%= @guest.email %></p>
+  </div>
+  <% if can? :update, @guest %>
+    <div class="d-flex flex-wrap gap-2">
+      <%= link_to "Edit", edit_forum_chapter_guest_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: @guest.id), class: "btn btn-outline-secondary" %>
+      <%= button_to "Convert to Member", convert_to_member_forum_chapter_guest_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: @guest.id), method: :patch, class: "btn btn-success",
+            data: { turbo_confirm: "Convert #{@guest.display_name} to a full member?" } %>
+      <%= button_to "Delete", forum_chapter_guest_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: @guest.id), method: :delete, class: "btn btn-outline-danger",
+            data: { turbo_confirm: "Remove #{@guest.display_name}?" } %>
+    </div>
+  <% end %>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-6 col-lg-4">
+    <div class="stats-card">
+      <div class="icon-bg gradient-blue"><i class="bi bi-calendar-check"></i></div>
+      <div>
+        <div class="stats-value"><%= @visit_count %></div>
+        <div class="stats-label">Visits</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-4">
+    <div class="stats-card">
+      <div class="icon-bg gradient-purple"><i class="bi bi-person-heart"></i></div>
+      <div>
+        <div class="stats-value h6 mb-0"><%= @guest.invited_by&.display_name || "&mdash;".html_safe %></div>
+        <div class="stats-label">Invited By</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-4">
+    <div class="stats-card">
+      <div class="icon-bg gradient-green"><i class="bi bi-calendar3"></i></div>
+      <div>
+        <div class="stats-value h6 mb-0"><%= @guest.created_at.strftime("%d %b %Y") %></div>
+        <div class="stats-label">First Added</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header fw-semibold">Profile</div>
+  <div class="card-body">
+    <dl class="row mb-0">
+      <dt class="col-sm-3">Phone</dt><dd class="col-sm-9"><%= @guest.phone %></dd>
+      <dt class="col-sm-3">Nature of Business</dt><dd class="col-sm-9"><%= @guest.nature_of_business %></dd>
+      <dt class="col-sm-3">Business Category</dt><dd class="col-sm-9"><%= @guest.business_category %></dd>
+      <dt class="col-sm-3">Speciality</dt><dd class="col-sm-9"><%= @guest.speciality %></dd>
+    </dl>
+  </div>
+</div>

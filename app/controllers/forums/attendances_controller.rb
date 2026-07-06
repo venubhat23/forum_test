@@ -3,16 +3,19 @@ module Forums
     before_action :set_chapter
 
     def index
+      authorize! :read, Attendance
       @attendances = Attendance.joins(:user).where(users: { chapter_id: @chapter.id }).order(occurred_on: :desc).page(params[:page])
     end
 
     def new
+      authorize! :create, Attendance
       @attendance = Attendance.new(occurred_on: Date.current)
       @people = attendable_people
     end
 
     def create
       @attendance = Attendance.new(attendance_params)
+      authorize! :create, @attendance
 
       if @attendance.user && @attendance.user.chapter_id == @chapter.id && @attendance.save
         redirect_to forum_chapter_attendances_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id), notice: "Attendance recorded for #{@attendance.user.display_name}."

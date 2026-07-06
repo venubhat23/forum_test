@@ -1,0 +1,16 @@
+<% content_for :title, "Edit #{@member.display_name}" %>
+
+<div class="page-header">
+  <h1 class="page-title h4">Edit <%= @member.display_name %></h1>
+  <p class="page-subtitle mb-0"><%= @chapter.name %> &middot; <%= @current_forum.name %></p>
+</div>
+
+<div class="row justify-content-center">
+  <div class="col-12 col-lg-7">
+    <div class="card">
+      <div class="card-body p-4">
+        <%= render "form", member: @member, url: forum_chapter_member_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: @member.id), method: :patch %>
+      </div>
+    </div>
+  </div>
+</div>

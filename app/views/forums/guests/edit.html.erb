@@ -1,0 +1,16 @@
+<% content_for :title, "Edit #{@guest.display_name}" %>
+
+<div class="page-header">
+  <h1 class="page-title h4">Edit <%= @guest.display_name %></h1>
+  <p class="page-subtitle mb-0"><%= @chapter.name %> &middot; <%= @current_forum.name %></p>
+</div>
+
+<div class="row justify-content-center">
+  <div class="col-12 col-lg-7">
+    <div class="card">
+      <div class="card-body p-4">
+        <%= render "form", guest: @guest, url: forum_chapter_guest_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: @guest.id), method: :patch %>
+      </div>
+    </div>
+  </div>
+</div>

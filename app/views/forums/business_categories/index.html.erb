@@ -1,0 +1,57 @@
+<% content_for :title, "Business Categories" %>
+
+<div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+  <div>
+    <h1 class="page-title h4">Business Categories</h1>
+    <p class="page-subtitle mb-0"><%= @current_forum.name %></p>
+  </div>
+  <% if can? :create, BusinessCategory %>
+    <%= link_to new_forum_business_category_path(forum_slug: @current_forum.slug), class: "btn btn-primary" do %>
+      <i class="bi bi-plus-lg me-1"></i> New Category
+    <% end %>
+  <% end %>
+</div>
+
+<div class="row g-3">
+  <% @top_level.each do |category| %>
+    <div class="col-12 col-lg-6">
+      <div class="card h-100">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <span class="fw-semibold"><%= category.name %></span>
+          <div class="d-flex gap-1">
+            <% if can? :create, BusinessCategory %>
+              <%= link_to "Add Speciality", new_forum_business_category_path(forum_slug: @current_forum.slug, parent_id: category.id), class: "btn btn-sm btn-outline-primary" %>
+            <% end %>
+            <% if can? :update, category %>
+              <%= link_to "Edit", edit_forum_business_category_path(forum_slug: @current_forum.slug, id: category.id), class: "btn btn-sm btn-outline-secondary" %>
+              <%= button_to "Delete", forum_business_category_path(forum_slug: @current_forum.slug, id: category.id), method: :delete, class: "btn btn-sm btn-outline-danger",
+                    data: { turbo_confirm: "Delete #{category.name} and all its specialities?" } %>
+            <% end %>
+          </div>
+        </div>
+        <div class="list-group list-group-flush">
+          <% category.children.order(:name).each do |child| %>
+            <div class="list-group-item d-flex justify-content-between align-items-center">
+              <span><%= child.name %></span>
+              <% if can? :update, child %>
+                <div class="d-flex gap-1">
+                  <%= link_to "Edit", edit_forum_business_category_path(forum_slug: @current_forum.slug, id: child.id), class: "btn btn-sm btn-outline-secondary" %>
+                  <%= button_to "Delete", forum_business_category_path(forum_slug: @current_forum.slug, id: child.id), method: :delete, class: "btn btn-sm btn-outline-danger",
+                        data: { turbo_confirm: "Delete #{child.name}?" } %>
+                </div>
+              <% end %>
+            </div>
+          <% end %>
+          <% if category.children.empty? %>
+            <div class="list-group-item text-muted small">No specialities yet.</div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+  <% if @top_level.empty? %>
+    <div class="col-12">
+      <div class="card"><div class="card-body text-center text-muted py-4">No business categories yet. Create the first one to get started.</div></div>
+    </div>
+  <% end %>
+</div>

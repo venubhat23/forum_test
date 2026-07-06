@@ -1,0 +1,86 @@
+<% content_for :title, @member.display_name %>
+
+<div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+  <div>
+    <h1 class="page-title h4"><%= @member.display_name %></h1>
+    <p class="page-subtitle mb-0"><%= @chapter.name %> &middot; <%= @member.email %></p>
+  </div>
+  <% if can? :update, @member %>
+    <div class="d-flex flex-wrap gap-2">
+      <%= link_to "Edit", edit_forum_chapter_member_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: @member.id), class: "btn btn-outline-secondary" %>
+      <%= link_to "Print ID Card", print_forum_chapter_member_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: @member.id), class: "btn btn-outline-secondary", target: "_blank" %>
+      <% if @member.suspended? %>
+        <%= button_to "Reactivate", activate_forum_chapter_member_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: @member.id), method: :patch, class: "btn btn-success" %>
+      <% else %>
+        <%= button_to "Suspend", suspend_forum_chapter_member_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: @member.id), method: :patch, class: "btn btn-outline-danger",
+              data: { turbo_confirm: "Suspend #{@member.display_name}?" } %>
+      <% end %>
+    </div>
+  <% end %>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-6 col-lg-3">
+    <div class="stats-card">
+      <div class="icon-bg gradient-purple"><i class="bi bi-shield-check"></i></div>
+      <div>
+        <div class="stats-value"><span class="badge <%= @member.suspended? ? 'bg-danger' : 'bg-success' %>"><%= @member.suspended? ? "Suspended" : "Active" %></span></div>
+        <div class="stats-label">Account</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="stats-card">
+      <div class="icon-bg gradient-blue"><i class="bi bi-arrow-repeat"></i></div>
+      <div>
+        <div class="stats-value h6 mb-0"><%= @member.renews_on&.strftime("%d %b %Y") || "&mdash;".html_safe %></div>
+        <div class="stats-label">Membership Renews</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="stats-card">
+      <div class="icon-bg gradient-green"><i class="bi bi-calendar3"></i></div>
+      <div>
+        <div class="stats-value h6 mb-0"><%= @member.created_at.strftime("%d %b %Y") %></div>
+        <div class="stats-label">Joined</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="stats-card">
+      <div class="icon-bg gradient-indigo"><i class="bi bi-briefcase"></i></div>
+      <div>
+        <div class="stats-value h6 mb-0"><%= @member.business_name.presence || "&mdash;".html_safe %></div>
+        <div class="stats-label">Business</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<% if can? :update, @member %>
+  <div class="card mb-4">
+    <div class="card-header fw-semibold">Account Actions</div>
+    <div class="card-body d-flex flex-wrap gap-2">
+      <%= button_to "Reset Password", reset_password_forum_chapter_member_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: @member.id), method: :post, class: "btn btn-outline-warning",
+            data: { turbo_confirm: "Generate a new password for #{@member.email}?" } %>
+      <%= button_to "Force Logout", force_logout_forum_chapter_member_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: @member.id), method: :post, class: "btn btn-outline-danger",
+            data: { turbo_confirm: "Sign #{@member.email} out of all active sessions?" } %>
+      <%= button_to "Renew Membership (+1 year)", renew_forum_chapter_member_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: @member.id), method: :patch, class: "btn btn-outline-primary" %>
+    </div>
+  </div>
+<% end %>
+
+<div class="card">
+  <div class="card-header fw-semibold">Profile</div>
+  <div class="card-body">
+    <dl class="row mb-0">
+      <dt class="col-sm-3">Phone</dt><dd class="col-sm-9"><%= @member.phone %></dd>
+      <dt class="col-sm-3">Business Category</dt><dd class="col-sm-9"><%= @member.business_category_id ? @member.business_category&.name : @member.business_category %></dd>
+      <dt class="col-sm-3">Speciality</dt><dd class="col-sm-9"><%= @member.speciality %></dd>
+      <dt class="col-sm-3">Website</dt><dd class="col-sm-9"><%= @member.website %></dd>
+      <dt class="col-sm-3">GST</dt><dd class="col-sm-9"><%= @member.gst_number %></dd>
+      <dt class="col-sm-3">PAN</dt><dd class="col-sm-9"><%= @member.pan_number %></dd>
+    </dl>
+  </div>
+</div>

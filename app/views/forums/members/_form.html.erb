@@ -1,0 +1,103 @@
+<%= form_with model: member, url: url, method: method, scope: :member, local: true do |f| %>
+  <h2 class="h6 text-uppercase text-muted mb-3">Profile</h2>
+  <div class="mb-3">
+    <%= f.label :full_name, "Full Name", class: "form-label" %>
+    <%= f.text_field :full_name, class: "form-control", required: true %>
+  </div>
+  <div class="row g-3 mb-3">
+    <div class="col-12 col-sm-6">
+      <%= f.label :email, class: "form-label" %>
+      <%= f.email_field :email, class: "form-control", required: true %>
+    </div>
+    <div class="col-12 col-sm-6">
+      <%= f.label :phone, "Phone Number", class: "form-label" %>
+      <%= f.telephone_field :phone, class: "form-control", required: true %>
+    </div>
+  </div>
+  <div class="row g-3 mb-3">
+    <div class="col-12 col-sm-6">
+      <%= f.label :date_of_birth, class: "form-label" %>
+      <%= f.date_field :date_of_birth, class: "form-control" %>
+    </div>
+    <div class="col-12 col-sm-6">
+      <%= f.label :photo, "Photo", class: "form-label" %>
+      <%= f.file_field :photo, class: "form-control", accept: "image/*" %>
+    </div>
+  </div>
+  <div class="mb-4">
+    <%= f.label :address, class: "form-label" %>
+    <%= f.text_area :address, class: "form-control", rows: 2 %>
+  </div>
+
+  <h2 class="h6 text-uppercase text-muted mb-3">Business Details</h2>
+  <div class="mb-3">
+    <%= f.label :business_name, "Business Name", class: "form-label" %>
+    <%= f.text_field :business_name, class: "form-control" %>
+  </div>
+  <div class="row g-3 mb-3">
+    <div class="col-12 col-sm-6">
+      <%= f.label :business_category, "Business Category (free text)", class: "form-label" %>
+      <%= f.text_field :business_category, class: "form-control" %>
+    </div>
+    <div class="col-12 col-sm-6">
+      <%= f.label :speciality, class: "form-label" %>
+      <%= f.text_field :speciality, class: "form-control" %>
+    </div>
+  </div>
+  <div class="row g-3 mb-3">
+    <div class="col-12 col-sm-6">
+      <%= f.label :business_category_id, "Category (from list)", class: "form-label" %>
+      <%= f.collection_select :business_category_id, @current_forum.business_categories.order(:name), :id, :name, { include_blank: true }, class: "form-select" %>
+    </div>
+    <div class="col-12 col-sm-6">
+      <%= f.label :website, class: "form-label" %>
+      <%= f.text_field :website, class: "form-control" %>
+    </div>
+  </div>
+  <div class="row g-3 mb-4">
+    <div class="col-12 col-sm-4">
+      <%= f.label :gst_number, "GST Number", class: "form-label" %>
+      <%= f.text_field :gst_number, class: "form-control" %>
+    </div>
+    <div class="col-12 col-sm-4">
+      <%= f.label :pan_number, "PAN Number", class: "form-label" %>
+      <%= f.text_field :pan_number, class: "form-control" %>
+    </div>
+    <div class="col-12 col-sm-4">
+      <%= f.label :aadhaar_number, "Aadhaar Number", class: "form-label" %>
+      <%= f.text_field :aadhaar_number, class: "form-control" %>
+    </div>
+  </div>
+
+  <h2 class="h6 text-uppercase text-muted mb-3">KYC Documents</h2>
+  <div class="mb-4">
+    <%= f.label :kyc_documents, "Upload documents (multiple allowed)", class: "form-label" %>
+    <%= f.file_field :kyc_documents, multiple: true, class: "form-control" %>
+    <% if member.persisted? && member.kyc_documents.attached? %>
+      <ul class="list-unstyled small mt-2 mb-0">
+        <% member.kyc_documents.each do |doc| %>
+          <li><i class="bi bi-paperclip me-1"></i><%= link_to doc.filename, rails_blob_path(doc, disposition: "attachment") %></li>
+        <% end %>
+      </ul>
+    <% end %>
+  </div>
+
+  <% if member.new_record? %>
+    <h2 class="h6 text-uppercase text-muted mb-3">Login</h2>
+    <div class="row g-3 mb-4">
+      <div class="col-12 col-sm-6">
+        <%= f.label :password, class: "form-label" %>
+        <%= f.password_field :password, class: "form-control", required: true, minlength: 6, autocomplete: "new-password" %>
+      </div>
+      <div class="col-12 col-sm-6">
+        <%= f.label :password_confirmation, "Confirm Password", class: "form-label" %>
+        <%= f.password_field :password_confirmation, class: "form-control", required: true, minlength: 6, autocomplete: "new-password" %>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="d-flex flex-wrap gap-2">
+    <%= f.submit member.new_record? ? "Add Member" : "Save Changes", class: "btn btn-primary btn-lg" %>
+    <%= link_to "Cancel", forum_chapter_members_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id), class: "btn btn-outline-secondary btn-lg" %>
+  </div>
+<% end %>

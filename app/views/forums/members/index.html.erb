@@ -5,8 +5,14 @@
     <h1 class="page-title h4">Members</h1>
     <p class="page-subtitle mb-0"><%= @chapter.name %> &middot; <%= @current_forum.name %></p>
   </div>
-  <%= link_to new_forum_chapter_member_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id), class: "btn btn-primary" do %>
-    <i class="bi bi-plus-lg me-1"></i> Add Member
+  <% if can? :create, User %>
+    <div class="d-flex flex-wrap gap-2">
+      <%= link_to "Export CSV", "#{forum_chapter_members_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id)}.csv", class: "btn btn-outline-primary" %>
+      <%= link_to "Import Excel", import_forum_chapter_members_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id), class: "btn btn-outline-primary" %>
+      <%= link_to new_forum_chapter_member_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id), class: "btn btn-primary" do %>
+        <i class="bi bi-plus-lg me-1"></i> Add Member
+      <% end %>
+    </div>
   <% end %>
 </div>
 
@@ -21,6 +27,7 @@
           <th>Business</th>
           <th>Category</th>
           <th>Speciality</th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
@@ -32,10 +39,13 @@
             <td><%= member.business_name %></td>
             <td><%= member.business_category %></td>
             <td><%= member.speciality %></td>
+            <td class="text-end">
+              <%= link_to "View", forum_chapter_member_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: member.id), class: "btn btn-sm btn-outline-secondary" %>
+            </td>
           </tr>
         <% end %>
         <% if @members.empty? %>
-          <tr><td colspan="6" class="text-center text-muted py-4">No members yet. Add the first one to get started.</td></tr>
+          <tr><td colspan="7" class="text-center text-muted py-4">No members yet. Add the first one to get started.</td></tr>
         <% end %>
       </tbody>
     </table>

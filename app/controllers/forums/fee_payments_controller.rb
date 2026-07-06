@@ -4,16 +4,19 @@ module Forums
     before_action :set_fee_payment, only: [ :mark_paid ]
 
     def index
+      authorize! :read, FeePayment
       @fee_payments = FeePayment.joins(:user).where(users: { chapter_id: @chapter.id }).order(created_at: :desc).page(params[:page])
     end
 
     def new
+      authorize! :create, FeePayment
       @fee_payment = FeePayment.new
       @people = billable_people
     end
 
     def create
       @fee_payment = FeePayment.new(fee_payment_params)
+      authorize! :create, @fee_payment
 
       if @fee_payment.user && @fee_payment.user.chapter_id == @chapter.id && @fee_payment.save
         redirect_to forum_chapter_fee_payments_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id), notice: "Fee recorded for #{@fee_payment.user.display_name}."
@@ -26,6 +29,7 @@ module Forums
     end
 
     def mark_paid
+      authorize! :update, @fee_payment
       @fee_payment.mark_paid!
       redirect_to forum_chapter_fee_payments_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id), notice: "Fee marked as paid."
     end

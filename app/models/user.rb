@@ -5,12 +5,17 @@ class User < ApplicationRecord
          :recoverable, :rememberable, :validatable
 
   enum :role, { super_admin: 0, forum_admin: 1, chapter_admin: 2, committee_member: 3, member: 4, guest: 5 }
+  enum :membership_status, { pending: 0, active: 1, suspended: 2 }, prefix: :membership
 
   DESIGNATIONS = [ "President", "Vice President", "Secretary", "Treasurer", "Coordinator" ].freeze
+
+  has_one_attached :photo
+  has_many_attached :kyc_documents
 
   belongs_to :forum, optional: true
   belongs_to :chapter, optional: true
   belongs_to :invited_by, class_name: "User", optional: true
+  belongs_to :business_category, optional: true
   has_many :invitees, class_name: "User", foreign_key: :invited_by_id, dependent: :nullify, inverse_of: :invited_by
   has_many :fee_payments, dependent: :destroy
   has_many :attendances, dependent: :destroy
