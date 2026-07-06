@@ -93,6 +93,27 @@ Rails.application.routes.draw do
   scope "/f/:forum_slug", as: :forum do
     root to: "forums/dashboard#show"
     get "dashboard", to: "forums/dashboard#show"
+    get "apply", to: "membership_applications#new"
+    post "apply", to: "membership_applications#create"
+    resources :membership_applications, controller: "forums/membership_applications", only: [ :index, :show ] do
+      member do
+        patch :approve
+        patch :reject
+      end
+    end
+    resources :membership_plans, controller: "forums/membership_plans", except: [ :show ]
+    get "finance", to: "forums/finance#show"
+    resources :expenses, controller: "forums/expenses", except: [ :show ]
+    resources :documents, controller: "forums/documents", except: [ :show, :edit, :update ]
+    resources :announcements, controller: "forums/announcements", only: [ :index, :new, :create, :destroy ]
+    resources :notifications, controller: "forums/notifications", only: [ :index ] do
+      member do
+        patch :mark_read
+      end
+      collection do
+        patch :mark_all_read
+      end
+    end
     resources :chapters, controller: "forums/chapters", only: [ :index, :new, :create, :show, :edit, :update, :destroy ] do
       member do
         patch :activate
@@ -122,12 +143,17 @@ Rails.application.routes.draw do
       resources :fee_payments, controller: "forums/fee_payments", only: [ :index, :new, :create ] do
         member do
           patch :mark_paid
+          get :print
         end
       end
       resources :meetings, controller: "forums/meetings", only: [ :index, :new, :create, :show, :edit, :update, :destroy ]
       resources :weekly_presentations, controller: "forums/weekly_presentations", only: [ :index, :new, :create, :show, :edit, :update, :destroy ]
       resources :attendances, controller: "forums/attendances", only: [ :index, :new, :create ]
       resources :referrals, controller: "forums/referrals", only: [ :index, :new, :create, :show ] do
+        member do
+          patch :accept
+          patch :reject
+        end
         resources :thanksgiving_slips, controller: "forums/thanksgiving_slips", only: [ :new, :create ]
       end
     end
@@ -146,6 +172,30 @@ Rails.application.routes.draw do
       end
     end
     resources :office_darshans, controller: "forums/office_darshans", except: [ :edit, :update ]
+    resources :events, controller: "forums/events" do
+      resources :registrations, controller: "forums/event_registrations", only: [ :index, :create, :destroy ]
+    end
+    get "calendar", to: "forums/calendar#show"
+    get "analytics", to: "forums/analytics#show"
+    resources :roles, controller: "forums/roles", only: [ :index ]
+    resource :settings, controller: "forums/settings", only: [ :edit, :update ]
+    resource :profile, controller: "forums/profiles", only: [ :edit, :update ] do
+      post :force_logout_others
+    end
+    get "help", to: "forums/help#show"
+    resources :reports, controller: "forums/reports", only: [ :index ] do
+      collection do
+        get :members
+        get :guests
+        get :attendance
+        get :referrals
+        get :business_generated
+        get :chapters
+        get :meetings
+        get :events
+        get :renewals
+      end
+    end
   end
 
   # Role-based dispatcher: sends signed-in users to their home area.

@@ -26,6 +26,14 @@ class Ability
       can :manage, WeeklyPresentation, chapter: { forum_id: user.forum_id }
       can :manage, OneToOneMeeting, forum_id: user.forum_id
       can :manage, OfficeDarshan, forum_id: user.forum_id
+      can :manage, Event, forum_id: user.forum_id
+      can :manage, EventRegistration, event: { forum_id: user.forum_id }
+      can :manage, MembershipApplication, forum_id: user.forum_id
+      can :manage, MembershipPlan, forum_id: user.forum_id
+      can :manage, Expense, forum_id: user.forum_id
+      can :manage, Document, forum_id: user.forum_id
+      can [ :read, :create, :destroy ], Announcement, forum_id: user.forum_id
+      can :access, :forum_reports
     when :chapter_admin
       can [ :read, :update ], Chapter, id: user.chapter_id
       can :manage, User, chapter_id: user.chapter_id
@@ -38,12 +46,21 @@ class Ability
       can :manage, WeeklyPresentation, chapter_id: user.chapter_id
       can :manage, OneToOneMeeting, forum_id: user.forum_id
       can :manage, OfficeDarshan, forum_id: user.forum_id
+      can :manage, Event, forum_id: user.forum_id
+      can :manage, EventRegistration, event: { forum_id: user.forum_id }
+      can :manage, MembershipApplication, forum_id: user.forum_id
+      can :manage, MembershipPlan, forum_id: user.forum_id
+      can :manage, Expense, forum_id: user.forum_id
+      can :manage, Document, forum_id: user.forum_id
+      can [ :read, :create, :destroy ], Announcement, forum_id: user.forum_id
+      can :access, :forum_reports
     when :committee_member
       can :read, Chapter, id: user.chapter_id
       can :read, User, chapter_id: user.chapter_id
       can [ :read, :create ], Attendance, user: { chapter_id: user.chapter_id }
       can [ :read, :create ], Referral, giver_id: user.id
       can :read, Referral, giver: { chapter_id: user.chapter_id }
+      can :update, Referral, receiver_id: user.id
       can [ :read, :create ], ThanksgivingSlip, given_by_id: user.id
       can :read, BusinessCategory, forum_id: user.forum_id
       can [ :read, :create, :update ], Meeting, chapter_id: user.chapter_id
@@ -51,12 +68,16 @@ class Ability
       can [ :read, :create ], OneToOneMeeting, requester_id: user.id
       can [ :read, :update ], OneToOneMeeting, requested_with_id: user.id
       can :read, OfficeDarshan, member_id: user.id
+      can :read, Event, forum_id: user.forum_id
+      can [ :read, :create, :destroy ], EventRegistration, user_id: user.id
+      can :read, MembershipPlan, forum_id: user.forum_id
+      can :read, Document, forum_id: user.forum_id
     when :member
       can :read, Chapter, id: user.chapter_id
       can :read, User, id: user.id
       can :update, User, id: user.id
       can [ :read, :create ], Referral, giver_id: user.id
-      can :read, Referral, receiver_id: user.id
+      can [ :read, :update ], Referral, receiver_id: user.id
       can [ :read, :create ], ThanksgivingSlip, given_by_id: user.id
       can :read, Attendance, user_id: user.id
       can :read, FeePayment, user_id: user.id
@@ -65,12 +86,20 @@ class Ability
       can [ :read, :create ], OneToOneMeeting, requester_id: user.id
       can [ :read, :update ], OneToOneMeeting, requested_with_id: user.id
       can :read, OfficeDarshan, member_id: user.id
+      can :read, Event, forum_id: user.forum_id
+      can [ :read, :create, :destroy ], EventRegistration, user_id: user.id
+      can :read, MembershipPlan, forum_id: user.forum_id
+      can :read, Document, forum_id: user.forum_id
     when :guest
       can :read, Chapter, id: user.chapter_id
       can :read, User, id: user.id
       can :update, User, id: user.id
       can :read, Attendance, user_id: user.id
       can :read, Meeting, chapter_id: user.chapter_id
+      can :read, Event, forum_id: user.forum_id
+      can [ :read, :create, :destroy ], EventRegistration, user_id: user.id
+      can :read, MembershipPlan, forum_id: user.forum_id
+      can :read, Document, forum_id: user.forum_id
     end
   end
 end

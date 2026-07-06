@@ -1,0 +1,26 @@
+<% content_for :title, "Guests Report" %>
+
+<div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+  <h1 class="page-title h4">Guests Report</h1>
+  <%= link_to "Export CSV", "#{guests_forum_reports_path}.csv", class: "btn btn-outline-primary" %>
+</div>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Chapter</th><th>Nature of Business</th><th>Joined</th></tr></thead>
+      <tbody>
+        <% @guests.each do |g| %>
+          <tr>
+            <td class="fw-semibold"><%= g.full_name %></td>
+            <td><%= g.email %></td>
+            <td><%= g.phone %></td>
+            <td><%= g.chapter&.name %></td>
+            <td><%= g.nature_of_business %></td>
+            <td><%= g.created_at.strftime("%d %b %Y") %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -1,0 +1,26 @@
+<% content_for :title, "Chapters Report" %>
+
+<div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+  <h1 class="page-title h4">Chapters Report</h1>
+  <%= link_to "Export CSV", "#{chapters_forum_reports_path}.csv", class: "btn btn-outline-primary" %>
+</div>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead><tr><th>Name</th><th>Status</th><th>Members</th><th>Guests</th><th>Committee</th><th>Created</th></tr></thead>
+      <tbody>
+        <% @chapters.each do |c| %>
+          <tr>
+            <td class="fw-semibold"><%= c.name %></td>
+            <td><%= c.status.titleize %></td>
+            <td><%= c.members.count %></td>
+            <td><%= c.guests.count %></td>
+            <td><%= c.committee_members.count %></td>
+            <td><%= c.created_at.strftime("%d %b %Y") %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

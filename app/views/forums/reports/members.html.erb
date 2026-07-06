@@ -1,0 +1,27 @@
+<% content_for :title, "Members Report" %>
+
+<div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+  <h1 class="page-title h4">Members Report</h1>
+  <%= link_to "Export CSV", "#{members_forum_reports_path}.csv", class: "btn btn-outline-primary" %>
+</div>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Chapter</th><th>Status</th><th>Renews On</th><th>Joined</th></tr></thead>
+      <tbody>
+        <% @members.each do |m| %>
+          <tr>
+            <td class="fw-semibold"><%= m.full_name %></td>
+            <td><%= m.email %></td>
+            <td><%= m.phone %></td>
+            <td><%= m.chapter&.name %></td>
+            <td><%= m.membership_status.titleize %></td>
+            <td><%= m.renews_on&.strftime("%d %b %Y") %></td>
+            <td><%= m.created_at.strftime("%d %b %Y") %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

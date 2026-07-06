@@ -8,9 +8,15 @@ class OneToOneMeeting < ApplicationRecord
   validates :scheduled_at, presence: true
   validate :requester_and_requested_with_differ
 
+  after_create :notify_requested_with
+
   private
 
   def requester_and_requested_with_differ
     errors.add(:requested_with, "must be a different member than the requester") if requester_id == requested_with_id
+  end
+
+  def notify_requested_with
+    requested_with.notifications.create!(body: "#{requester.display_name} requested a one-to-one meeting with you.")
   end
 end

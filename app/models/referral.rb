@@ -1,5 +1,6 @@
 class Referral < ApplicationRecord
   enum :referral_type, { self_referral: 0, outside_referral: 1 }
+  enum :status, { pending: 0, accepted: 1, rejected: 2, converted: 3 }
 
   belongs_to :giver, class_name: "User"
   belongs_to :receiver, class_name: "User"
@@ -10,7 +11,13 @@ class Referral < ApplicationRecord
   validate :giver_and_receiver_differ
   validate :giver_and_receiver_in_same_forum
 
+  after_create :notify_receiver
+
   private
+
+  def notify_receiver
+    receiver.notifications.create!(body: "You received a new referral from #{giver.display_name} for #{prospect_name}.")
+  end
 
   def giver_and_receiver_differ
     return unless giver && receiver

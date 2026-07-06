@@ -1,0 +1,15 @@
+<% content_for :title, "Edit Expense" %>
+
+<div class="page-header">
+  <h1 class="page-title h4">Edit Expense</h1>
+</div>
+
+<div class="row justify-content-center">
+  <div class="col-12 col-lg-6">
+    <div class="card">
+      <div class="card-body p-4">
+        <%= render "form", expense: @expense, url: forum_expense_path(forum_slug: @current_forum.slug, id: @expense.id), method: :patch %>
+      </div>
+    </div>
+  </div>
+</div>

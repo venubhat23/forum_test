@@ -7,6 +7,8 @@ class Meeting < ApplicationRecord
 
   validates :scheduled_at, presence: true
 
+  after_create :notify_chapter_members
+
   def attendance_percentage
     total = chapter.members.count
     return 0 if total.zero?
@@ -18,5 +20,12 @@ class Meeting < ApplicationRecord
   def defaulters
     attended_ids = attendances.where(present: true).pluck(:user_id)
     chapter.members.where.not(id: attended_ids)
+  end
+
+  private
+
+  def notify_chapter_members
+    message = "A new #{meeting_type} meeting has been scheduled for #{scheduled_at.strftime('%d %b %Y %H:%M')}."
+    chapter.members.find_each { |member| member.notifications.create!(body: message) }
   end
 end

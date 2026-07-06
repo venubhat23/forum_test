@@ -16,12 +16,14 @@ class User < ApplicationRecord
   belongs_to :chapter, optional: true
   belongs_to :invited_by, class_name: "User", optional: true
   belongs_to :business_category, optional: true
+  belongs_to :membership_plan, optional: true
   has_many :invitees, class_name: "User", foreign_key: :invited_by_id, dependent: :nullify, inverse_of: :invited_by
   has_many :fee_payments, dependent: :destroy
   has_many :attendances, dependent: :destroy
   has_many :referrals_given, class_name: "Referral", foreign_key: :giver_id, dependent: :destroy, inverse_of: :giver
   has_many :referrals_received, class_name: "Referral", foreign_key: :receiver_id, dependent: :destroy, inverse_of: :receiver
   has_many :thanksgiving_slips_given, class_name: "ThanksgivingSlip", foreign_key: :given_by_id, dependent: :destroy, inverse_of: :given_by
+  has_many :notifications, dependent: :destroy
 
   validates :forum, presence: true, unless: :super_admin?
   validates :chapter, presence: true, if: -> { member? || guest? || committee_member? }

@@ -1,0 +1,47 @@
+<% content_for :title, "Expenses" %>
+
+<div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+  <div>
+    <h1 class="page-title h4">Expenses</h1>
+    <p class="page-subtitle mb-0"><%= @current_forum.name %></p>
+  </div>
+  <%= link_to new_forum_expense_path(forum_slug: @current_forum.slug), class: "btn btn-primary" do %>
+    <i class="bi bi-plus-lg me-1"></i> Record Expense
+  <% end %>
+</div>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th>Category</th>
+          <th>Amount</th>
+          <th>Date</th>
+          <th>Notes</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @expenses.each do |expense| %>
+          <tr>
+            <td class="fw-semibold"><%= expense.category %></td>
+            <td>&#8377;<%= number_with_delimiter(expense.amount.to_i) %></td>
+            <td><%= expense.incurred_on.strftime("%d %b %Y") %></td>
+            <td><%= expense.notes %></td>
+            <td class="text-end">
+              <%= link_to "Edit", edit_forum_expense_path(forum_slug: @current_forum.slug, id: expense.id), class: "btn btn-sm btn-outline-secondary" %>
+              <%= button_to "Delete", forum_expense_path(forum_slug: @current_forum.slug, id: expense.id), method: :delete, class: "btn btn-sm btn-outline-danger d-inline",
+                    data: { turbo_confirm: "Delete this expense?" } %>
+            </td>
+          </tr>
+        <% end %>
+        <% if @expenses.empty? %>
+          <tr><td colspan="5" class="text-center text-muted py-4">No expenses recorded yet.</td></tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<%= paginate @expenses %>

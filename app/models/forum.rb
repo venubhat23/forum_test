@@ -8,6 +8,12 @@ class Forum < ApplicationRecord
   has_many :business_categories, dependent: :destroy
   has_many :one_to_one_meetings, dependent: :destroy
   has_many :office_darshans, dependent: :destroy
+  has_many :events, dependent: :destroy
+  has_many :membership_applications, dependent: :destroy
+  has_many :membership_plans, dependent: :destroy
+  has_many :expenses, dependent: :destroy
+  has_many :documents, dependent: :destroy
+  has_one :forum_setting, dependent: :destroy
 
   validates :name, presence: true
   validates :slug, presence: true, uniqueness: true,

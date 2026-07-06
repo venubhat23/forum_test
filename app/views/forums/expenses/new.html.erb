@@ -1,0 +1,15 @@
+<% content_for :title, "Record Expense" %>
+
+<div class="page-header">
+  <h1 class="page-title h4">Record Expense</h1>
+</div>
+
+<div class="row justify-content-center">
+  <div class="col-12 col-lg-6">
+    <div class="card">
+      <div class="card-body p-4">
+        <%= render "form", expense: @expense, url: forum_expenses_path(forum_slug: @current_forum.slug), method: :post %>
+      </div>
+    </div>
+  </div>
+</div>

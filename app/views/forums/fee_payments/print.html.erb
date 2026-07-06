@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Invoice <%= @fee_payment.invoice_number %></title>
+  <style>
+    body { font-family: -apple-system, sans-serif; padding: 32px; max-width: 600px; margin: 0 auto; }
+    h1 { font-size: 20px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+    td, th { padding: 8px; border-bottom: 1px solid #ddd; text-align: left; }
+    .total { font-weight: bold; font-size: 16px; }
+    @media print { body { padding: 0; } }
+  </style>
+</head>
+<body>
+  <h1><%= @current_forum.name %></h1>
+  <p>Invoice #<%= @fee_payment.invoice_number %></p>
+
+  <table>
+    <tr><th>Billed To</th><td><%= @fee_payment.user.display_name %> (<%= @fee_payment.user.email %>)</td></tr>
+    <tr><th>Fee Type</th><td><%= @fee_payment.fee_type.titleize %></td></tr>
+    <tr><th>Due Date</th><td><%= @fee_payment.due_date&.strftime("%d %b %Y") %></td></tr>
+    <tr><th>Status</th><td><%= @fee_payment.status.titleize %></td></tr>
+    <% if @fee_payment.paid? %>
+      <tr><th>Paid On</th><td><%= @fee_payment.paid_on&.strftime("%d %b %Y") %></td></tr>
+      <tr><th>Payment Method</th><td><%= @fee_payment.payment_method&.titleize || "—" %></td></tr>
+    <% end %>
+    <tr class="total"><th>Amount</th><td><%= number_to_currency(@fee_payment.amount) %></td></tr>
+  </table>
+
+  <script>window.onload = () => window.print();</script>
+</body>
+</html>

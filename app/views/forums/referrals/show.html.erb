@@ -1,8 +1,16 @@
 <% content_for :title, @referral.prospect_name %>
 
-<div class="page-header">
-  <h1 class="page-title h4"><%= @referral.prospect_name %></h1>
-  <p class="page-subtitle mb-0"><%= @chapter.name %> &middot; <%= @current_forum.name %></p>
+<div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+  <div>
+    <h1 class="page-title h4"><%= @referral.prospect_name %></h1>
+    <p class="page-subtitle mb-0"><%= @chapter.name %> &middot; <%= @current_forum.name %> &middot; <span class="badge bg-secondary"><%= @referral.status.titleize %></span></p>
+  </div>
+  <% if can?(:update, @referral) && @referral.pending? %>
+    <div class="d-flex flex-wrap gap-2">
+      <%= button_to "Accept", accept_forum_chapter_referral_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: @referral.id), method: :patch, class: "btn btn-success" %>
+      <%= button_to "Reject", reject_forum_chapter_referral_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: @referral.id), method: :patch, class: "btn btn-outline-danger" %>
+    </div>
+  <% end %>
 </div>
 
 <div class="card mb-4">
@@ -29,6 +37,7 @@
           <th>Given By</th>
           <th>Amount</th>
           <th>Notes</th>
+          <th>Proof</th>
           <th>Date</th>
         </tr>
       </thead>
@@ -38,11 +47,12 @@
             <td><%= slip.given_by.display_name %></td>
             <td><%= number_to_currency(slip.amount) %></td>
             <td><%= slip.notes.presence || "—" %></td>
+            <td><%= slip.proof.attached? ? link_to("View", rails_blob_path(slip.proof, disposition: "attachment")) : "—" %></td>
             <td><%= slip.created_at.strftime("%d %b %Y") %></td>
           </tr>
         <% end %>
         <% if @referral.thanksgiving_slips.empty? %>
-          <tr><td colspan="4" class="text-center text-muted py-4">No thanksgiving slips yet.</td></tr>
+          <tr><td colspan="5" class="text-center text-muted py-4">No thanksgiving slips yet.</td></tr>
         <% end %>
       </tbody>
     </table>

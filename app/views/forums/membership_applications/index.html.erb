@@ -1,0 +1,49 @@
+<% content_for :title, "Membership Applications" %>
+
+<div class="page-header">
+  <h1 class="page-title h4">Membership Applications</h1>
+  <p class="page-subtitle mb-0"><%= @current_forum.name %></p>
+</div>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Business</th>
+          <th>Status</th>
+          <th>Submitted</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @applications.each do |app| %>
+          <tr>
+            <td class="fw-semibold"><%= app.name %></td>
+            <td><%= app.email %></td>
+            <td><%= app.business_name %></td>
+            <td>
+              <% case app.status
+                 when "pending" %>
+                <span class="badge bg-warning text-dark">Pending</span>
+              <% when "approved" %>
+                <span class="badge bg-success">Approved</span>
+              <% else %>
+                <span class="badge bg-secondary">Rejected</span>
+              <% end %>
+            </td>
+            <td><%= app.created_at.strftime("%d %b %Y") %></td>
+            <td class="text-end">
+              <%= link_to "Review", forum_membership_application_path(forum_slug: @current_forum.slug, id: app.id), class: "btn btn-sm btn-outline-secondary" %>
+            </td>
+          </tr>
+        <% end %>
+        <% if @applications.empty? %>
+          <tr><td colspan="6" class="text-center text-muted py-4">No applications yet.</td></tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

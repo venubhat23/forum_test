@@ -50,6 +50,16 @@
             </div>
 
             <div class="d-flex align-items-center">
+              <% if current_area == :forum %>
+                <% unread_count = current_user.notifications.unread.count %>
+                <%= link_to forum_notifications_path(forum_slug: @current_forum.slug), class: "btn btn-outline-secondary btn-sm position-relative me-2", title: "Notifications" do %>
+                  <i class="bi bi-bell"></i>
+                  <% if unread_count.positive? %>
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"><%= unread_count %></span>
+                  <% end %>
+                <% end %>
+              <% end %>
+
               <button class="theme-toggle-btn" id="themeToggleBtn" type="button" title="Toggle dark/light mode" onclick="toggleTheme()">
                 <i class="bi bi-sun-fill sun-icon"></i>
                 <i class="bi bi-moon-stars-fill moon-icon"></i>

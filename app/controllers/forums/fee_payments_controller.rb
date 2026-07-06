@@ -1,7 +1,7 @@
 module Forums
   class FeePaymentsController < BaseController
     before_action :set_chapter
-    before_action :set_fee_payment, only: [ :mark_paid ]
+    before_action :set_fee_payment, only: [ :mark_paid, :print ]
 
     def index
       authorize! :read, FeePayment
@@ -30,8 +30,13 @@ module Forums
 
     def mark_paid
       authorize! :update, @fee_payment
-      @fee_payment.mark_paid!
+      @fee_payment.mark_paid!(payment_method: params[:payment_method])
       redirect_to forum_chapter_fee_payments_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id), notice: "Fee marked as paid."
+    end
+
+    def print
+      authorize! :read, @fee_payment
+      render layout: false
     end
 
     private

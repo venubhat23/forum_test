@@ -1,0 +1,44 @@
+<% content_for :title, "Announcements" %>
+
+<div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+  <div>
+    <h1 class="page-title h4">Announcements</h1>
+    <p class="page-subtitle mb-0"><%= @current_forum.name %></p>
+  </div>
+  <%= link_to new_forum_announcement_path(forum_slug: @current_forum.slug), class: "btn btn-primary" do %>
+    <i class="bi bi-plus-lg me-1"></i> New Announcement
+  <% end %>
+</div>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Scope</th>
+          <th>Posted</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @announcements.each do |a| %>
+          <tr>
+            <td class="fw-semibold"><%= a.title %></td>
+            <td><span class="badge bg-secondary"><%= a.everyone? ? "Platform-wide" : "This forum" %></span></td>
+            <td><%= a.created_at.strftime("%d %b %Y") %></td>
+            <td class="text-end">
+              <% if a.forum_id == @current_forum.id %>
+                <%= button_to "Delete", forum_announcement_path(forum_slug: @current_forum.slug, id: a.id), method: :delete, class: "btn btn-sm btn-outline-danger",
+                      data: { turbo_confirm: "Delete this announcement?" } %>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+        <% if @announcements.empty? %>
+          <tr><td colspan="4" class="text-center text-muted py-4">No announcements yet.</td></tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -1,12 +1,14 @@
 module Forums
   class ReferralsController < BaseController
     before_action :set_chapter
-    before_action :set_referral, only: [ :show ]
+    before_action :set_referral, only: [ :show, :accept, :reject ]
 
     def index
       authorize! :read, Referral
       @referrals = Referral.joins("INNER JOIN users givers ON givers.id = referrals.giver_id")
         .where(givers: { chapter_id: @chapter.id }).order(created_at: :desc).page(params[:page])
+      @monthly_stats = Referral.joins("INNER JOIN users givers ON givers.id = referrals.giver_id")
+        .where(givers: { chapter_id: @chapter.id }).group_by_month(:created_at, last: 6).count
     end
 
     def show
@@ -31,6 +33,18 @@ module Forums
         flash.now[:alert] = @referral.errors.full_messages.to_sentence
         render :new, status: :unprocessable_entity
       end
+    end
+
+    def accept
+      authorize! :update, @referral
+      @referral.update!(status: :accepted)
+      redirect_to forum_chapter_referral_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: @referral.id), notice: "Referral accepted."
+    end
+
+    def reject
+      authorize! :update, @referral
+      @referral.update!(status: :rejected)
+      redirect_to forum_chapter_referral_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: @referral.id), notice: "Referral rejected."
     end
 
     private

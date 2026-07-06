@@ -1,0 +1,69 @@
+<% content_for :title, @application.name %>
+
+<div class="page-header">
+  <h1 class="page-title h4"><%= @application.name %></h1>
+  <p class="page-subtitle mb-0">Submitted <%= @application.created_at.strftime("%d %b %Y") %></p>
+</div>
+
+<div class="card mb-4">
+  <div class="card-header fw-semibold">Application Details</div>
+  <div class="card-body">
+    <dl class="row mb-0">
+      <dt class="col-sm-3">Email</dt><dd class="col-sm-9"><%= @application.email %></dd>
+      <dt class="col-sm-3">Phone</dt><dd class="col-sm-9"><%= @application.phone.presence || "&mdash;".html_safe %></dd>
+      <dt class="col-sm-3">Business</dt><dd class="col-sm-9"><%= @application.business_name.presence || "&mdash;".html_safe %></dd>
+      <dt class="col-sm-3">Nature of Business</dt><dd class="col-sm-9"><%= @application.nature_of_business.presence || "&mdash;".html_safe %></dd>
+      <dt class="col-sm-3">Status</dt>
+      <dd class="col-sm-9">
+        <% case @application.status
+           when "pending" %>
+          <span class="badge bg-warning text-dark">Pending</span>
+        <% when "approved" %>
+          <span class="badge bg-success">Approved</span>
+        <% else %>
+          <span class="badge bg-secondary">Rejected</span>
+          <% if @application.review_note.present? %>
+            <div class="text-muted small mt-1"><%= @application.review_note %></div>
+          <% end %>
+        <% end %>
+      </dd>
+    </dl>
+  </div>
+</div>
+
+<% if @application.pending? %>
+  <div class="row g-3">
+    <div class="col-12 col-lg-6">
+      <div class="card h-100">
+        <div class="card-header fw-semibold">Approve &amp; Create Member</div>
+        <div class="card-body">
+          <%= form_with url: approve_forum_membership_application_path(forum_slug: @current_forum.slug, id: @application.id), method: :patch, local: true do %>
+            <div class="mb-3">
+              <label class="form-label">Chapter</label>
+              <%= select_tag "chapter_id", options_from_collection_for_select(@current_forum.chapters.order(:name), :id, :name), class: "form-select", required: true %>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Temporary Password (blank = auto-generate)</label>
+              <%= password_field_tag "password", nil, class: "form-control" %>
+            </div>
+            <%= submit_tag "Approve & Create Member", class: "btn btn-success" %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 col-lg-6">
+      <div class="card h-100">
+        <div class="card-header fw-semibold">Reject</div>
+        <div class="card-body">
+          <%= form_with url: reject_forum_membership_application_path(forum_slug: @current_forum.slug, id: @application.id), method: :patch, local: true do %>
+            <div class="mb-3">
+              <label class="form-label">Reason (optional)</label>
+              <%= text_area_tag "review_note", nil, class: "form-control", rows: 3 %>
+            </div>
+            <%= submit_tag "Reject Application", class: "btn btn-outline-danger" %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>

@@ -1,0 +1,57 @@
+<% content_for :title, "Calendar" %>
+
+<div class="page-header">
+  <h1 class="page-title h4">Calendar</h1>
+  <p class="page-subtitle mb-0"><%= Date.current.strftime("%B %Y") %></p>
+</div>
+
+<div class="row g-3">
+  <div class="col-12 col-lg-4">
+    <div class="card h-100">
+      <div class="card-header fw-semibold">Meetings</div>
+      <div class="list-group list-group-flush">
+        <% @meetings.each do |m| %>
+          <div class="list-group-item">
+            <div class="fw-semibold"><%= m.chapter.name %> &middot; <%= m.meeting_type.titleize %></div>
+            <div class="text-muted small"><%= m.scheduled_at.strftime("%d %b, %H:%M") %></div>
+          </div>
+        <% end %>
+        <% if @meetings.empty? %>
+          <div class="list-group-item text-muted text-center py-3">No meetings this month.</div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+  <div class="col-12 col-lg-4">
+    <div class="card h-100">
+      <div class="card-header fw-semibold">Events</div>
+      <div class="list-group list-group-flush">
+        <% @events.each do |e| %>
+          <div class="list-group-item">
+            <div class="fw-semibold"><%= e.title %></div>
+            <div class="text-muted small"><%= e.starts_at.strftime("%d %b, %H:%M") %></div>
+          </div>
+        <% end %>
+        <% if @events.empty? %>
+          <div class="list-group-item text-muted text-center py-3">No events this month.</div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+  <div class="col-12 col-lg-4">
+    <div class="card h-100">
+      <div class="card-header fw-semibold">Membership Renewals</div>
+      <div class="list-group list-group-flush">
+        <% @renewals.each do |u| %>
+          <div class="list-group-item">
+            <div class="fw-semibold"><%= u.display_name %></div>
+            <div class="text-muted small"><%= u.renews_on.strftime("%d %b") %></div>
+          </div>
+        <% end %>
+        <% if @renewals.empty? %>
+          <div class="list-group-item text-muted text-center py-3">No renewals this month.</div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

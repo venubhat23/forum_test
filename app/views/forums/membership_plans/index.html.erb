@@ -1,0 +1,49 @@
+<% content_for :title, "Membership Plans" %>
+
+<div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+  <div>
+    <h1 class="page-title h4">Membership Plans</h1>
+    <p class="page-subtitle mb-0"><%= @current_forum.name %></p>
+  </div>
+  <% if can? :create, MembershipPlan %>
+    <%= link_to new_forum_membership_plan_path(forum_slug: @current_forum.slug), class: "btn btn-primary" do %>
+      <i class="bi bi-plus-lg me-1"></i> New Plan
+    <% end %>
+  <% end %>
+</div>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Cycle</th>
+          <th>Price</th>
+          <th>Members</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @plans.each do |plan| %>
+          <tr>
+            <td class="fw-semibold"><%= plan.name %></td>
+            <td><%= plan.cycle.titleize %></td>
+            <td>&#8377;<%= number_with_delimiter(plan.price.to_i) %></td>
+            <td><%= plan.users.count %></td>
+            <td class="text-end">
+              <% if can? :update, plan %>
+                <%= link_to "Edit", edit_forum_membership_plan_path(forum_slug: @current_forum.slug, id: plan.id), class: "btn btn-sm btn-outline-secondary" %>
+                <%= button_to "Delete", forum_membership_plan_path(forum_slug: @current_forum.slug, id: plan.id), method: :delete, class: "btn btn-sm btn-outline-danger d-inline",
+                      data: { turbo_confirm: "Delete #{plan.name}?" } %>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+        <% if @plans.empty? %>
+          <tr><td colspan="5" class="text-center text-muted py-4">No membership plans yet.</td></tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

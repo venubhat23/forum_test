@@ -1,0 +1,57 @@
+<% content_for :title, "My Profile" %>
+
+<div class="page-header">
+  <h1 class="page-title h4">My Profile</h1>
+</div>
+
+<div class="row justify-content-center">
+  <div class="col-12 col-lg-7">
+    <div class="card mb-4">
+      <div class="card-body p-4">
+        <%= form_with model: @user, url: forum_profile_path(forum_slug: @current_forum.slug), method: :patch, local: true do |f| %>
+          <div class="row g-3 mb-3">
+            <div class="col-12 col-sm-6">
+              <%= f.label :full_name, class: "form-label" %>
+              <%= f.text_field :full_name, class: "form-control" %>
+            </div>
+            <div class="col-12 col-sm-6">
+              <%= f.label :phone, class: "form-label" %>
+              <%= f.text_field :phone, class: "form-control" %>
+            </div>
+          </div>
+          <div class="mb-4">
+            <%= f.label :email, class: "form-label" %>
+            <%= f.email_field :email, class: "form-control" %>
+          </div>
+
+          <h2 class="h6 text-uppercase text-muted mb-3">Change Password (optional)</h2>
+          <div class="row g-3 mb-3">
+            <div class="col-12 col-sm-6">
+              <%= f.label :password, "New Password", class: "form-label" %>
+              <%= f.password_field :password, class: "form-control", autocomplete: "new-password" %>
+            </div>
+            <div class="col-12 col-sm-6">
+              <%= f.label :password_confirmation, "Confirm New Password", class: "form-label" %>
+              <%= f.password_field :password_confirmation, class: "form-control", autocomplete: "new-password" %>
+            </div>
+          </div>
+          <div class="mb-4">
+            <%= f.label :current_password, class: "form-label" %>
+            <%= f.password_field :current_password, class: "form-control", autocomplete: "current-password" %>
+            <div class="form-text">Required only if changing your password.</div>
+          </div>
+
+          <%= f.submit "Save Changes", class: "btn btn-primary btn-lg" %>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header fw-semibold">Active Sessions</div>
+      <div class="card-body d-flex justify-content-between align-items-center">
+        <p class="text-muted small mb-0">If you signed in on another device and want to sign it out, use this.</p>
+        <%= button_to "Sign Out Other Sessions", force_logout_others_forum_profile_path(forum_slug: @current_forum.slug), method: :post, class: "btn btn-outline-danger" %>
+      </div>
+    </div>
+  </div>
+</div>

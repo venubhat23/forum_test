@@ -1,0 +1,15 @@
+<% content_for :title, "New Membership Plan" %>
+
+<div class="page-header">
+  <h1 class="page-title h4">New Membership Plan</h1>
+</div>
+
+<div class="row justify-content-center">
+  <div class="col-12 col-lg-6">
+    <div class="card">
+      <div class="card-body p-4">
+        <%= render "form", plan: @plan, url: forum_membership_plans_path(forum_slug: @current_forum.slug), method: :post %>
+      </div>
+    </div>
+  </div>
+</div>

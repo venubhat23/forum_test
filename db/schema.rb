@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_06_013645) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_06_021703) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -102,6 +102,53 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_06_013645) do
     t.index ["code"], name: "index_coupons_on_code", unique: true
   end
 
+  create_table "documents", force: :cascade do |t|
+    t.bigint "forum_id", null: false
+    t.string "title", null: false
+    t.string "category"
+    t.string "documentable_type"
+    t.bigint "documentable_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["documentable_type", "documentable_id"], name: "index_documents_on_documentable"
+    t.index ["forum_id"], name: "index_documents_on_forum_id"
+  end
+
+  create_table "event_registrations", force: :cascade do |t|
+    t.bigint "event_id", null: false
+    t.bigint "user_id", null: false
+    t.boolean "attended", default: false, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["event_id", "user_id"], name: "index_event_registrations_on_event_id_and_user_id", unique: true
+    t.index ["event_id"], name: "index_event_registrations_on_event_id"
+    t.index ["user_id"], name: "index_event_registrations_on_user_id"
+  end
+
+  create_table "events", force: :cascade do |t|
+    t.bigint "forum_id", null: false
+    t.string "title", null: false
+    t.integer "event_type", default: 0, null: false
+    t.datetime "starts_at", null: false
+    t.string "venue"
+    t.datetime "registration_opens_at"
+    t.datetime "registration_closes_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["forum_id"], name: "index_events_on_forum_id"
+  end
+
+  create_table "expenses", force: :cascade do |t|
+    t.bigint "forum_id", null: false
+    t.string "category", null: false
+    t.decimal "amount", precision: 10, scale: 2, null: false
+    t.date "incurred_on", null: false
+    t.text "notes"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["forum_id"], name: "index_expenses_on_forum_id"
+  end
+
   create_table "fee_payments", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.integer "fee_type", null: false
@@ -111,6 +158,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_06_013645) do
     t.date "paid_on"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "invoice_number", null: false
+    t.integer "payment_method"
+    t.index ["invoice_number"], name: "index_fee_payments_on_invoice_number", unique: true
     t.index ["user_id"], name: "index_fee_payments_on_user_id"
   end
 
@@ -128,6 +178,18 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_06_013645) do
     t.datetime "updated_at", null: false
     t.index ["forum_id"], name: "index_forum_requests_on_forum_id"
     t.index ["reviewed_by_id"], name: "index_forum_requests_on_reviewed_by_id"
+  end
+
+  create_table "forum_settings", force: :cascade do |t|
+    t.bigint "forum_id", null: false
+    t.string "theme_color", default: "#4f46e5"
+    t.string "invoice_prefix", default: "INV"
+    t.text "attendance_rules"
+    t.text "meeting_rules"
+    t.text "membership_rules"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["forum_id"], name: "index_forum_settings_on_forum_id", unique: true
   end
 
   create_table "forums", force: :cascade do |t|
@@ -174,6 +236,44 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_06_013645) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["chapter_id"], name: "index_meetings_on_chapter_id"
+  end
+
+  create_table "membership_applications", force: :cascade do |t|
+    t.bigint "forum_id", null: false
+    t.bigint "chapter_id"
+    t.string "name", null: false
+    t.string "email", null: false
+    t.string "phone"
+    t.string "business_name"
+    t.string "nature_of_business"
+    t.integer "status", default: 0, null: false
+    t.text "review_note"
+    t.bigint "reviewed_by_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["chapter_id"], name: "index_membership_applications_on_chapter_id"
+    t.index ["forum_id"], name: "index_membership_applications_on_forum_id"
+    t.index ["reviewed_by_id"], name: "index_membership_applications_on_reviewed_by_id"
+  end
+
+  create_table "membership_plans", force: :cascade do |t|
+    t.bigint "forum_id", null: false
+    t.string "name", null: false
+    t.integer "cycle", default: 0, null: false
+    t.decimal "price", precision: 10, scale: 2, default: "0.0", null: false
+    t.text "renewal_rules"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["forum_id"], name: "index_membership_plans_on_forum_id"
+  end
+
+  create_table "notifications", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "body", null: false
+    t.datetime "read_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_notifications_on_user_id"
   end
 
   create_table "office_darshans", force: :cascade do |t|
@@ -252,6 +352,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_06_013645) do
     t.text "notes"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "status", default: 0, null: false
     t.index ["giver_id"], name: "index_referrals_on_giver_id"
     t.index ["receiver_id"], name: "index_referrals_on_receiver_id"
   end
@@ -359,14 +460,25 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_06_013645) do
   add_foreign_key "business_categories", "business_categories", column: "parent_id"
   add_foreign_key "business_categories", "forums"
   add_foreign_key "chapters", "forums"
+  add_foreign_key "documents", "forums"
+  add_foreign_key "event_registrations", "events"
+  add_foreign_key "event_registrations", "users"
+  add_foreign_key "events", "forums"
+  add_foreign_key "expenses", "forums"
   add_foreign_key "fee_payments", "users"
   add_foreign_key "forum_requests", "forums"
   add_foreign_key "forum_requests", "users", column: "reviewed_by_id"
+  add_foreign_key "forum_settings", "forums"
   add_foreign_key "forums", "plans"
   add_foreign_key "invoices", "coupons"
   add_foreign_key "invoices", "forums"
   add_foreign_key "invoices", "plans"
   add_foreign_key "meetings", "chapters"
+  add_foreign_key "membership_applications", "chapters"
+  add_foreign_key "membership_applications", "forums"
+  add_foreign_key "membership_applications", "users", column: "reviewed_by_id"
+  add_foreign_key "membership_plans", "forums"
+  add_foreign_key "notifications", "users"
   add_foreign_key "office_darshans", "forums"
   add_foreign_key "office_darshans", "users", column: "member_id"
   add_foreign_key "one_to_one_meetings", "forums"
@@ -386,6 +498,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_06_013645) do
   add_foreign_key "users", "business_categories"
   add_foreign_key "users", "chapters"
   add_foreign_key "users", "forums"
+  add_foreign_key "users", "membership_plans"
   add_foreign_key "users", "users", column: "invited_by_id"
   add_foreign_key "weekly_presentations", "chapters"
   add_foreign_key "weekly_presentations", "meetings"

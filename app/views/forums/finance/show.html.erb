@@ -1,0 +1,89 @@
+<% content_for :title, "Finance" %>
+
+<div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+  <div>
+    <h1 class="page-title h4">Finance</h1>
+    <p class="page-subtitle mb-0"><%= @current_forum.name %></p>
+  </div>
+  <div class="d-flex flex-wrap gap-2">
+    <%= link_to "Export CSV", "#{forum_finance_path(forum_slug: @current_forum.slug)}.csv", class: "btn btn-outline-primary" %>
+    <%= link_to "Record Expense", new_forum_expense_path(forum_slug: @current_forum.slug), class: "btn btn-primary" %>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-6 col-lg-3">
+    <div class="stats-card">
+      <div class="icon-bg gradient-green"><i class="bi bi-cash-coin"></i></div>
+      <div>
+        <div class="stats-value">&#8377;<%= number_with_delimiter(@income.to_i) %></div>
+        <div class="stats-label">Income (Collected)</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="stats-card">
+      <div class="icon-bg gradient-red"><i class="bi bi-graph-down"></i></div>
+      <div>
+        <div class="stats-value">&#8377;<%= number_with_delimiter(@expenses_total.to_i) %></div>
+        <div class="stats-label">Expenses</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="stats-card">
+      <div class="icon-bg gradient-blue"><i class="bi bi-wallet2"></i></div>
+      <div>
+        <div class="stats-value">&#8377;<%= number_with_delimiter(@net.to_i) %></div>
+        <div class="stats-label">Net</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="stats-card">
+      <div class="icon-bg gradient-yellow"><i class="bi bi-hourglass-split"></i></div>
+      <div>
+        <div class="stats-value">&#8377;<%= number_with_delimiter(@outstanding.to_i) %></div>
+        <div class="stats-label">Outstanding Fees</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-12 col-lg-6">
+    <div class="card h-100">
+      <div class="card-header fw-semibold">Recent Payments</div>
+      <div class="list-group list-group-flush">
+        <% @recent_payments.each do |fee| %>
+          <div class="list-group-item d-flex justify-content-between">
+            <span><%= fee.user.display_name %> &middot; <%= fee.fee_type.titleize %></span>
+            <span>&#8377;<%= number_with_delimiter(fee.amount.to_i) %></span>
+          </div>
+        <% end %>
+        <% if @recent_payments.empty? %>
+          <div class="list-group-item text-muted text-center py-3">No payments yet.</div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+  <div class="col-12 col-lg-6">
+    <div class="card h-100">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span class="fw-semibold">Recent Expenses</span>
+        <%= link_to "View all", forum_expenses_path(forum_slug: @current_forum.slug), class: "small" %>
+      </div>
+      <div class="list-group list-group-flush">
+        <% @recent_expenses.each do |expense| %>
+          <div class="list-group-item d-flex justify-content-between">
+            <span><%= expense.category %></span>
+            <span>&#8377;<%= number_with_delimiter(expense.amount.to_i) %></span>
+          </div>
+        <% end %>
+        <% if @recent_expenses.empty? %>
+          <div class="list-group-item text-muted text-center py-3">No expenses yet.</div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

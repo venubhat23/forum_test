@@ -34,9 +34,12 @@
               <span class="badge <%= fee.paid? ? 'badge-status-active' : 'badge-status-trial' %>"><%= fee.status.titleize %></span>
             </td>
             <td class="text-end">
-              <% unless fee.paid? %>
-                <%= button_to "Mark Paid", mark_paid_forum_chapter_fee_payment_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: fee.id), method: :patch, class: "btn btn-sm btn-outline-success" %>
-              <% end %>
+              <div class="d-flex gap-1 justify-content-end">
+                <%= link_to "Invoice", print_forum_chapter_fee_payment_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: fee.id), class: "btn btn-sm btn-outline-secondary", target: "_blank" %>
+                <% unless fee.paid? %>
+                  <%= button_to "Mark Paid", mark_paid_forum_chapter_fee_payment_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: fee.id), method: :patch, class: "btn btn-sm btn-outline-success" %>
+                <% end %>
+              </div>
             </td>
           </tr>
         <% end %>

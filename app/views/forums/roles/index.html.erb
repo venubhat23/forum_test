@@ -1,0 +1,69 @@
+<% content_for :title, "Roles & Permissions" %>
+
+<div class="page-header">
+  <h1 class="page-title h4">Roles &amp; Permissions</h1>
+  <p class="page-subtitle mb-0">
+    Live-evaluated against the actual <code>Ability</code> class &mdash; reflects what's really enforced.
+  </p>
+</div>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th>Role</th>
+          <th>Manage Chapters</th>
+          <th>Manage Members</th>
+          <th>Record Fees</th>
+          <th>Create Meetings</th>
+          <th>Reports &amp; Analytics</th>
+          <th>Own Chapter Only?</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @roles.each do |role| %>
+          <% user = User.new(role: role, forum_id: @current_forum.id, chapter_id: @own_chapter&.id) %>
+          <% ability = Ability.new(user) %>
+          <tr>
+            <td class="fw-semibold"><%= role.titleize %></td>
+            <td><%= ability.can?(:manage, Chapter.new(forum_id: @current_forum.id)) ? "✅" : "❌" %></td>
+            <td><%= ability.can?(:create, User.new(forum_id: @current_forum.id, chapter_id: @own_chapter&.id, role: :member)) ? "✅" : "❌" %></td>
+            <td><%= ability.can?(:create, FeePayment.new(user: User.new(forum_id: @current_forum.id, chapter_id: @own_chapter&.id))) ? "✅" : "❌" %></td>
+            <td><%= ability.can?(:create, Meeting.new(chapter_id: @own_chapter&.id)) ? "✅" : "❌" %></td>
+            <td><%= ability.can?(:access, :forum_reports) ? "✅" : "❌" %></td>
+            <td>
+              <% if @other_chapter %>
+                <%= ability.can?(:manage, Chapter.new(forum_id: @current_forum.id, id: @other_chapter.id)) ? "No restriction" : "Yes" %>
+              <% else %>
+                &mdash;
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="card mt-4">
+  <div class="card-header fw-semibold">What Each Role Can Do</div>
+  <div class="card-body">
+    <dl class="row mb-0">
+      <dt class="col-sm-3">Forum Admin</dt>
+      <dd class="col-sm-9">Full access across the whole forum: all chapters, members, finance, settings.</dd>
+
+      <dt class="col-sm-3">Chapter Admin</dt>
+      <dd class="col-sm-9">Full management within their own chapter only (members, guests, committee, fees, meetings).</dd>
+
+      <dt class="col-sm-3">Committee Member</dt>
+      <dd class="col-sm-9">Meetings, presentations, attendance, and referrals within their chapter. No member/fee management.</dd>
+
+      <dt class="col-sm-3">Member</dt>
+      <dd class="col-sm-9">Self-service: own profile, referrals, one-to-ones, event registration, view own fees/attendance.</dd>
+
+      <dt class="col-sm-3">Guest</dt>
+      <dd class="col-sm-9">Read-only: own profile, own attendance, view events, and event registration.</dd>
+    </dl>
+  </div>
+</div>

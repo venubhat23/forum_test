@@ -1,0 +1,35 @@
+<% content_for :title, "Reports" %>
+
+<div class="page-header">
+  <h1 class="page-title h4">Reports</h1>
+  <p class="page-subtitle mb-0"><%= @current_forum.name %></p>
+</div>
+
+<div class="row g-3">
+  <% [
+       [ "Members", members_forum_reports_path, "bi-people" ],
+       [ "Guests", guests_forum_reports_path, "bi-person-badge" ],
+       [ "Attendance", attendance_forum_reports_path, "bi-calendar-check" ],
+       [ "Referrals", referrals_forum_reports_path, "bi-arrow-left-right" ],
+       [ "Business Generated", business_generated_forum_reports_path, "bi-cash-coin" ],
+       [ "Chapters", chapters_forum_reports_path, "bi-diagram-3" ],
+       [ "Meetings", meetings_forum_reports_path, "bi-calendar-event" ],
+       [ "Events", events_forum_reports_path, "bi-calendar-week" ],
+       [ "Renewals", renewals_forum_reports_path, "bi-arrow-repeat" ]
+     ].each do |title, path, icon| %>
+    <div class="col-12 col-md-6 col-lg-4">
+      <div class="card h-100">
+        <div class="card-body d-flex align-items-center gap-3">
+          <div class="icon-bg gradient-blue"><i class="bi <%= icon %>"></i></div>
+          <div class="flex-grow-1">
+            <div class="fw-semibold"><%= title %></div>
+            <div class="d-flex gap-2 mt-2">
+              <%= link_to "View", path, class: "btn btn-sm btn-outline-secondary" %>
+              <%= link_to "Export CSV", "#{path}.csv", class: "btn btn-sm btn-outline-primary" %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>

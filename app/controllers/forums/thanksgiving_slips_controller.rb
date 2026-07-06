@@ -33,7 +33,7 @@ module Forums
     end
 
     def thanksgiving_slip_params
-      params.require(:thanksgiving_slip).permit(:amount, :notes)
+      params.require(:thanksgiving_slip).permit(:amount, :notes, :proof)
     end
   end
 end
