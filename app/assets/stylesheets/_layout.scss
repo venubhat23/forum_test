@@ -547,3 +547,58 @@ body.sidebar-collapsed .main-content {
     border-radius: 16px;
   }
 }
+
+/* ============================================================
+   Global polish for stock Bootstrap components (cards, tables,
+   forms, buttons, badges) so every index/show/form page across
+   the app — not just the dashboard — gets the same premium look.
+   ============================================================ */
+
+.card-header {
+  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+  font-weight: 600;
+}
+
+.table > thead > tr > th {
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
+
+.table-hover > tbody > tr:hover > * {
+  --bs-table-hover-bg: rgba(99, 102, 241, 0.06);
+}
+
+.form-label {
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: #475569;
+}
+
+.form-control,
+.form-select {
+  border-color: #e2e8f0;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: #6366f1;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+  border-color: transparent;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+  background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+  border-color: transparent;
+}
+
+.badge {
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
