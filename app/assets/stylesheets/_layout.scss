@@ -815,3 +815,65 @@ nav.pagination span.page.gap {
 .icon-btn-danger:hover  { border-color: #dc2626; color: #dc2626; background: rgba(220, 38, 38, 0.08); }
 .icon-btn-success       { border-color: #059669; color: #059669; }
 .icon-btn-success:hover { border-color: #059669; color: #ffffff; background: #059669; }
+
+/* ── Dashboard section titles & attention panel ── */
+.dashboard-section-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #6366f1;
+  margin: 0 0 0.9rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.attention-panel {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%);
+  border: 1px solid rgba(99, 102, 241, 0.15);
+  border-radius: 16px;
+  padding: 1.25rem 1.25rem 0.25rem;
+}
+
+.attention-card {
+  display: block;
+  height: 100%;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 1.1rem 1.25rem;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.attention-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  border-color: #c7d2fe;
+}
+
+.attention-card-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  margin-bottom: 0.6rem;
+}
+
+.attention-card-value {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #1e293b;
+  line-height: 1;
+}
+
+.attention-card-label {
+  color: #64748b;
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-top: 0.25rem;
+}

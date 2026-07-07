@@ -1,15 +1,60 @@
 <% content_for :title, "Super Admin Dashboard" %>
 
+<%
+  greeting = case Time.current.hour
+             when 5..11 then "Good morning"
+             when 12..16 then "Good afternoon"
+             else "Good evening"
+             end
+%>
+
 <div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-2">
   <div>
-    <h1 class="page-title h4">Platform Dashboard</h1>
-    <p class="page-subtitle mb-0">Overview of all networking forums on the platform.</p>
+    <h1 class="page-title h4"><%= greeting %>, <%= current_user.email.split("@").first.titleize %></h1>
+    <p class="page-subtitle mb-0">Here's what's happening across the platform on <%= Date.current.strftime("%A, %d %B %Y") %>.</p>
   </div>
-  <%= link_to new_super_admin_forum_path, class: "btn btn-primary" do %>
+  <%= link_to new_super_admin_forum_path, class: "btn btn-primary rounded-pill px-4" do %>
     <i class="bi bi-plus-lg me-1"></i> Create Forum
   <% end %>
 </div>
 
+<% if @upcoming_renewals.positive? || @overdue_invoices.positive? || @pending_forum_requests.positive? || @open_support_tickets.positive? %>
+  <div class="attention-panel mb-4">
+    <div class="dashboard-section-title"><i class="bi bi-bell-fill"></i> Needs Your Attention</div>
+    <div class="row g-3">
+      <div class="col-6 col-lg-3">
+        <%= link_to super_admin_subscriptions_path, class: "attention-card" do %>
+          <div class="attention-card-icon mini-stat-icon-warning"><i class="bi bi-arrow-repeat"></i></div>
+          <div class="attention-card-value"><%= @upcoming_renewals %></div>
+          <div class="attention-card-label">Renewals in 30 Days</div>
+        <% end %>
+      </div>
+      <div class="col-6 col-lg-3">
+        <%= link_to super_admin_invoices_path(status: :overdue), class: "attention-card" do %>
+          <div class="attention-card-icon mini-stat-icon-danger"><i class="bi bi-exclamation-triangle"></i></div>
+          <div class="attention-card-value"><%= @overdue_invoices %></div>
+          <div class="attention-card-label">Overdue Invoices</div>
+        <% end %>
+      </div>
+      <div class="col-6 col-lg-3">
+        <%= link_to super_admin_forum_requests_path, class: "attention-card" do %>
+          <div class="attention-card-icon mini-stat-icon-info"><i class="bi bi-inbox"></i></div>
+          <div class="attention-card-value"><%= @pending_forum_requests %></div>
+          <div class="attention-card-label">Pending Forum Requests</div>
+        <% end %>
+      </div>
+      <div class="col-6 col-lg-3">
+        <%= link_to super_admin_support_tickets_path, class: "attention-card" do %>
+          <div class="attention-card-icon mini-stat-icon-primary"><i class="bi bi-headset"></i></div>
+          <div class="attention-card-value"><%= @open_support_tickets %></div>
+          <div class="attention-card-label">Open Support Tickets</div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+<% end %>
+
+<div class="dashboard-section-title"><i class="bi bi-building"></i> Platform Overview</div>
 <div class="row g-3 mb-4">
   <div class="col-6 col-lg-3">
     <div class="stats-card">
@@ -47,26 +92,9 @@
       </div>
     </div>
   </div>
-  <div class="col-6 col-lg-3">
-    <div class="stats-card">
-      <div class="icon-bg gradient-purple"><i class="bi bi-diagram-3"></i></div>
-      <div>
-        <div class="stats-value"><%= @total_chapters %></div>
-        <div class="stats-label">Total Chapters</div>
-      </div>
-    </div>
-  </div>
-  <div class="col-6 col-lg-3">
-    <div class="stats-card">
-      <div class="icon-bg gradient-indigo"><i class="bi bi-person-badge"></i></div>
-      <div>
-        <div class="stats-value"><%= @total_forum_admins %></div>
-        <div class="stats-label">Forum Admins</div>
-      </div>
-    </div>
-  </div>
 </div>
 
+<div class="dashboard-section-title"><i class="bi bi-graph-up-arrow"></i> Business &amp; Engagement</div>
 <div class="row g-3 mb-4">
   <div class="col-6 col-lg-3">
     <div class="stats-card">
@@ -104,42 +132,21 @@
       </div>
     </div>
   </div>
-</div>
-
-<div class="row g-3 mb-4">
   <div class="col-6 col-lg-3">
     <div class="stats-card">
-      <div class="icon-bg gradient-yellow"><i class="bi bi-arrow-repeat"></i></div>
+      <div class="icon-bg gradient-purple"><i class="bi bi-diagram-3"></i></div>
       <div>
-        <div class="stats-value"><%= link_to @upcoming_renewals, super_admin_subscriptions_path %></div>
-        <div class="stats-label">Renewals in 30 Days</div>
+        <div class="stats-value"><%= @total_chapters %></div>
+        <div class="stats-label">Total Chapters</div>
       </div>
     </div>
   </div>
   <div class="col-6 col-lg-3">
     <div class="stats-card">
-      <div class="icon-bg gradient-red"><i class="bi bi-exclamation-triangle"></i></div>
+      <div class="icon-bg gradient-indigo"><i class="bi bi-person-badge"></i></div>
       <div>
-        <div class="stats-value"><%= link_to @overdue_invoices, super_admin_invoices_path(status: :overdue) %></div>
-        <div class="stats-label">Overdue Invoices</div>
-      </div>
-    </div>
-  </div>
-  <div class="col-6 col-lg-3">
-    <div class="stats-card">
-      <div class="icon-bg gradient-purple"><i class="bi bi-inbox"></i></div>
-      <div>
-        <div class="stats-value"><%= link_to @pending_forum_requests, super_admin_forum_requests_path %></div>
-        <div class="stats-label">Pending Forum Requests</div>
-      </div>
-    </div>
-  </div>
-  <div class="col-6 col-lg-3">
-    <div class="stats-card">
-      <div class="icon-bg gradient-blue"><i class="bi bi-headset"></i></div>
-      <div>
-        <div class="stats-value"><%= link_to @open_support_tickets, super_admin_support_tickets_path %></div>
-        <div class="stats-label">Open Support Tickets</div>
+        <div class="stats-value"><%= @total_forum_admins %></div>
+        <div class="stats-label">Forum Admins</div>
       </div>
     </div>
   </div>
@@ -163,11 +170,18 @@
       <tbody>
         <% @recent_forums.each do |forum| %>
           <tr>
-            <td><%= forum.name %></td>
+            <td>
+              <div class="d-flex align-items-center gap-2">
+                <span class="row-avatar row-avatar-<%= forum.status %>"><%= forum.name.first.upcase %></span>
+                <span class="fw-semibold"><%= forum.name %></span>
+              </div>
+            </td>
             <td><span class="badge badge-status-<%= forum.status %>"><%= forum.status.titleize %></span></td>
             <td><%= forum.created_at.strftime("%d %b %Y") %></td>
             <td class="text-end">
-              <%= link_to "View", super_admin_forum_path(forum), class: "btn btn-sm btn-outline-secondary" %>
+              <%= link_to super_admin_forum_path(forum), class: "icon-btn icon-btn-view", title: "View" do %>
+                <i class="bi bi-eye"></i>
+              <% end %>
             </td>
           </tr>
         <% end %>

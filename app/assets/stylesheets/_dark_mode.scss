@@ -282,3 +282,29 @@
   border-color: var(--border-light);
   color: var(--text-secondary);
 }
+
+[data-theme="dark"] .dashboard-section-title {
+  color: #a5b4fc;
+}
+
+[data-theme="dark"] .attention-panel {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+  border-color: rgba(99, 102, 241, 0.25);
+}
+
+[data-theme="dark"] .attention-card {
+  background: var(--bg-primary);
+  border-color: var(--border-light);
+}
+
+[data-theme="dark"] .attention-card:hover {
+  border-color: #818cf8;
+}
+
+[data-theme="dark"] .attention-card-value {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .attention-card-label {
+  color: var(--text-secondary);
+}
