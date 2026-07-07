@@ -26,7 +26,12 @@
           <% user = User.new(role: role, forum_id: @current_forum.id, chapter_id: @own_chapter&.id) %>
           <% ability = Ability.new(user) %>
           <tr>
-            <td class="fw-semibold"><%= role.titleize %></td>
+            <td>
+              <div class="d-flex align-items-center gap-2">
+                <span class="row-avatar"><i class="bi bi-shield-lock"></i></span>
+                <span class="fw-semibold"><%= role.titleize %></span>
+              </div>
+            </td>
             <td><%= ability.can?(:manage, Chapter.new(forum_id: @current_forum.id)) ? "✅" : "❌" %></td>
             <td><%= ability.can?(:create, User.new(forum_id: @current_forum.id, chapter_id: @own_chapter&.id, role: :member)) ? "✅" : "❌" %></td>
             <td><%= ability.can?(:create, FeePayment.new(user: User.new(forum_id: @current_forum.id, chapter_id: @own_chapter&.id))) ? "✅" : "❌" %></td>

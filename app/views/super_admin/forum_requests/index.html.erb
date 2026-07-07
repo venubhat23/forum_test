@@ -21,7 +21,12 @@
       <tbody>
         <% @forum_requests.each do |req| %>
           <tr>
-            <td class="fw-semibold"><%= req.company_name %></td>
+            <td>
+              <div class="d-flex align-items-center gap-2">
+                <span class="row-avatar"><%= req.company_name.first.upcase %></span>
+                <span class="fw-semibold"><%= req.company_name %></span>
+              </div>
+            </td>
             <td><%= req.name %></td>
             <td><%= req.email %></td>
             <td>
@@ -36,7 +41,9 @@
             </td>
             <td><%= req.created_at.strftime("%d %b %Y") %></td>
             <td class="text-end">
-              <%= link_to "Review", super_admin_forum_request_path(req), class: "btn btn-sm btn-outline-secondary" %>
+              <%= link_to super_admin_forum_request_path(req), class: "icon-btn icon-btn-view", title: "Review" do %>
+                <i class="bi bi-eye"></i>
+              <% end %>
             </td>
           </tr>
         <% end %>

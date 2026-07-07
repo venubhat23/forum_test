@@ -40,7 +40,12 @@
       <tbody>
         <% @referrals.each do |referral| %>
           <tr>
-            <td class="fw-semibold"><%= referral.prospect_name %></td>
+            <td>
+              <div class="d-flex align-items-center gap-2">
+                <span class="row-avatar"><%= referral.prospect_name.first.upcase %></span>
+                <span class="fw-semibold"><%= referral.prospect_name %></span>
+              </div>
+            </td>
             <td><%= referral.giver.display_name %></td>
             <td><%= referral.receiver.display_name %></td>
             <td><span class="badge bg-secondary"><%= referral.referral_type.titleize %></span></td>
@@ -48,7 +53,9 @@
             <td><%= referral.thanksgiving_slips.count %></td>
             <td><%= referral.created_at.strftime("%d %b %Y") %></td>
             <td class="text-end">
-              <%= link_to "View", forum_chapter_referral_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: referral.id), class: "btn btn-sm btn-outline-secondary" %>
+              <%= link_to forum_chapter_referral_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: referral.id), class: "icon-btn icon-btn-view", title: "View" do %>
+                <i class="bi bi-eye"></i>
+              <% end %>
             </td>
           </tr>
         <% end %>

@@ -27,12 +27,19 @@
       <tbody>
         <% @meetings.each do |m| %>
           <tr>
-            <td class="fw-semibold"><%= m.requester.display_name %></td>
+            <td>
+              <div class="d-flex align-items-center gap-2">
+                <span class="row-avatar"><%= m.requester.display_name.first.upcase %></span>
+                <span class="fw-semibold"><%= m.requester.display_name %></span>
+              </div>
+            </td>
             <td><%= m.requested_with.display_name %></td>
             <td><%= m.scheduled_at.strftime("%d %b %Y %H:%M") %></td>
             <td><span class="badge bg-secondary"><%= m.status.titleize %></span></td>
             <td class="text-end">
-              <%= link_to "View", forum_one_to_one_meeting_path(forum_slug: @current_forum.slug, id: m.id), class: "btn btn-sm btn-outline-secondary" %>
+              <%= link_to forum_one_to_one_meeting_path(forum_slug: @current_forum.slug, id: m.id), class: "icon-btn icon-btn-view", title: "View" do %>
+                <i class="bi bi-eye"></i>
+              <% end %>
             </td>
           </tr>
         <% end %>

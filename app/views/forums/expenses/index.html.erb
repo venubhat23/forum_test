@@ -25,14 +25,25 @@
       <tbody>
         <% @expenses.each do |expense| %>
           <tr>
-            <td class="fw-semibold"><%= expense.category %></td>
+            <td>
+              <div class="d-flex align-items-center gap-2">
+                <span class="row-avatar"><i class="bi bi-receipt"></i></span>
+                <span class="fw-semibold"><%= expense.category %></span>
+              </div>
+            </td>
             <td>&#8377;<%= number_with_delimiter(expense.amount.to_i) %></td>
             <td><%= expense.incurred_on.strftime("%d %b %Y") %></td>
             <td><%= expense.notes %></td>
             <td class="text-end">
-              <%= link_to "Edit", edit_forum_expense_path(forum_slug: @current_forum.slug, id: expense.id), class: "btn btn-sm btn-outline-secondary" %>
-              <%= button_to "Delete", forum_expense_path(forum_slug: @current_forum.slug, id: expense.id), method: :delete, class: "btn btn-sm btn-outline-danger d-inline",
-                    data: { turbo_confirm: "Delete this expense?" } %>
+              <div class="d-flex gap-1 justify-content-end">
+                <%= link_to edit_forum_expense_path(forum_slug: @current_forum.slug, id: expense.id), class: "icon-btn icon-btn-edit", title: "Edit" do %>
+                  <i class="bi bi-pencil"></i>
+                <% end %>
+                <%= button_to forum_expense_path(forum_slug: @current_forum.slug, id: expense.id), method: :delete, class: "icon-btn icon-btn-danger", title: "Delete",
+                      data: { turbo_confirm: "Delete this expense?" } do %>
+                  <i class="bi bi-trash"></i>
+                <% end %>
+              </div>
             </td>
           </tr>
         <% end %>

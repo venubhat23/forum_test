@@ -24,13 +24,20 @@
       <tbody>
         <% @announcements.each do |a| %>
           <tr>
-            <td class="fw-semibold"><%= a.title %></td>
+            <td>
+              <div class="d-flex align-items-center gap-2">
+                <span class="row-avatar"><i class="bi bi-megaphone"></i></span>
+                <span class="fw-semibold"><%= a.title %></span>
+              </div>
+            </td>
             <td><span class="badge bg-secondary"><%= a.everyone? ? "Platform-wide" : "This forum" %></span></td>
             <td><%= a.created_at.strftime("%d %b %Y") %></td>
             <td class="text-end">
               <% if a.forum_id == @current_forum.id %>
-                <%= button_to "Delete", forum_announcement_path(forum_slug: @current_forum.slug, id: a.id), method: :delete, class: "btn btn-sm btn-outline-danger",
-                      data: { turbo_confirm: "Delete this announcement?" } %>
+                <%= button_to forum_announcement_path(forum_slug: @current_forum.slug, id: a.id), method: :delete, class: "icon-btn icon-btn-danger", title: "Delete",
+                      data: { turbo_confirm: "Delete this announcement?" } do %>
+                  <i class="bi bi-trash"></i>
+                <% end %>
               <% end %>
             </td>
           </tr>

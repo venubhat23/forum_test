@@ -28,7 +28,12 @@
       <tbody>
         <% @plans.each do |plan| %>
           <tr>
-            <td class="fw-semibold"><%= plan.name %></td>
+            <td>
+              <div class="d-flex align-items-center gap-2">
+                <span class="row-avatar"><i class="bi bi-gem"></i></span>
+                <span class="fw-semibold"><%= plan.name %></span>
+              </div>
+            </td>
             <td><code><%= plan.key %></code></td>
             <td>&#8377;<%= number_with_delimiter(plan.price.to_i) %></td>
             <td><%= plan.billing_cycle.titleize %></td>
@@ -43,11 +48,17 @@
             <td><%= plan.forums.count %></td>
             <td class="text-end">
               <div class="d-flex gap-1 justify-content-end">
-                <%= link_to "Edit", edit_super_admin_plan_path(plan), class: "btn btn-sm btn-outline-secondary" %>
+                <%= link_to edit_super_admin_plan_path(plan), class: "icon-btn icon-btn-edit", title: "Edit" do %>
+                  <i class="bi bi-pencil"></i>
+                <% end %>
                 <% if plan.active? %>
-                  <%= button_to "Archive", archive_super_admin_plan_path(plan), method: :patch, class: "btn btn-sm btn-outline-danger" %>
+                  <%= button_to archive_super_admin_plan_path(plan), method: :patch, class: "icon-btn icon-btn-danger", title: "Archive" do %>
+                    <i class="bi bi-archive"></i>
+                  <% end %>
                 <% else %>
-                  <%= button_to "Activate", activate_super_admin_plan_path(plan), method: :patch, class: "btn btn-sm btn-outline-success" %>
+                  <%= button_to activate_super_admin_plan_path(plan), method: :patch, class: "icon-btn icon-btn-success", title: "Activate" do %>
+                    <i class="bi bi-check-lg"></i>
+                  <% end %>
                 <% end %>
               </div>
             </td>

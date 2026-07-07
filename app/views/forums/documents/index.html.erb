@@ -27,14 +27,21 @@
       <tbody>
         <% @documents.each do |doc| %>
           <tr>
-            <td class="fw-semibold"><%= doc.title %></td>
+            <td>
+              <div class="d-flex align-items-center gap-2">
+                <span class="row-avatar"><i class="bi bi-file-earmark-text"></i></span>
+                <span class="fw-semibold"><%= doc.title %></span>
+              </div>
+            </td>
             <td><%= doc.category %></td>
             <td><%= doc.file.attached? ? link_to(doc.file.filename, rails_blob_path(doc.file, disposition: "attachment")) : "—" %></td>
             <td><%= doc.created_at.strftime("%d %b %Y") %></td>
             <td class="text-end">
               <% if can? :destroy, doc %>
-                <%= button_to "Delete", forum_document_path(forum_slug: @current_forum.slug, id: doc.id), method: :delete, class: "btn btn-sm btn-outline-danger",
-                      data: { turbo_confirm: "Delete #{doc.title}?" } %>
+                <%= button_to forum_document_path(forum_slug: @current_forum.slug, id: doc.id), method: :delete, class: "icon-btn icon-btn-danger", title: "Delete",
+                      data: { turbo_confirm: "Delete #{doc.title}?" } do %>
+                  <i class="bi bi-trash"></i>
+                <% end %>
               <% end %>
             </td>
           </tr>

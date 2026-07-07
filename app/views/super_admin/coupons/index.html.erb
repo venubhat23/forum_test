@@ -26,7 +26,12 @@
       <tbody>
         <% @coupons.each do |coupon| %>
           <tr>
-            <td class="fw-semibold"><code><%= coupon.code %></code></td>
+            <td>
+              <div class="d-flex align-items-center gap-2">
+                <span class="row-avatar"><i class="bi bi-tag"></i></span>
+                <code class="fw-semibold"><%= coupon.code %></code>
+              </div>
+            </td>
             <td><%= coupon.percentage? ? "#{coupon.discount_value.to_i}%" : "&#8377;#{number_with_delimiter(coupon.discount_value.to_i)}".html_safe %></td>
             <td><%= coupon.expires_on&.strftime("%d %b %Y") || "Never" %></td>
             <td><%= coupon.times_redeemed %><%= "/#{coupon.max_redemptions}" if coupon.max_redemptions %></td>
@@ -39,11 +44,17 @@
             </td>
             <td class="text-end">
               <div class="d-flex gap-1 justify-content-end">
-                <%= link_to "Edit", edit_super_admin_coupon_path(coupon), class: "btn btn-sm btn-outline-secondary" %>
+                <%= link_to edit_super_admin_coupon_path(coupon), class: "icon-btn icon-btn-edit", title: "Edit" do %>
+                  <i class="bi bi-pencil"></i>
+                <% end %>
                 <% if coupon.active? %>
-                  <%= button_to "Deactivate", archive_super_admin_coupon_path(coupon), method: :patch, class: "btn btn-sm btn-outline-danger" %>
+                  <%= button_to archive_super_admin_coupon_path(coupon), method: :patch, class: "icon-btn icon-btn-danger", title: "Deactivate" do %>
+                    <i class="bi bi-slash-circle"></i>
+                  <% end %>
                 <% else %>
-                  <%= button_to "Activate", activate_super_admin_coupon_path(coupon), method: :patch, class: "btn btn-sm btn-outline-success" %>
+                  <%= button_to activate_super_admin_coupon_path(coupon), method: :patch, class: "icon-btn icon-btn-success", title: "Activate" do %>
+                    <i class="bi bi-check-lg"></i>
+                  <% end %>
                 <% end %>
               </div>
             </td>

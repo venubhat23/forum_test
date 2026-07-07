@@ -17,15 +17,24 @@
     <div class="col-12 col-lg-6">
       <div class="card h-100">
         <div class="card-header d-flex justify-content-between align-items-center">
-          <span class="fw-semibold"><%= category.name %></span>
+          <div class="d-flex align-items-center gap-2">
+            <span class="row-avatar"><i class="bi bi-tags"></i></span>
+            <span class="fw-semibold"><%= category.name %></span>
+          </div>
           <div class="d-flex gap-1">
             <% if can? :create, BusinessCategory %>
-              <%= link_to "Add Speciality", new_forum_business_category_path(forum_slug: @current_forum.slug, parent_id: category.id), class: "btn btn-sm btn-outline-primary" %>
+              <%= link_to new_forum_business_category_path(forum_slug: @current_forum.slug, parent_id: category.id), class: "icon-btn icon-btn-view", title: "Add Speciality" do %>
+                <i class="bi bi-plus-lg"></i>
+              <% end %>
             <% end %>
             <% if can? :update, category %>
-              <%= link_to "Edit", edit_forum_business_category_path(forum_slug: @current_forum.slug, id: category.id), class: "btn btn-sm btn-outline-secondary" %>
-              <%= button_to "Delete", forum_business_category_path(forum_slug: @current_forum.slug, id: category.id), method: :delete, class: "btn btn-sm btn-outline-danger",
-                    data: { turbo_confirm: "Delete #{category.name} and all its specialities?" } %>
+              <%= link_to edit_forum_business_category_path(forum_slug: @current_forum.slug, id: category.id), class: "icon-btn icon-btn-edit", title: "Edit" do %>
+                <i class="bi bi-pencil"></i>
+              <% end %>
+              <%= button_to forum_business_category_path(forum_slug: @current_forum.slug, id: category.id), method: :delete, class: "icon-btn icon-btn-danger", title: "Delete",
+                    data: { turbo_confirm: "Delete #{category.name} and all its specialities?" } do %>
+                <i class="bi bi-trash"></i>
+              <% end %>
             <% end %>
           </div>
         </div>
@@ -35,9 +44,13 @@
               <span><%= child.name %></span>
               <% if can? :update, child %>
                 <div class="d-flex gap-1">
-                  <%= link_to "Edit", edit_forum_business_category_path(forum_slug: @current_forum.slug, id: child.id), class: "btn btn-sm btn-outline-secondary" %>
-                  <%= button_to "Delete", forum_business_category_path(forum_slug: @current_forum.slug, id: child.id), method: :delete, class: "btn btn-sm btn-outline-danger",
-                        data: { turbo_confirm: "Delete #{child.name}?" } %>
+                  <%= link_to edit_forum_business_category_path(forum_slug: @current_forum.slug, id: child.id), class: "icon-btn icon-btn-edit", title: "Edit" do %>
+                    <i class="bi bi-pencil"></i>
+                  <% end %>
+                  <%= button_to forum_business_category_path(forum_slug: @current_forum.slug, id: child.id), method: :delete, class: "icon-btn icon-btn-danger", title: "Delete",
+                        data: { turbo_confirm: "Delete #{child.name}?" } do %>
+                    <i class="bi bi-trash"></i>
+                  <% end %>
                 </div>
               <% end %>
             </div>

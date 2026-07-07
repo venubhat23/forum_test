@@ -33,14 +33,21 @@
       <tbody>
         <% @members.each do |member| %>
           <tr>
-            <td class="fw-semibold"><%= member.full_name %></td>
+            <td>
+              <div class="d-flex align-items-center gap-2">
+                <span class="row-avatar"><%= member.full_name.first.upcase %></span>
+                <span class="fw-semibold"><%= member.full_name %></span>
+              </div>
+            </td>
             <td><%= member.email %></td>
             <td><%= member.phone %></td>
             <td><%= member.business_name %></td>
             <td><%= member.business_category %></td>
             <td><%= member.speciality %></td>
             <td class="text-end">
-              <%= link_to "View", forum_chapter_member_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: member.id), class: "btn btn-sm btn-outline-secondary" %>
+              <%= link_to forum_chapter_member_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: member.id), class: "icon-btn icon-btn-view", title: "View" do %>
+                <i class="bi bi-eye"></i>
+              <% end %>
             </td>
           </tr>
         <% end %>

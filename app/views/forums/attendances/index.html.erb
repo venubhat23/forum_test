@@ -24,7 +24,15 @@
       <tbody>
         <% @attendances.each do |attendance| %>
           <tr>
-            <td class="fw-semibold"><%= attendance.user.display_name %> <span class="text-muted small">(<%= attendance.user.role.titleize %>)</span></td>
+            <td>
+              <div class="d-flex align-items-center gap-2">
+                <span class="row-avatar"><%= attendance.user.display_name.first.upcase %></span>
+                <div>
+                  <span class="fw-semibold"><%= attendance.user.display_name %></span>
+                  <span class="text-muted small d-block">(<%= attendance.user.role.titleize %>)</span>
+                </div>
+              </div>
+            </td>
             <td><%= attendance.event_type.titleize %></td>
             <td><%= attendance.occurred_on.strftime("%d %b %Y") %></td>
             <td><span class="badge <%= attendance.present? ? 'badge-status-active' : 'badge-status-suspended' %>"><%= attendance.present? ? "Present" : "Absent" %></span></td>

@@ -810,6 +810,8 @@ nav.pagination span.page.gap {
   color: #64748b;
 }
 
-.icon-btn-view:hover   { border-color: #6366f1; color: #6366f1; background: rgba(99, 102, 241, 0.08); }
-.icon-btn-edit:hover   { border-color: #2563eb; color: #2563eb; background: rgba(37, 99, 235, 0.08); }
-.icon-btn-danger:hover { border-color: #dc2626; color: #dc2626; background: rgba(220, 38, 38, 0.08); }
+.icon-btn-view:hover    { border-color: #6366f1; color: #6366f1; background: rgba(99, 102, 241, 0.08); }
+.icon-btn-edit:hover    { border-color: #2563eb; color: #2563eb; background: rgba(37, 99, 235, 0.08); }
+.icon-btn-danger:hover  { border-color: #dc2626; color: #dc2626; background: rgba(220, 38, 38, 0.08); }
+.icon-btn-success       { border-color: #059669; color: #059669; }
+.icon-btn-success:hover { border-color: #059669; color: #ffffff; background: #059669; }

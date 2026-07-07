@@ -19,13 +19,20 @@
       <tbody>
         <% @tickets.each do |ticket| %>
           <tr>
-            <td class="fw-semibold"><%= ticket.subject %></td>
+            <td>
+              <div class="d-flex align-items-center gap-2">
+                <span class="row-avatar"><i class="bi bi-headset"></i></span>
+                <span class="fw-semibold"><%= ticket.subject %></span>
+              </div>
+            </td>
             <td><%= ticket.forum&.name %></td>
             <td><%= ticket.raised_by.email %></td>
             <td><%= ticket.priority.titleize %></td>
             <td><span class="badge bg-secondary"><%= ticket.status.titleize %></span></td>
             <td class="text-end">
-              <%= link_to "View", super_admin_support_ticket_path(ticket), class: "btn btn-sm btn-outline-secondary" %>
+              <%= link_to super_admin_support_ticket_path(ticket), class: "icon-btn icon-btn-view", title: "View" do %>
+                <i class="bi bi-eye"></i>
+              <% end %>
             </td>
           </tr>
         <% end %>

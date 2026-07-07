@@ -22,7 +22,12 @@
         <% @payments.each do |payment| %>
           <tr>
             <td><%= payment.paid_on.strftime("%d %b %Y") %></td>
-            <td><%= payment.invoice.forum.name %></td>
+            <td>
+              <div class="d-flex align-items-center gap-2">
+                <span class="row-avatar"><i class="bi bi-cash-coin"></i></span>
+                <span><%= payment.invoice.forum.name %></span>
+              </div>
+            </td>
             <td><%= link_to payment.invoice.invoice_number, super_admin_invoice_path(payment.invoice) %></td>
             <td>&#8377;<%= number_with_delimiter(payment.amount.to_i) %></td>
             <td><%= payment.payment_method.titleize %></td>

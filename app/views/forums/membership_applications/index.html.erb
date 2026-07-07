@@ -21,7 +21,12 @@
       <tbody>
         <% @applications.each do |app| %>
           <tr>
-            <td class="fw-semibold"><%= app.name %></td>
+            <td>
+              <div class="d-flex align-items-center gap-2">
+                <span class="row-avatar"><%= app.name.first.upcase %></span>
+                <span class="fw-semibold"><%= app.name %></span>
+              </div>
+            </td>
             <td><%= app.email %></td>
             <td><%= app.business_name %></td>
             <td>
@@ -36,7 +41,9 @@
             </td>
             <td><%= app.created_at.strftime("%d %b %Y") %></td>
             <td class="text-end">
-              <%= link_to "Review", forum_membership_application_path(forum_slug: @current_forum.slug, id: app.id), class: "btn btn-sm btn-outline-secondary" %>
+              <%= link_to forum_membership_application_path(forum_slug: @current_forum.slug, id: app.id), class: "icon-btn icon-btn-view", title: "Review" do %>
+                <i class="bi bi-eye"></i>
+              <% end %>
             </td>
           </tr>
         <% end %>

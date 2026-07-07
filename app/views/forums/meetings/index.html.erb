@@ -28,13 +28,20 @@
       <tbody>
         <% @meetings.each do |meeting| %>
           <tr>
-            <td><span class="badge bg-secondary"><%= meeting.meeting_type.titleize %></span></td>
+            <td>
+              <div class="d-flex align-items-center gap-2">
+                <span class="row-avatar"><i class="bi bi-calendar3"></i></span>
+                <span class="badge bg-secondary"><%= meeting.meeting_type.titleize %></span>
+              </div>
+            </td>
             <td><%= meeting.scheduled_at.strftime("%d %b %Y %H:%M") %></td>
             <td><%= meeting.venue %></td>
             <td><%= meeting.speaker %></td>
             <td><%= meeting.attendance_percentage %>%</td>
             <td class="text-end">
-              <%= link_to "View", forum_chapter_meeting_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: meeting.id), class: "btn btn-sm btn-outline-secondary" %>
+              <%= link_to forum_chapter_meeting_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: meeting.id), class: "icon-btn icon-btn-view", title: "View" do %>
+                <i class="bi bi-eye"></i>
+              <% end %>
             </td>
           </tr>
         <% end %>

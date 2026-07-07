@@ -34,13 +34,20 @@
       <tbody>
         <% @invoices.each do |invoice| %>
           <tr>
-            <td class="fw-semibold"><%= link_to invoice.invoice_number, super_admin_invoice_path(invoice) %></td>
+            <td>
+              <div class="d-flex align-items-center gap-2">
+                <span class="row-avatar"><i class="bi bi-file-earmark-text"></i></span>
+                <span class="fw-semibold"><%= link_to invoice.invoice_number, super_admin_invoice_path(invoice) %></span>
+              </div>
+            </td>
             <td><%= invoice.forum.name %></td>
             <td>&#8377;<%= number_with_delimiter(invoice.amount.to_i) %></td>
             <td><span class="badge badge-status-<%= invoice.status %>"><%= invoice.status.titleize %></span></td>
             <td><%= invoice.due_date.strftime("%d %b %Y") %></td>
             <td class="text-end">
-              <%= link_to "View", super_admin_invoice_path(invoice), class: "btn btn-sm btn-outline-secondary" %>
+              <%= link_to super_admin_invoice_path(invoice), class: "icon-btn icon-btn-view", title: "View" do %>
+                <i class="bi bi-eye"></i>
+              <% end %>
             </td>
           </tr>
         <% end %>
