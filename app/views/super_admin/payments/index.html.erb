@@ -5,6 +5,36 @@
   <p class="page-subtitle mb-0">All recorded payments across the platform.</p>
 </div>
 
+<div class="row g-3 mb-4">
+  <div class="col-6 col-lg-4">
+    <div class="mini-stat-card">
+      <div>
+        <div class="mini-stat-label">Total Payments</div>
+        <div class="mini-stat-value text-primary"><%= @total_payments %></div>
+      </div>
+      <div class="mini-stat-icon mini-stat-icon-primary"><i class="bi bi-receipt"></i></div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-4">
+    <div class="mini-stat-card">
+      <div>
+        <div class="mini-stat-label">Total Amount</div>
+        <div class="mini-stat-value text-success">&#8377;<%= number_with_delimiter(@total_amount.to_i) %></div>
+      </div>
+      <div class="mini-stat-icon mini-stat-icon-success"><i class="bi bi-cash-coin"></i></div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-4">
+    <div class="mini-stat-card">
+      <div>
+        <div class="mini-stat-label">This Month</div>
+        <div class="mini-stat-value text-info">&#8377;<%= number_with_delimiter(@this_month_amount.to_i) %></div>
+      </div>
+      <div class="mini-stat-icon mini-stat-icon-info"><i class="bi bi-graph-up"></i></div>
+    </div>
+  </div>
+</div>
+
 <div class="card">
   <div class="table-responsive">
     <table class="table table-hover align-middle mb-0">

@@ -4,7 +4,14 @@ module Forums
 
     def index
       authorize! :read, Event
-      @events = @current_forum.events.order(starts_at: :desc).page(params[:page])
+      @total_events = @current_forum.events.count
+      @upcoming_events = @current_forum.events.where("starts_at >= ?", Time.current).count
+      @past_events = @current_forum.events.where("starts_at < ?", Time.current).count
+
+      @events = @current_forum.events.order(starts_at: :desc)
+      @events = @events.where("title ILIKE ?", "%#{params[:q]}%") if params[:q].present?
+      @events = @events.where(event_type: params[:event_type]) if params[:event_type].present?
+      @events = @events.page(params[:page])
     end
 
     def show

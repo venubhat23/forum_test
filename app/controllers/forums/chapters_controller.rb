@@ -4,7 +4,14 @@ module Forums
 
     def index
       authorize! :read, Chapter
-      @chapters = @current_forum.chapters.order(:name).page(params[:page])
+      @total_chapters = @current_forum.chapters.count
+      @active_chapters = @current_forum.chapters.active.count
+      @inactive_chapters = @current_forum.chapters.inactive.count
+
+      @chapters = @current_forum.chapters.order(:name)
+      @chapters = @chapters.where("name ILIKE ?", "%#{params[:q]}%") if params[:q].present?
+      @chapters = @chapters.where(status: params[:status]) if params[:status].present?
+      @chapters = @chapters.page(params[:page])
     end
 
     def show

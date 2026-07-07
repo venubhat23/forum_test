@@ -8,7 +8,15 @@ module Forums
 
     def index
       authorize! :read, User
-      @members = @chapter.members.order(:full_name).page(params[:page])
+      @total_members = @chapter.members.count
+      @active_members = @chapter.members.where(suspended_at: nil).count
+      @suspended_members = @chapter.members.where.not(suspended_at: nil).count
+
+      @members = @chapter.members.order(:full_name)
+      @members = @members.where("full_name ILIKE ? OR email ILIKE ?", "%#{params[:q]}%", "%#{params[:q]}%") if params[:q].present?
+      @members = @members.where(suspended_at: nil) if params[:status] == "active"
+      @members = @members.where.not(suspended_at: nil) if params[:status] == "suspended"
+      @members = @members.page(params[:page])
       respond_to do |format|
         format.html
         format.csv { send_data members_csv(@chapter.members.order(:full_name)), filename: "members-#{@chapter.name.parameterize}-#{Date.current}.csv" }

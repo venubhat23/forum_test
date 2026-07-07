@@ -3,7 +3,13 @@ module SuperAdmin
     before_action :set_plan, only: [ :edit, :update, :archive, :activate ]
 
     def index
+      @total_plans = Plan.count
+      @active_plans = Plan.active.count
+      @archived_plans = Plan.archived.count
+
       @plans = Plan.ordered
+      @plans = @plans.where("name ILIKE ?", "%#{params[:q]}%") if params[:q].present?
+      @plans = @plans.where(status: params[:status]) if params[:status].present?
     end
 
     def new

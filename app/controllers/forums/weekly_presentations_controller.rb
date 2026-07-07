@@ -5,7 +5,11 @@ module Forums
 
     def index
       authorize! :read, WeeklyPresentation
-      @presentations = @chapter.weekly_presentations.order(scheduled_on: :desc).page(params[:page])
+      @total_presentations = @chapter.weekly_presentations.count
+
+      @presentations = @chapter.weekly_presentations.order(scheduled_on: :desc)
+      @presentations = @presentations.joins(:member).where("users.full_name ILIKE ? OR weekly_presentations.topic ILIKE ?", "%#{params[:q]}%", "%#{params[:q]}%") if params[:q].present?
+      @presentations = @presentations.page(params[:page])
     end
 
     def show

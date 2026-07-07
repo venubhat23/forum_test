@@ -4,7 +4,14 @@ module Forums
 
     def index
       authorize! :read, OneToOneMeeting
-      @meetings = OneToOneMeeting.accessible_by(current_ability).where(forum_id: @current_forum.id).order(scheduled_at: :desc)
+      base = OneToOneMeeting.accessible_by(current_ability).where(forum_id: @current_forum.id)
+      @total_meetings = base.count
+      @requested_meetings = base.where(status: :requested).count
+      @accepted_meetings = base.where(status: :accepted).count
+      @completed_meetings = base.where(status: :completed).count
+
+      @meetings = base.order(scheduled_at: :desc)
+      @meetings = @meetings.where(status: params[:status]) if params[:status].present?
     end
 
     def show

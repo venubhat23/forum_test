@@ -3,6 +3,11 @@ module SuperAdmin
     before_action :set_invoice, only: [ :show, :mark_paid, :void ]
 
     def index
+      @total_invoices = Invoice.count
+      @paid_invoices = Invoice.where(status: :paid).count
+      @pending_invoices = Invoice.where(status: :pending).count
+      @overdue_invoices = Invoice.where(status: :overdue).or(Invoice.where("due_date < ? AND status = ?", Date.current, Invoice.statuses[:pending])).count
+
       @invoices = Invoice.includes(:forum, :coupon).order(created_at: :desc)
       @invoices = @invoices.where(forum_id: params[:forum_id]) if params[:forum_id].present?
       @invoices = @invoices.where(status: params[:status]) if params[:status].present?

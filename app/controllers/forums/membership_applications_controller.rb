@@ -4,7 +4,13 @@ module Forums
 
     def index
       authorize! :read, MembershipApplication
-      @applications = @current_forum.membership_applications.order(created_at: :desc)
+      base = @current_forum.membership_applications
+      @pending_applications = base.where(status: :pending).count
+      @approved_applications = base.where(status: :approved).count
+      @rejected_applications = base.where(status: :rejected).count
+
+      @applications = base.order(created_at: :desc)
+      @applications = @applications.where(status: params[:status]) if params[:status].present?
     end
 
     def show

@@ -3,7 +3,13 @@ module SuperAdmin
     before_action :set_coupon, only: [ :edit, :update, :archive, :activate ]
 
     def index
+      @total_coupons = Coupon.count
+      @active_coupons = Coupon.where(active: true).count
+      @inactive_coupons = Coupon.where(active: false).count
+
       @coupons = Coupon.order(created_at: :desc)
+      @coupons = @coupons.where("code ILIKE ?", "%#{params[:q]}%") if params[:q].present?
+      @coupons = @coupons.where(active: params[:status] == "active") if params[:status].present?
     end
 
     def new

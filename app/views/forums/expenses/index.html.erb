@@ -10,6 +10,35 @@
   <% end %>
 </div>
 
+<div class="row g-3 mb-4">
+  <div class="col-6 col-lg-6">
+    <div class="mini-stat-card">
+      <div>
+        <div class="mini-stat-label">Total Expenses</div>
+        <div class="mini-stat-value text-primary"><%= @total_expenses %></div>
+      </div>
+      <div class="mini-stat-icon mini-stat-icon-primary"><i class="bi bi-receipt"></i></div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-6">
+    <div class="mini-stat-card">
+      <div>
+        <div class="mini-stat-label">Total Amount</div>
+        <div class="mini-stat-value text-danger">&#8377;<%= number_with_delimiter(@total_amount.to_i) %></div>
+      </div>
+      <div class="mini-stat-icon mini-stat-icon-danger"><i class="bi bi-cash-stack"></i></div>
+    </div>
+  </div>
+</div>
+
+<%= form_with url: forum_expenses_path(forum_slug: @current_forum.slug), method: :get, local: true, class: "card mb-3" do %>
+  <div class="card-body d-flex flex-wrap gap-2">
+    <%= text_field_tag :q, params[:q], class: "form-control", placeholder: "Search by category...", style: "max-width: 260px;" %>
+    <%= submit_tag "Filter", class: "btn btn-outline-secondary" %>
+    <%= link_to "Reset", forum_expenses_path(forum_slug: @current_forum.slug), class: "btn btn-link" %>
+  </div>
+<% end %>
+
 <div class="card">
   <div class="table-responsive">
     <table class="table table-hover align-middle mb-0">

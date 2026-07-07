@@ -4,7 +4,12 @@ module Forums
 
     def index
       authorize! :read, Expense
-      @expenses = @current_forum.expenses.order(incurred_on: :desc).page(params[:page])
+      @total_expenses = @current_forum.expenses.count
+      @total_amount = @current_forum.expenses.sum(:amount)
+
+      @expenses = @current_forum.expenses.order(incurred_on: :desc)
+      @expenses = @expenses.where("category ILIKE ?", "%#{params[:q]}%") if params[:q].present?
+      @expenses = @expenses.page(params[:page])
     end
 
     def new

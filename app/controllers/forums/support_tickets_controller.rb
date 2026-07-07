@@ -3,7 +3,13 @@ module Forums
     before_action :set_ticket, only: [ :show, :reply ]
 
     def index
-      @tickets = SupportTicket.where(forum: @current_forum, raised_by: current_user).order(created_at: :desc)
+      base = SupportTicket.where(forum: @current_forum, raised_by: current_user)
+      @total_tickets = base.count
+      @open_tickets = base.where(status: [ :open, :in_progress ]).count
+      @closed_tickets = base.where(status: [ :resolved, :closed ]).count
+
+      @tickets = base.order(created_at: :desc)
+      @tickets = @tickets.where(status: params[:status]) if params[:status].present?
     end
 
     def new

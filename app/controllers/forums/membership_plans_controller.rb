@@ -4,7 +4,10 @@ module Forums
 
     def index
       authorize! :read, MembershipPlan
+      @total_plans = @current_forum.membership_plans.count
+
       @plans = @current_forum.membership_plans.order(:name)
+      @plans = @plans.where("name ILIKE ?", "%#{params[:q]}%") if params[:q].present?
     end
 
     def show

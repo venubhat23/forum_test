@@ -5,7 +5,16 @@ module Forums
 
     def index
       authorize! :read, FeePayment
-      @fee_payments = FeePayment.joins(:user).where(users: { chapter_id: @chapter.id }).order(created_at: :desc).page(params[:page])
+      base = FeePayment.joins(:user).where(users: { chapter_id: @chapter.id })
+      @total_fees = base.count
+      @paid_fees = base.where(status: :paid).count
+      @pending_fees = base.where(status: :pending).count
+      @total_amount = base.sum(:amount)
+
+      @fee_payments = base.order(created_at: :desc)
+      @fee_payments = @fee_payments.where("users.full_name ILIKE ?", "%#{params[:q]}%") if params[:q].present?
+      @fee_payments = @fee_payments.where(status: params[:status]) if params[:status].present?
+      @fee_payments = @fee_payments.page(params[:page])
     end
 
     def new

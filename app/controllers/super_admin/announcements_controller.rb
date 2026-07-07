@@ -4,7 +4,12 @@ module SuperAdmin
     before_action :set_form_collections, only: [ :new, :create, :edit, :update ]
 
     def index
+      @total_announcements = Announcement.count
+      @published_announcements = Announcement.published.count
+      @draft_announcements = @total_announcements - @published_announcements
+
       @announcements = Announcement.order(created_at: :desc)
+      @announcements = @announcements.where("title ILIKE ?", "%#{params[:q]}%") if params[:q].present?
     end
 
     def new

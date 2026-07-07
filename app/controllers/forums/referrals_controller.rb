@@ -5,10 +5,19 @@ module Forums
 
     def index
       authorize! :read, Referral
-      @referrals = Referral.joins("INNER JOIN users givers ON givers.id = referrals.giver_id")
-        .where(givers: { chapter_id: @chapter.id }).order(created_at: :desc).page(params[:page])
-      @monthly_stats = Referral.joins("INNER JOIN users givers ON givers.id = referrals.giver_id")
-        .where(givers: { chapter_id: @chapter.id }).group_by_month(:created_at, last: 6).count
+      base = Referral.joins("INNER JOIN users givers ON givers.id = referrals.giver_id")
+        .where(givers: { chapter_id: @chapter.id })
+
+      @total_referrals = base.count
+      @pending_referrals = base.where(status: :pending).count
+      @accepted_referrals = base.where(status: :accepted).count
+      @converted_referrals = base.where(status: :converted).count
+      @monthly_stats = base.group_by_month(:created_at, last: 6).count
+
+      @referrals = base.order(created_at: :desc)
+      @referrals = @referrals.where("prospect_name ILIKE ?", "%#{params[:q]}%") if params[:q].present?
+      @referrals = @referrals.where(status: params[:status]) if params[:status].present?
+      @referrals = @referrals.page(params[:page])
     end
 
     def show

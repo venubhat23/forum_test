@@ -4,7 +4,16 @@ module Forums
 
     def index
       authorize! :read, Attendance
-      @attendances = Attendance.joins(:user).where(users: { chapter_id: @chapter.id }).order(occurred_on: :desc).page(params[:page])
+      base = Attendance.joins(:user).where(users: { chapter_id: @chapter.id })
+      @total_attendance = base.count
+      @present_count = base.where(present: true).count
+      @absent_count = base.where(present: false).count
+
+      @attendances = base.order(occurred_on: :desc)
+      @attendances = @attendances.where("users.full_name ILIKE ?", "%#{params[:q]}%") if params[:q].present?
+      @attendances = @attendances.where(present: true) if params[:status] == "present"
+      @attendances = @attendances.where(present: false) if params[:status] == "absent"
+      @attendances = @attendances.page(params[:page])
     end
 
     def new

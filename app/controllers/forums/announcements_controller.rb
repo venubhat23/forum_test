@@ -4,7 +4,13 @@ module Forums
 
     def index
       authorize! :read, Announcement
-      @announcements = Announcement.where(forum: @current_forum).or(Announcement.where(audience: :everyone)).order(created_at: :desc)
+      base = Announcement.where(forum: @current_forum).or(Announcement.where(audience: :everyone))
+      @total_announcements = base.count
+      @forum_announcements = base.where(forum: @current_forum).count
+      @platform_announcements = base.where(audience: :everyone).count
+
+      @announcements = base.order(created_at: :desc)
+      @announcements = @announcements.where("title ILIKE ?", "%#{params[:q]}%") if params[:q].present?
     end
 
     def new

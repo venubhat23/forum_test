@@ -5,7 +5,12 @@ module Forums
 
     def index
       authorize! :read, User
-      @guests = @chapter.guests.order(:full_name).page(params[:page])
+      @total_guests = @chapter.guests.count
+      @guests_this_month = @chapter.guests.where(created_at: Time.current.beginning_of_month..).count
+
+      @guests = @chapter.guests.order(:full_name)
+      @guests = @guests.where("full_name ILIKE ? OR email ILIKE ?", "%#{params[:q]}%", "%#{params[:q]}%") if params[:q].present?
+      @guests = @guests.page(params[:page])
     end
 
     def show

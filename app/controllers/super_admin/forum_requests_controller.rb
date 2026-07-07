@@ -3,7 +3,12 @@ module SuperAdmin
     before_action :set_forum_request, only: [ :show, :approve, :reject ]
 
     def index
+      @pending_requests = ForumRequest.pending.count
+      @approved_requests = ForumRequest.where(status: :approved).count
+      @rejected_requests = ForumRequest.where(status: :rejected).count
+
       @forum_requests = ForumRequest.order(created_at: :desc)
+      @forum_requests = @forum_requests.where(status: params[:status]) if params[:status].present?
     end
 
     def show

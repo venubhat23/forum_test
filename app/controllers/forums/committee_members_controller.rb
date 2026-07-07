@@ -5,7 +5,11 @@ module Forums
 
     def index
       authorize! :read, User
-      @committee_members = @chapter.committee_members.order(:designation, :full_name).page(params[:page])
+      @total_committee_members = @chapter.committee_members.count
+
+      @committee_members = @chapter.committee_members.order(:designation, :full_name)
+      @committee_members = @committee_members.where("full_name ILIKE ? OR designation ILIKE ?", "%#{params[:q]}%", "%#{params[:q]}%") if params[:q].present?
+      @committee_members = @committee_members.page(params[:page])
     end
 
     def show

@@ -3,7 +3,13 @@ module SuperAdmin
     before_action :set_forum, only: [ :extend_trial, :change_renewal_date ]
 
     def index
+      @active_forums = Forum.active.count
+      @trial_forums = Forum.trial.count
+      @suspended_forums = Forum.suspended.count
+      @renewals_soon = Forum.where(renews_on: Date.current..30.days.from_now.to_date).count
+
       @forums = Forum.includes(:plan).order(:renews_on)
+      @forums = @forums.where(status: params[:status]) if params[:status].present?
     end
 
     def extend_trial

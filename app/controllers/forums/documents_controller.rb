@@ -4,7 +4,11 @@ module Forums
 
     def index
       authorize! :read, Document
-      @documents = @current_forum.documents.order(created_at: :desc).page(params[:page])
+      @total_documents = @current_forum.documents.count
+
+      @documents = @current_forum.documents.order(created_at: :desc)
+      @documents = @documents.where("title ILIKE ? OR category ILIKE ?", "%#{params[:q]}%", "%#{params[:q]}%") if params[:q].present?
+      @documents = @documents.page(params[:page])
     end
 
     def new

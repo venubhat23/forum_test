@@ -3,6 +3,10 @@ module SuperAdmin
     before_action :set_user, only: [ :show, :edit, :update, :destroy, :suspend, :unsuspend, :reset_password, :force_logout ]
 
     def index
+      @total_users = User.count
+      @active_users = User.where(suspended_at: nil).count
+      @suspended_users = User.where.not(suspended_at: nil).count
+
       @users = User.includes(:forum)
       @users = @users.where(role: params[:role]) if params[:role].present?
       @users = @users.where(forum_id: params[:forum_id]) if params[:forum_id].present?

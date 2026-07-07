@@ -12,6 +12,36 @@
   <% end %>
 </div>
 
+<div class="row g-3 mb-4">
+  <div class="col-6 col-lg-6">
+    <div class="mini-stat-card">
+      <div>
+        <div class="mini-stat-label">Total Meetings</div>
+        <div class="mini-stat-value text-primary"><%= @total_meetings %></div>
+      </div>
+      <div class="mini-stat-icon mini-stat-icon-primary"><i class="bi bi-calendar3"></i></div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-6">
+    <div class="mini-stat-card">
+      <div>
+        <div class="mini-stat-label">Avg Attendance</div>
+        <div class="mini-stat-value text-success"><%= @avg_attendance %>%</div>
+      </div>
+      <div class="mini-stat-icon mini-stat-icon-success"><i class="bi bi-graph-up"></i></div>
+    </div>
+  </div>
+</div>
+
+<%= form_with url: forum_chapter_meetings_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id), method: :get, local: true, class: "card mb-3" do %>
+  <div class="card-body d-flex flex-wrap gap-2">
+    <%= text_field_tag :q, params[:q], class: "form-control", placeholder: "Search by venue or speaker...", style: "max-width: 260px;" %>
+    <%= select_tag :meeting_type, options_for_select([ [ "All types", "" ] ] + Meeting.meeting_types.keys.map { |t| [ t.titleize, t ] }, params[:meeting_type]), class: "form-select", style: "max-width: 200px;" %>
+    <%= submit_tag "Filter", class: "btn btn-outline-secondary" %>
+    <%= link_to "Reset", forum_chapter_meetings_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id), class: "btn btn-link" %>
+  </div>
+<% end %>
+
 <div class="card">
   <div class="table-responsive">
     <table class="table table-hover align-middle mb-0">

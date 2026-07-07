@@ -5,7 +5,14 @@ module Forums
 
     def index
       authorize! :read, Meeting
-      @meetings = @chapter.meetings.order(scheduled_at: :desc).page(params[:page])
+      all_meetings = @chapter.meetings.to_a
+      @total_meetings = all_meetings.size
+      @avg_attendance = all_meetings.any? ? (all_meetings.sum(&:attendance_percentage) / all_meetings.size.to_f).round(1) : 0
+
+      @meetings = @chapter.meetings.order(scheduled_at: :desc)
+      @meetings = @meetings.where("venue ILIKE ? OR speaker ILIKE ?", "%#{params[:q]}%", "%#{params[:q]}%") if params[:q].present?
+      @meetings = @meetings.where(meeting_type: params[:meeting_type]) if params[:meeting_type].present?
+      @meetings = @meetings.page(params[:page])
     end
 
     def show

@@ -4,7 +4,13 @@ module Forums
 
     def index
       authorize! :read, OfficeDarshan
-      @darshans = OfficeDarshan.accessible_by(current_ability).where(forum_id: @current_forum.id).order(visit_date: :desc)
+      base = OfficeDarshan.accessible_by(current_ability).where(forum_id: @current_forum.id)
+      @total_darshans = base.count
+      @scheduled_darshans = base.where(status: :scheduled).count
+      @completed_darshans = base.where(status: :completed).count
+
+      @darshans = base.order(visit_date: :desc)
+      @darshans = @darshans.where(status: params[:status]) if params[:status].present?
     end
 
     def show
