@@ -3,9 +3,12 @@
 <div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-2">
   <div>
     <h1 class="page-title h4"><%= @forum.name %></h1>
-    <p class="page-subtitle mb-0">/f/<%= @forum.slug %></p>
+    <p class="page-subtitle mb-0"><%= forum_root_url(forum_slug: @forum.slug) %></p>
   </div>
   <div class="d-flex flex-wrap gap-2">
+    <%= link_to tree_super_admin_forum_path(@forum), class: "btn btn-outline-primary" do %>
+      <i class="bi bi-diagram-3 me-1"></i>Forum Tree
+    <% end %>
     <%= link_to "Edit", edit_super_admin_forum_path(@forum), class: "btn btn-outline-secondary" %>
     <% if @forum.suspended? %>
       <%= button_to "Activate", activate_super_admin_forum_path(@forum), method: :patch, class: "btn btn-success" %>
@@ -59,6 +62,28 @@
   </div>
 </div>
 
+<div class="card mb-4">
+  <div class="card-header fw-semibold">Forum URL &amp; Logo</div>
+  <div class="card-body">
+    <div class="d-flex flex-wrap align-items-center gap-3">
+      <% setting = @forum.forum_setting %>
+      <% if setting&.logo&.attached? %>
+        <%= image_tag setting.logo, class: "auth-brand-logo", style: "margin: 0;", alt: @forum.name %>
+      <% else %>
+        <div class="sidebar-brand-icon"><i class="bi bi-image"></i></div>
+      <% end %>
+      <div class="flex-grow-1">
+        <div class="d-flex align-items-center gap-2">
+          <code id="forum-url"><%= forum_root_url(forum_slug: @forum.slug) %></code>
+          <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-1" onclick="navigator.clipboard.writeText(document.getElementById('forum-url').innerText)" title="Copy URL"><i class="bi bi-clipboard small"></i></button>
+        </div>
+        <div class="text-muted small mt-1">Opens this forum's branded login page. Upload or change the logo from Forum Settings (inside the forum) or when creating the forum.</div>
+      </div>
+      <%= link_to "Open", forum_root_path(forum_slug: @forum.slug), class: "btn btn-outline-primary", target: "_blank", rel: "noopener" %>
+    </div>
+  </div>
+</div>
+
 <div class="card">
   <div class="card-header fw-semibold">Forum Admin</div>
   <div class="card-body">
@@ -68,7 +93,7 @@
           <div class="sidebar-brand-icon"><i class="bi bi-person-fill"></i></div>
           <div>
             <div class="fw-semibold"><%= @forum.admin.email %></div>
-            <div class="text-muted small">Forum Admin &middot; logs in at <code>/f/<%= @forum.slug %>/dashboard</code></div>
+            <div class="text-muted small">Forum Admin &middot; logs in at <code><%= forum_root_url(forum_slug: @forum.slug) %></code></div>
           </div>
         </div>
         <div class="d-flex flex-wrap gap-2">

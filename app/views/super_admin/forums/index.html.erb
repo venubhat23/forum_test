@@ -81,7 +81,7 @@
                 <span class="fw-semibold"><%= forum.name %></span>
               </div>
             </td>
-            <td><code>/f/<%= forum.slug %></code></td>
+            <td><code><%= forum_root_path(forum_slug: forum.slug) %></code></td>
             <td><span class="badge badge-plan-<%= forum.plan.key %>"><%= forum.plan.name %></span></td>
             <td><span class="badge badge-status-<%= forum.status %>"><%= forum.status.titleize %></span></td>
             <td><%= forum.chapters.count %></td>

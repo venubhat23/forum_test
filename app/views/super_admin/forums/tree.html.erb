@@ -1,0 +1,82 @@
+<% content_for :title, "#{@forum.name} · Forum Tree" %>
+
+<div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+  <div>
+    <h1 class="page-title h4">Forum Tree</h1>
+    <p class="page-subtitle mb-0"><%= @forum.name %></p>
+  </div>
+  <%= link_to "Back to Forum", super_admin_forum_path(@forum), class: "btn btn-outline-secondary" %>
+</div>
+
+<div class="card">
+  <div class="card-body p-4">
+    <div class="d-flex align-items-center gap-2 mb-1">
+      <i class="bi bi-diagram-3 text-primary fs-4"></i>
+      <span class="fw-bold h5 mb-0"><%= @forum.name %></span>
+      <span class="badge badge-status-<%= @forum.status %>"><%= @forum.status.titleize %></span>
+    </div>
+
+    <% if @forum.admin %>
+      <div class="ms-4 ps-3 border-start mt-2 py-1">
+        <i class="bi bi-person-badge text-primary me-1"></i>
+        <span class="fw-semibold">Forum Admin</span>
+        <span class="text-muted">&middot; <%= @forum.admin.display_name %> (<%= @forum.admin.email %>)</span>
+      </div>
+    <% end %>
+
+    <div class="ms-4 ps-3 border-start mt-2">
+      <div class="fw-semibold text-uppercase text-muted small mb-2">
+        <i class="bi bi-diagram-2 me-1"></i>Chapters (<%= @chapters.size %>)
+      </div>
+
+      <% if @chapters.empty? %>
+        <p class="text-muted small">No chapters yet.</p>
+      <% end %>
+
+      <div class="accordion" id="chapterTree">
+        <% @chapters.each do |chapter| %>
+          <% users_by_role = chapter.users.group_by(&:role) %>
+          <% chapter_total = chapter.users.size %>
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#chapter-<%= chapter.id %>">
+                <i class="bi bi-signpost-split me-2"></i>
+                <span class="fw-semibold"><%= chapter.name %></span>
+                <span class="badge bg-secondary ms-2"><%= pluralize(chapter_total, "person") %></span>
+              </button>
+            </h2>
+            <div id="chapter-<%= chapter.id %>" class="accordion-collapse collapse" data-bs-parent="#chapterTree">
+              <div class="accordion-body">
+                <% @role_labels.each do |role, label| %>
+                  <% role_users = users_by_role[role] || [] %>
+                  <% next if role_users.empty? %>
+                  <div class="mb-3">
+                    <div class="fw-semibold small text-uppercase text-muted mb-1">
+                      <i class="bi bi-people me-1"></i><%= label %>
+                    </div>
+
+                    <% if role_users.size > @listed_member_limit %>
+                      <span class="badge bg-primary-subtle text-primary fs-6 fw-semibold px-3 py-2">
+                        <%= role_users.size %> <%= label %>
+                      </span>
+                    <% else %>
+                      <ul class="list-unstyled mb-0 ps-3">
+                        <% role_users.each do |u| %>
+                          <li><i class="bi bi-person-fill text-muted me-1"></i><%= u.display_name %> <span class="text-muted small">(<%= u.email %>)</span></li>
+                        <% end %>
+                      </ul>
+                    <% end %>
+                  </div>
+                <% end %>
+
+                <% if chapter_total.zero? %>
+                  <p class="text-muted small mb-0">No members in this chapter yet.</p>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

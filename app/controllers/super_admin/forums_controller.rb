@@ -1,7 +1,7 @@
 module SuperAdmin
   class ForumsController < BaseController
     before_action :set_forum, only: [ :show, :edit, :update, :destroy, :suspend, :activate, :update_plan,
-                                       :impersonate, :reset_admin_password, :force_logout_admin ]
+                                       :impersonate, :reset_admin_password, :force_logout_admin, :tree ]
 
     def index
       @total_forums = Forum.count
@@ -18,6 +18,13 @@ module SuperAdmin
     def show
     end
 
+    def tree
+      @chapters = @forum.chapters.order(:name).includes(:users)
+      @role_labels = { "chapter_admin" => "Chapter Admins", "committee_member" => "Committee Members",
+                        "member" => "Members", "guest" => "Guests" }
+      @listed_member_limit = 10
+    end
+
     def new
       @forum = Forum.new
       @plans = Plan.ordered.active
@@ -27,6 +34,8 @@ module SuperAdmin
       @forum = Forum.new(forum_params)
       admin_email = params.dig(:admin, :email)
       admin_password = params.dig(:admin, :password)
+      logo = params.dig(:forum, :logo)
+      theme_color = params.dig(:forum, :theme_color)
 
       ActiveRecord::Base.transaction do
         @forum.save!
@@ -38,9 +47,14 @@ module SuperAdmin
           forum: @forum
         )
         @admin.save!
+
+        setting = ForumSetting.new(forum: @forum)
+        setting.logo.attach(logo) if logo.present?
+        setting.theme_color = theme_color if theme_color.present?
+        setting.save!
       end
 
-      redirect_to super_admin_forum_path(@forum), notice: "#{@forum.name} was created with admin login #{admin_email}."
+      redirect_to super_admin_forum_path(@forum), notice: "#{@forum.name} was created with admin login #{admin_email}. Its URL is #{forum_root_url(forum_slug: @forum.slug)}"
     rescue ActiveRecord::RecordInvalid => e
       @admin ||= User.new(email: admin_email, role: :forum_admin)
       @admin.valid?

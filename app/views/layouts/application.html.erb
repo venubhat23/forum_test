@@ -33,6 +33,30 @@
   </head>
 
   <body>
+    <% if notice %>
+      <div id="toast-notification" class="toast-notification toast-success">
+        <div class="toast-notification-content">
+          <div class="d-flex align-items-center">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            <span><%= notice %></span>
+          </div>
+          <button type="button" class="btn-close ms-3" onclick="closeToast()"></button>
+        </div>
+      </div>
+    <% end %>
+
+    <% if alert.present? %>
+      <div id="toast-notification" class="toast-notification toast-danger">
+        <div class="toast-notification-content">
+          <div class="d-flex align-items-center">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <span><%= alert %></span>
+          </div>
+          <button type="button" class="btn-close ms-3" onclick="closeToast()"></button>
+        </div>
+      </div>
+    <% end %>
+
     <% if user_signed_in? %>
       <header class="app-header">
         <div class="container-fluid h-100">
@@ -46,6 +70,9 @@
                 <i class="bi bi-list"></i>
               </button>
 
+              <% if (logo = brand_logo)&.attached? %>
+                <%= image_tag logo, class: "header-logo me-2", alt: brand_header_text %>
+              <% end %>
               <span class="brand-header-text"><%= brand_header_text %></span>
             </div>
 
@@ -98,30 +125,6 @@
               <div class="small mb-0"><%= announcement.body %></div>
             </div>
           <% end %>
-        <% end %>
-
-        <% if notice %>
-          <div id="toast-notification" class="toast-notification toast-success">
-            <div class="toast-notification-content">
-              <div class="d-flex align-items-center">
-                <i class="bi bi-check-circle-fill me-2"></i>
-                <span><%= notice %></span>
-              </div>
-              <button type="button" class="btn-close ms-3" onclick="closeToast()"></button>
-            </div>
-          </div>
-        <% end %>
-
-        <% if alert.present? %>
-          <div id="toast-notification" class="toast-notification toast-danger">
-            <div class="toast-notification-content">
-              <div class="d-flex align-items-center">
-                <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                <span><%= alert %></span>
-              </div>
-              <button type="button" class="btn-close ms-3" onclick="closeToast()"></button>
-            </div>
-          </div>
         <% end %>
 
         <%= yield %>

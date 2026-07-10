@@ -542,6 +542,16 @@ body.sidebar-collapsed .main-content {
   box-shadow: 0 8px 20px rgba(102, 126, 234, 0.35);
 }
 
+.auth-brand-logo {
+  width: 64px;
+  height: 64px;
+  object-fit: cover;
+  border-radius: 16px;
+  margin: 0 auto 1rem auto;
+  display: block;
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.35);
+}
+
 @media (max-width: 480px) {
   .auth-card {
     padding: 2rem 1.25rem;

@@ -14,4 +14,9 @@ module ApplicationHelper
     else "Business Network"
     end
   end
+
+  def brand_logo
+    return nil unless current_area == :forum
+    @current_forum&.forum_setting&.logo
+  end
 end

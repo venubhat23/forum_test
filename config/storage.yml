@@ -6,6 +6,20 @@ local:
   service: Disk
   root: <%= Rails.root.join("storage") %>
 
+# Cloudflare R2 (S3-compatible) — used for forum logos and other uploads.
+# Same account/bucket as insurebook_admin. Keys come from ENV, set in .env
+# locally (gitignored) and in Render's dashboard for production — never
+# commit real keys into this file.
+cloudflare_r2:
+  service: S3
+  access_key_id: <%= ENV["R2_ACCESS_KEY_ID"] %>
+  secret_access_key: <%= ENV["R2_SECRET_ACCESS_KEY"] %>
+  region: auto
+  bucket: <%= ENV.fetch("R2_BUCKET") { "insurebook-uploads" } %>
+  endpoint: <%= ENV["R2_ENDPOINT"] %>
+  force_path_style: true
+  public: true
+
 # Use bin/rails credentials:edit to set the AWS secrets (as aws:access_key_id|secret_access_key)
 # amazon:
 #   service: S3

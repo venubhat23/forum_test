@@ -2,7 +2,7 @@
 
 <div class="page-header">
   <h1 class="page-title h4">Edit <%= @forum.name %></h1>
-  <p class="page-subtitle mb-0">/f/<%= @forum.slug %> &middot; slug can't be changed here.</p>
+  <p class="page-subtitle mb-0"><%= forum_root_url(forum_slug: @forum.slug) %> &middot; slug can't be changed here.</p>
 </div>
 
 <div class="row justify-content-center">

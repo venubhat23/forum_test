@@ -1,6 +1,11 @@
 class Forum < ApplicationRecord
   enum :status, { trial: 0, active: 1, suspended: 2, expired: 3, archived: 4 }, default: :active
 
+  RESERVED_SLUGS = %w[
+    super_admin users dashboard impersonation forum_requests up rails
+    assets packs cable admin api f new edit create update destroy
+  ].freeze
+
   belongs_to :plan
 
   has_many :chapters, dependent: :destroy
@@ -17,7 +22,8 @@ class Forum < ApplicationRecord
 
   validates :name, presence: true
   validates :slug, presence: true, uniqueness: true,
-    format: { with: /\A[a-z0-9\-]+\z/, message: "can only contain lowercase letters, numbers, and hyphens" }
+    format: { with: /\A[a-z0-9\-]+\z/, message: "can only contain lowercase letters, numbers, and hyphens" },
+    exclusion: { in: RESERVED_SLUGS, message: "is reserved and can't be used" }
 
   before_validation :generate_slug, on: :create
   before_validation :assign_default_plan, on: :create
@@ -58,7 +64,7 @@ class Forum < ApplicationRecord
     base = name.parameterize
     candidate = base
     counter = 1
-    while Forum.exists?(slug: candidate)
+    while Forum.exists?(slug: candidate) || RESERVED_SLUGS.include?(candidate)
       counter += 1
       candidate = "#{base}-#{counter}"
     end

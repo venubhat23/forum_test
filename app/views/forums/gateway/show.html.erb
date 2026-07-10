@@ -1,0 +1,44 @@
+<% content_for :title, @forum.name %>
+
+<div class="auth-wrapper">
+  <div class="auth-card">
+    <div class="text-center mb-4">
+      <% if @setting&.logo&.attached? %>
+        <%= image_tag @setting.logo, class: "auth-brand-logo", alt: @forum.name %>
+      <% else %>
+        <div class="auth-brand-icon">
+          <i class="bi bi-people-fill"></i>
+        </div>
+      <% end %>
+      <h1 class="h4 fw-bold mb-1"><%= @forum.name %></h1>
+      <p class="text-muted mb-0">Sign in to your account</p>
+    </div>
+
+    <% if alert %>
+      <div class="alert alert-danger" data-turbo-temporary><%= alert %></div>
+    <% end %>
+
+    <%= form_with url: user_session_path, method: :post, local: true do %>
+      <div class="mb-3">
+        <%= label_tag "user_email", "Email", class: "form-label" %>
+        <%= email_field_tag "user[email]", nil, autofocus: true, autocomplete: "email", class: "form-control form-control-lg", inputmode: "email" %>
+      </div>
+
+      <div class="mb-3">
+        <%= label_tag "user_password", "Password", class: "form-label" %>
+        <%= password_field_tag "user[password]", nil, autocomplete: "current-password", class: "form-control form-control-lg" %>
+      </div>
+
+      <div class="form-check mb-4">
+        <%= check_box_tag "user[remember_me]", "1", false, class: "form-check-input" %>
+        <%= label_tag "user_remember_me", "Remember me", class: "form-check-label" %>
+      </div>
+
+      <%= submit_tag "Sign In", class: "btn btn-primary btn-lg w-100" %>
+    <% end %>
+
+    <div class="text-center mt-4">
+      <%= link_to "Forgot your password?", new_user_password_path, class: "small" %>
+    </div>
+  </div>
+</div>

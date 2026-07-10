@@ -16,6 +16,7 @@ Rails.application.routes.draw do
     get "roles", to: "roles#index"
     resources :forums, only: [ :index, :new, :create, :show, :edit, :update, :destroy ] do
       member do
+        get :tree
         patch :suspend
         patch :activate
         patch :update_plan
@@ -90,8 +91,8 @@ Rails.application.routes.draw do
 
   resources :forum_requests, only: [ :new, :create ]
 
-  scope "/f/:forum_slug", as: :forum do
-    root to: "forums/dashboard#show"
+  scope "/:forum_slug", as: :forum do
+    root to: "forums/gateway#show"
     get "dashboard", to: "forums/dashboard#show"
     get "apply", to: "membership_applications#new"
     post "apply", to: "membership_applications#create"

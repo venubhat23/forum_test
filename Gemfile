@@ -55,6 +55,9 @@ gem "thruster", require: false
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
 gem "image_processing", "~> 1.2"
 
+# S3-compatible client, used for Cloudflare R2 storage of uploaded logos/documents
+gem "aws-sdk-s3", require: false
+
 # Excel import for bulk member upload
 gem "roo"
 
