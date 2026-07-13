@@ -4,7 +4,7 @@ require "roo"
 module Forums
   class MembersController < BaseController
     before_action :set_chapter, except: [ :import, :bulk_import ]
-    before_action :set_member, only: [ :show, :edit, :update, :suspend, :activate, :reset_password, :force_logout, :renew, :print ]
+    before_action :set_member, only: [ :show, :edit, :update, :suspend, :activate, :reset_password, :force_logout, :renew, :print, :update_role ]
 
     def index
       authorize! :read, User
@@ -12,7 +12,7 @@ module Forums
       @active_members = @chapter.members.where(suspended_at: nil).count
       @suspended_members = @chapter.members.where.not(suspended_at: nil).count
 
-      @members = @chapter.members.order(:full_name)
+      @members = @chapter.members.order(role_order_sql, :full_name)
       @members = @members.where("full_name ILIKE ? OR email ILIKE ?", "%#{params[:q]}%", "%#{params[:q]}%") if params[:q].present?
       @members = @members.where(suspended_at: nil) if params[:status] == "active"
       @members = @members.where.not(suspended_at: nil) if params[:status] == "suspended"
@@ -95,6 +95,13 @@ module Forums
       redirect_to forum_chapter_member_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: @member.id), notice: "Membership renewed until #{@member.renews_on.strftime('%d %b %Y')}."
     end
 
+    def update_role
+      authorize! :update, @member
+      @member.update!(designation: params[:designation].presence)
+      notice = @member.designation.present? ? "#{@member.display_name} is now #{@member.designation}." : "#{@member.display_name}'s role was removed."
+      redirect_to forum_chapter_members_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id), notice: notice
+    end
+
     def print
       authorize! :read, @member
       render layout: false
@@ -147,6 +154,11 @@ module Forums
 
     private
 
+    def role_order_sql
+      cases = User::DESIGNATIONS.each_with_index.map { |d, i| "WHEN #{User.connection.quote(d)} THEN #{i}" }.join(" ")
+      Arel.sql("CASE designation #{cases} ELSE #{User::DESIGNATIONS.size} END ASC")
+    end
+
     def set_chapter
       @chapter = @current_forum.chapters.find(params[:chapter_id])
     end
@@ -157,13 +169,13 @@ module Forums
 
     def member_params
       params.require(:member).permit(:full_name, :email, :phone, :password, :password_confirmation,
-        :business_name, :business_category, :speciality, :gst_number, :pan_number, :aadhaar_number,
+        :business_name, :business_category, :speciality, :designation, :gst_number, :pan_number, :aadhaar_number,
         :website, :address, :experience_years, :date_of_birth, :business_category_id, :photo, kyc_documents: [])
     end
 
     def member_update_params
       params.require(:member).permit(:full_name, :email, :phone,
-        :business_name, :business_category, :speciality, :gst_number, :pan_number, :aadhaar_number,
+        :business_name, :business_category, :speciality, :designation, :gst_number, :pan_number, :aadhaar_number,
         :website, :address, :experience_years, :date_of_birth, :business_category_id, :photo, kyc_documents: [])
     end
 

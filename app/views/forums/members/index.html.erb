@@ -66,6 +66,7 @@
           <th>Business</th>
           <th>Category</th>
           <th>Speciality</th>
+          <th>Role</th>
           <th></th>
         </tr>
       </thead>
@@ -81,8 +82,20 @@
             <td><%= member.email %></td>
             <td><%= member.phone %></td>
             <td><%= member.business_name %></td>
-            <td><%= member.business_category %></td>
+            <td><%= member.business_category_id ? member.business_category_ref&.name : member.business_category %></td>
             <td><%= member.speciality %></td>
+            <td>
+              <% if member.designation.present? %>
+                <span class="badge bg-primary"><%= member.designation %></span>
+              <% else %>
+                <span class="badge bg-secondary">Member</span>
+              <% end %>
+              <% if can? :update, member %>
+                <%= form_with url: update_role_forum_chapter_member_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: member.id), method: :patch, local: true, class: "mt-1" do %>
+                  <%= select_tag :designation, options_for_select([ [ "Member (no role)", "" ] ] + User::DESIGNATIONS, member.designation), class: "form-select form-select-sm", style: "min-width: 170px;", onchange: "this.form.requestSubmit()" %>
+                <% end %>
+              <% end %>
+            </td>
             <td class="text-end">
               <%= link_to forum_chapter_member_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: member.id), class: "icon-btn icon-btn-view", title: "View" do %>
                 <i class="bi bi-eye"></i>
@@ -91,7 +104,7 @@
           </tr>
         <% end %>
         <% if @members.empty? %>
-          <tr><td colspan="7" class="text-center text-muted py-4">No members yet. Add the first one to get started.</td></tr>
+          <tr><td colspan="8" class="text-center text-muted py-4">No members yet. Add the first one to get started.</td></tr>
         <% end %>
       </tbody>
     </table>

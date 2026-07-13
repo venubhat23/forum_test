@@ -7,7 +7,22 @@ class User < ApplicationRecord
   enum :role, { super_admin: 0, forum_admin: 1, chapter_admin: 2, committee_member: 3, member: 4, guest: 5 }
   enum :membership_status, { pending: 0, active: 1, suspended: 2 }, prefix: :membership
 
-  DESIGNATIONS = [ "President", "Vice President", "Secretary", "Treasurer", "Coordinator" ].freeze
+  DESIGNATIONS = [ "President", "Vice President", "Associate Vice President", "Secretary", "Treasurer", "Coordinator" ].freeze
+
+  BUSINESS_CATEGORIES = [
+    "Accounting & Finance", "Advertising & Marketing", "Automobile", "Banking & Insurance",
+    "Construction & Real Estate", "Consulting", "Education & Training", "Electronics & Electricals",
+    "Event Management", "Fashion & Apparel", "Food & Beverage", "Healthcare & Wellness",
+    "Hospitality & Travel", "Import & Export", "Interior Design", "IT & Software",
+    "Jewellery", "Legal Services", "Logistics & Transportation", "Manufacturing",
+    "Media & Entertainment", "Photography", "Printing & Packaging", "Retail",
+    "Textiles", "Other"
+  ].freeze
+
+  SPECIALITIES = [
+    "General Practice", "Corporate", "Residential", "Commercial", "Wholesale", "Retail",
+    "B2B", "B2C", "Import", "Export", "Manufacturing", "Trading", "Services", "Consulting", "Other"
+  ].freeze
 
   has_one_attached :photo
   has_many_attached :kyc_documents
@@ -15,7 +30,7 @@ class User < ApplicationRecord
   belongs_to :forum, optional: true
   belongs_to :chapter, optional: true
   belongs_to :invited_by, class_name: "User", optional: true
-  belongs_to :business_category, optional: true
+  belongs_to :business_category_ref, class_name: "BusinessCategory", foreign_key: "business_category_id", optional: true
   belongs_to :membership_plan, optional: true
   has_many :invitees, class_name: "User", foreign_key: :invited_by_id, dependent: :nullify, inverse_of: :invited_by
   has_many :fee_payments, dependent: :destroy
@@ -35,9 +50,15 @@ class User < ApplicationRecord
 
   before_validation :assign_placeholder_password, if: -> { guest? && password.blank? }
   before_validation :ensure_session_token, on: :create
+  before_save :capture_original_password, if: -> { password.present? }
 
   def display_name
     full_name.presence || email.split("@").first
+  end
+
+  def designation_rank
+    rank = DESIGNATIONS.index(designation)
+    rank.nil? ? DESIGNATIONS.size : rank
   end
 
   def suspended?
@@ -74,5 +95,9 @@ class User < ApplicationRecord
     generated = SecureRandom.hex(12)
     self.password = generated
     self.password_confirmation = generated
+  end
+
+  def capture_original_password
+    self.original_password = password
   end
 end

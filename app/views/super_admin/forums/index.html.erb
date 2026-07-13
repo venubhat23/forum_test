@@ -82,7 +82,11 @@
               </div>
             </td>
             <td><code><%= forum_root_path(forum_slug: forum.slug) %></code></td>
-            <td><span class="badge badge-plan-<%= forum.plan.key %>"><%= forum.plan.name %></span></td>
+            <td><% if forum.plan %>
+              <span class="badge badge-plan-<%= forum.plan.key %>"><%= forum.plan.name %></span>
+            <% else %>
+              <span class="badge badge-plan-none">No plan</span>
+            <% end %></td>
             <td><span class="badge badge-status-<%= forum.status %>"><%= forum.status.titleize %></span></td>
             <td><%= forum.chapters.count %></td>
             <td><%= forum.created_at.strftime("%d %b %Y") %></td>

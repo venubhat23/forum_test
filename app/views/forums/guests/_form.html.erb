@@ -1,4 +1,4 @@
-<%= form_with model: guest, url: url, method: method, local: true, scope: :guest do |f| %>
+<%= form_with model: guest, url: url, method: method, local: true, scope: :guest, data: { controller: "submit-loading", action: "submit->submit-loading#start" } do |f| %>
   <h2 class="h6 text-uppercase text-muted mb-3">Basic Profile</h2>
   <div class="mb-3">
     <%= f.label :full_name, "Full Name", class: "form-label" %>
@@ -21,11 +21,11 @@
   <div class="row g-3 mb-3">
     <div class="col-12 col-sm-6">
       <%= f.label :business_category, "Business Category", class: "form-label" %>
-      <%= f.text_field :business_category, class: "form-control" %>
+      <%= f.select :business_category, User::BUSINESS_CATEGORIES, { include_blank: true }, class: "form-select" %>
     </div>
     <div class="col-12 col-sm-6">
       <%= f.label :speciality, class: "form-label" %>
-      <%= f.text_field :speciality, class: "form-control" %>
+      <%= f.select :speciality, User::SPECIALITIES, { include_blank: true }, class: "form-select" %>
     </div>
   </div>
   <div class="mb-4">
@@ -34,7 +34,10 @@
   </div>
 
   <div class="d-flex flex-wrap gap-2">
-    <%= f.submit guest.new_record? ? "Add Guest" : "Save Changes", class: "btn btn-primary btn-lg" %>
+    <button type="submit" class="btn btn-primary btn-lg" data-submit-loading-target="button" data-loading-text="<%= guest.new_record? ? "Adding..." : "Saving..." %>">
+      <span data-submit-loading-target="spinner" class="spinner-border spinner-border-sm me-2 d-none" role="status" aria-hidden="true"></span>
+      <span data-submit-loading-target="label"><%= guest.new_record? ? "Add Guest" : "Save Changes" %></span>
+    </button>
     <%= link_to "Cancel", forum_chapter_guests_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id), class: "btn btn-outline-secondary btn-lg" %>
   </div>
 <% end %>

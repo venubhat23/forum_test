@@ -8,7 +8,9 @@ module Forums
     private
 
     def set_active_announcements
-      @active_announcements = Announcement.for_forum(@current_forum)
+      seen_ids = session[:seen_announcement_ids] ||= []
+      @active_announcements = Announcement.for_forum(@current_forum).reject { |a| seen_ids.include?(a.id) }
+      session[:seen_announcement_ids] = seen_ids + @active_announcements.map(&:id)
     end
 
     def set_current_forum

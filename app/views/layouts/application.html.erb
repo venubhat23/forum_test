@@ -57,6 +57,23 @@
       </div>
     <% end %>
 
+    <% if current_area == :forum && @active_announcements.present? %>
+      <% @active_announcements.each.with_index do |announcement, index| %>
+        <div class="toast-notification toast-announcement toast-info" style="top: calc(var(--header-height) + 10px + <%= index * 110 %>px);" data-announcement-toast>
+          <div class="toast-notification-content">
+            <div class="d-flex align-items-center">
+              <i class="bi bi-megaphone-fill me-2"></i>
+              <div>
+                <div class="fw-semibold"><%= announcement.title %></div>
+                <div class="small mb-0"><%= announcement.body %></div>
+              </div>
+            </div>
+            <button type="button" class="btn-close ms-3" onclick="closeAnnouncementToast(this)"></button>
+          </div>
+        </div>
+      <% end %>
+    <% end %>
+
     <% if user_signed_in? %>
       <header class="app-header">
         <div class="container-fluid h-100">
@@ -70,7 +87,11 @@
                 <i class="bi bi-list"></i>
               </button>
 
-              <% if (logo = brand_logo)&.attached? %>
+              <% unless (logo = brand_logo)&.attached? %>
+                <div class="header-brand-icon me-2">
+                  <i class="bi <%= current_area == :super_admin ? 'bi-diagram-3-fill' : 'bi-people-fill' %>"></i>
+                </div>
+              <% else %>
                 <%= image_tag logo, class: "header-logo me-2", alt: brand_header_text %>
               <% end %>
               <span class="brand-header-text"><%= brand_header_text %></span>
@@ -108,7 +129,9 @@
         </div>
       </header>
 
-      <%= render current_area == :super_admin ? "layouts/super_admin_sidebar" : "layouts/forum_sidebar" %>
+      <% if current_area.present? %>
+        <%= render current_area == :super_admin ? "layouts/super_admin_sidebar" : "layouts/forum_sidebar" %>
+      <% end %>
 
       <main class="main-content">
         <% if session[:impersonator_id].present? %>
@@ -116,15 +139,6 @@
             <span><i class="bi bi-incognito me-2"></i>You are viewing as <strong><%= current_user.email %></strong> (impersonation).</span>
             <%= button_to "Return to Super Admin", impersonation_path, method: :delete, class: "btn btn-sm btn-dark" %>
           </div>
-        <% end %>
-
-        <% if current_area == :forum && @active_announcements.present? %>
-          <% @active_announcements.each do |announcement| %>
-            <div class="alert alert-info mb-3" role="alert">
-              <div class="fw-semibold"><i class="bi bi-megaphone-fill me-2"></i><%= announcement.title %></div>
-              <div class="small mb-0"><%= announcement.body %></div>
-            </div>
-          <% end %>
         <% end %>
 
         <%= yield %>
@@ -224,6 +238,22 @@
           setTimeout(function() { toast.style.transform = 'translateX(0)'; }, 100);
           setTimeout(closeToast, 5000);
         }
+      });
+
+      // ── Announcement toasts (slide in from the left) ─────────────────
+      function closeAnnouncementToast(el) {
+        var toast = el.closest ? el.closest('.toast-announcement') : el;
+        if (!toast) return;
+        toast.style.transform = 'translateX(calc(-100% - 20px))';
+        setTimeout(function() { toast.remove(); }, 300);
+      }
+
+      document.addEventListener('turbo:load', function() {
+        var toasts = document.querySelectorAll('.toast-announcement');
+        toasts.forEach(function(toast, index) {
+          setTimeout(function() { toast.style.transform = 'translateX(0)'; }, 100 + index * 150);
+          setTimeout(function() { closeAnnouncementToast(toast); }, 6000 + index * 150);
+        });
       });
     </script>
   </body>

@@ -7,6 +7,7 @@ module Forums
       authorize! :read, User
       @total_guests = @chapter.guests.count
       @guests_this_month = @chapter.guests.where(created_at: Time.current.beginning_of_month..).count
+      @upcoming_event = @current_forum.events.where("starts_at >= ?", Time.current).order(:starts_at).first
 
       @guests = @chapter.guests.order(:full_name)
       @guests = @guests.where("full_name ILIKE ? OR email ILIKE ?", "%#{params[:q]}%", "%#{params[:q]}%") if params[:q].present?

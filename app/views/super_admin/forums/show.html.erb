@@ -94,6 +94,12 @@
           <div>
             <div class="fw-semibold"><%= @forum.admin.email %></div>
             <div class="text-muted small">Forum Admin &middot; logs in at <code><%= forum_root_url(forum_slug: @forum.slug) %></code></div>
+            <div class="d-flex align-items-center gap-1 mt-1">
+              <small class="text-muted">Password: <code id="admin-password"><%= @forum.admin.original_password.presence || "Not available" %></code></small>
+              <% if @forum.admin.original_password.present? %>
+                <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-1" onclick="navigator.clipboard.writeText(document.getElementById('admin-password').innerText)" title="Copy password"><i class="bi bi-clipboard small"></i></button>
+              <% end %>
+            </div>
           </div>
         </div>
         <div class="d-flex flex-wrap gap-2">

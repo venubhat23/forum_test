@@ -9,12 +9,14 @@ class ApplicationController < ActionController::Base
   end
 
   def after_sign_in_path_for(resource)
+    session[:seen_announcement_ids] = []
+
     if resource.super_admin?
       super_admin_dashboard_path
     elsif resource.forum
       forum_dashboard_path(forum_slug: resource.forum.slug)
     else
-      root_path
+      awaiting_forum_path
     end
   end
 

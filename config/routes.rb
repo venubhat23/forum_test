@@ -132,6 +132,7 @@ Rails.application.routes.draw do
           post :reset_password
           post :force_logout
           patch :renew
+          patch :update_role
           get :print
         end
       end
@@ -201,6 +202,7 @@ Rails.application.routes.draw do
 
   # Role-based dispatcher: sends signed-in users to their home area.
   get "dashboard", to: "home#dashboard"
+  get "awaiting_forum", to: "home#awaiting_forum"
 
   # Defines the root path route ("/")
   root "home#dashboard"

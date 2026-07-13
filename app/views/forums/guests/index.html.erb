@@ -31,6 +31,13 @@
   </div>
 </div>
 
+<% if @upcoming_event %>
+  <div class="alert alert-success d-flex align-items-center gap-2 mb-3" role="alert">
+    <i class="bi bi-whatsapp fs-5"></i>
+    <div>Inviting guests to <strong><%= @upcoming_event.title %></strong> (<%= @upcoming_event.starts_at.strftime("%d %b %Y") %>) — use the WhatsApp button on any guest with a phone number to send them an invite.</div>
+  </div>
+<% end %>
+
 <%= form_with url: forum_chapter_guests_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id), method: :get, local: true, class: "card mb-3" do %>
   <div class="card-body d-flex flex-wrap gap-2">
     <%= text_field_tag :q, params[:q], class: "form-control", placeholder: "Search by name or email...", style: "max-width: 280px;" %>
@@ -66,6 +73,11 @@
             <td><%= guest.nature_of_business %></td>
             <td><%= guest.invited_by&.display_name || "—" %></td>
             <td class="text-end">
+              <% if @upcoming_event && (invite_link = whatsapp_invite_link(guest, @upcoming_event, @current_forum)) %>
+                <%= link_to invite_link, class: "icon-btn icon-btn-whatsapp", title: "Invite to #{@upcoming_event.title} via WhatsApp", target: "_blank", rel: "noopener" do %>
+                  <i class="bi bi-whatsapp"></i>
+                <% end %>
+              <% end %>
               <%= link_to forum_chapter_guest_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: guest.id), class: "icon-btn icon-btn-view", title: "View" do %>
                 <i class="bi bi-eye"></i>
               <% end %>

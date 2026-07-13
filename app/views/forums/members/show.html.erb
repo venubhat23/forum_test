@@ -76,7 +76,7 @@
   <div class="card-body">
     <dl class="row mb-0">
       <dt class="col-sm-3">Phone</dt><dd class="col-sm-9"><%= @member.phone %></dd>
-      <dt class="col-sm-3">Business Category</dt><dd class="col-sm-9"><%= @member.business_category_id ? @member.business_category&.name : @member.business_category %></dd>
+      <dt class="col-sm-3">Business Category</dt><dd class="col-sm-9"><%= @member.business_category_id ? @member.business_category_ref&.name : @member.business_category %></dd>
       <dt class="col-sm-3">Speciality</dt><dd class="col-sm-9"><%= @member.speciality %></dd>
       <dt class="col-sm-3">Website</dt><dd class="col-sm-9"><%= @member.website %></dd>
       <dt class="col-sm-3">GST</dt><dd class="col-sm-9"><%= @member.gst_number %></dd>
