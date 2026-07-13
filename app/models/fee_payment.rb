@@ -9,6 +9,7 @@ class FeePayment < ApplicationRecord
   }.freeze
 
   belongs_to :user
+  belongs_to :feeable, polymorphic: true, optional: true
 
   validates :amount, presence: true, numericality: { greater_than: 0 }
   validates :fee_type, presence: true
@@ -16,12 +17,18 @@ class FeePayment < ApplicationRecord
   validate :fee_type_allowed_for_role
 
   before_validation :assign_invoice_number, on: :create
+  after_save :extend_membership_renewal, if: -> { annual_membership? && paid? && saved_change_to_status? }
 
   def mark_paid!(payment_method: nil)
     update!(status: :paid, paid_on: Date.current, payment_method: payment_method || self.payment_method)
   end
 
   private
+
+  # Paying the annual membership fee renews the member for another year.
+  def extend_membership_renewal
+    user.update!(renews_on: 1.year.from_now.to_date, membership_status: :active)
+  end
 
   def assign_invoice_number
     return if invoice_number.present?

@@ -74,6 +74,12 @@
       <% end %>
     <% end %>
 
+    <% if current_area == :forum && @pending_fee_reminders.present? %>
+      <% @pending_fee_reminders.each.with_index do |item, index| %>
+        <%= render "forums/shared/fee_reminder_toast", item: item, index: @active_announcements.size + index %>
+      <% end %>
+    <% end %>
+
     <% if user_signed_in? %>
       <header class="app-header">
         <div class="container-fluid h-100">
@@ -252,7 +258,9 @@
         var toasts = document.querySelectorAll('.toast-announcement');
         toasts.forEach(function(toast, index) {
           setTimeout(function() { toast.style.transform = 'translateX(0)'; }, 100 + index * 150);
-          setTimeout(function() { closeAnnouncementToast(toast); }, 6000 + index * 150);
+          if (!toast.classList.contains('toast-fee-reminder')) {
+            setTimeout(function() { closeAnnouncementToast(toast); }, 6000 + index * 150);
+          }
         });
       });
     </script>

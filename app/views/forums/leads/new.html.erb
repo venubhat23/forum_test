@@ -1,0 +1,96 @@
+<% content_for :title, "Create Lead" %>
+
+<div class="page-header">
+  <h1 class="page-title h4">Create Lead</h1>
+  <p class="page-subtitle mb-0"><%= @current_forum.name %></p>
+</div>
+
+<div class="row justify-content-center">
+  <div class="col-12 col-lg-8">
+    <div class="card">
+      <div class="card-body p-4">
+        <%= form_with model: @lead, url: forum_leads_path(forum_slug: @current_forum.slug), local: true, scope: :lead,
+              data: { controller: "submit-loading", action: "submit->submit-loading#start" } do |f| %>
+          <% if @lead.errors.any? %>
+            <div class="alert alert-danger"><%= @lead.errors.full_messages.to_sentence %></div>
+          <% end %>
+
+          <h2 class="h6 text-uppercase text-muted mb-3">Prospect Details</h2>
+          <div class="mb-3">
+            <%= f.label :prospect_name, "Prospect Name", class: "form-label" %>
+            <%= f.text_field :prospect_name, class: "form-control", required: true %>
+          </div>
+          <div class="row g-3 mb-4">
+            <div class="col-12 col-sm-6">
+              <%= f.label :prospect_phone, "Prospect Phone", class: "form-label" %>
+              <%= f.telephone_field :prospect_phone, class: "form-control" %>
+            </div>
+            <div class="col-12 col-sm-6">
+              <%= f.label :prospect_email, "Prospect Email", class: "form-label" %>
+              <%= f.email_field :prospect_email, class: "form-control" %>
+            </div>
+          </div>
+
+          <h2 class="h6 text-uppercase text-muted mb-3">Business Info <span class="text-muted small text-lowercase">(optional)</span></h2>
+          <div class="row g-3 mb-4">
+            <div class="col-12 col-sm-6">
+              <%= f.label :business_name, class: "form-label" %>
+              <%= f.text_field :business_name, class: "form-control" %>
+            </div>
+            <div class="col-12 col-sm-6">
+              <%= f.label :business_category, class: "form-label" %>
+              <%= f.select :business_category, User::BUSINESS_CATEGORIES, { include_blank: true }, class: "form-select" %>
+            </div>
+          </div>
+
+          <h2 class="h6 text-uppercase text-muted mb-3">Other Info <span class="text-muted small text-lowercase">(optional)</span></h2>
+          <div class="mb-3">
+            <%= f.label :requirement, "What do they need?", class: "form-label" %>
+            <%= f.text_area :requirement, class: "form-control", rows: 2 %>
+          </div>
+          <div class="mb-4">
+            <%= f.label :notes, class: "form-label" %>
+            <%= f.text_area :notes, class: "form-control", rows: 2 %>
+          </div>
+
+          <h2 class="h6 text-uppercase text-muted mb-2">Tag Members</h2>
+          <p class="text-muted small mb-2">Pick everyone this lead is relevant to. The first person to accept claims it — everyone else will see it's already taken.</p>
+
+          <div class="lead-tag-picker mb-4" data-controller="lead-tagging">
+            <div class="d-flex flex-wrap gap-2 mb-2">
+              <button type="button" class="btn btn-sm btn-outline-secondary" data-action="lead-tagging#selectAll">Tag entire forum</button>
+              <button type="button" class="btn btn-sm btn-outline-secondary" data-action="lead-tagging#clearAll">Clear all</button>
+            </div>
+            <div class="lead-tag-list">
+              <% @taggable_members.group_by(&:chapter).each do |chapter, members| %>
+                <div class="lead-tag-group">
+                  <div class="lead-tag-group-header">
+                    <span><%= chapter&.name || "No Chapter" %></span>
+                    <button type="button" class="btn btn-sm btn-link p-0" data-action="lead-tagging#selectChapter" data-chapter-id="<%= chapter&.id %>">Tag chapter</button>
+                  </div>
+                  <% members.each do |member| %>
+                    <label class="lead-tag-option">
+                      <input type="checkbox" name="lead[tagged_user_ids][]" value="<%= member.id %>" data-lead-tagging-target="checkbox" data-chapter-id="<%= chapter&.id %>">
+                      <span><%= member.display_name %></span>
+                    </label>
+                  <% end %>
+                </div>
+              <% end %>
+              <% if @taggable_members.empty? %>
+                <p class="text-muted small mb-0">No other members to tag yet.</p>
+              <% end %>
+            </div>
+          </div>
+
+          <div class="d-flex flex-wrap gap-2">
+            <button type="submit" class="btn btn-primary btn-lg" data-submit-loading-target="button" data-loading-text="Creating...">
+              <span data-submit-loading-target="spinner" class="spinner-border spinner-border-sm me-2 d-none" role="status" aria-hidden="true"></span>
+              <span data-submit-loading-target="label">Create Lead</span>
+            </button>
+            <%= link_to "Cancel", forum_leads_path(forum_slug: @current_forum.slug), class: "btn btn-outline-secondary btn-lg" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

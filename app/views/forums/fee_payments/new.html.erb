@@ -10,6 +10,8 @@
     <div class="card">
       <div class="card-body p-4">
         <%= form_with model: @fee_payment, url: forum_chapter_fee_payments_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id), local: true, scope: :fee_payment do |f| %>
+          <%= hidden_field_tag "fee_payment[event_id]", params[:event_id] if params[:event_id].present? %>
+          <%= hidden_field_tag "fee_payment[meeting_id]", params[:meeting_id] if params[:meeting_id].present? %>
           <div class="mb-3">
             <%= f.label :user_id, "Member / Guest", class: "form-label" %>
             <%= f.collection_select :user_id, @people, :id, ->(person) { "#{person.display_name} (#{person.role.titleize})" }, { include_blank: "Select a person" }, class: "form-select", required: true %>
@@ -19,7 +21,7 @@
             <%= f.select :fee_type, FeePayment.fee_types.keys.map { |k| [k.titleize, k] }, { include_blank: "Select a fee type" }, class: "form-select", required: true %>
             <div class="form-text">Guests can only be charged Meeting or Event fees.</div>
           </div>
-          <div class="row g-3 mb-4">
+          <div class="row g-3 mb-3">
             <div class="col-12 col-sm-6">
               <%= f.label :amount, class: "form-label" %>
               <%= f.number_field :amount, step: "0.01", min: "0.01", class: "form-control", required: true %>
@@ -28,6 +30,12 @@
               <%= f.label :due_date, class: "form-label" %>
               <%= f.date_field :due_date, class: "form-control" %>
             </div>
+          </div>
+
+          <div class="form-check mb-4">
+            <%= check_box_tag "fee_payment[mark_as_paid]", "1", false, class: "form-check-input", id: "fee_payment_mark_as_paid" %>
+            <%= label_tag "fee_payment_mark_as_paid", "Mark as already paid", class: "form-check-label" %>
+            <div class="form-text">For an Annual Membership fee, this also extends the member's renewal date by one year.</div>
           </div>
 
           <div class="d-flex flex-wrap gap-2">

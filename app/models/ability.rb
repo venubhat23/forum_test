@@ -21,6 +21,7 @@ class Ability
       can :manage, Attendance, user: { forum_id: user.forum_id }
       can :manage, Referral, giver: { forum_id: user.forum_id }
       can :manage, ThanksgivingSlip, given_by: { forum_id: user.forum_id }
+      can :manage, Lead, forum_id: user.forum_id
       can :manage, BusinessCategory, forum_id: user.forum_id
       can :manage, Meeting, chapter: { forum_id: user.forum_id }
       can :manage, WeeklyPresentation, chapter: { forum_id: user.forum_id }
@@ -41,6 +42,7 @@ class Ability
       can :manage, Attendance, user: { chapter_id: user.chapter_id }
       can :manage, Referral, giver: { chapter_id: user.chapter_id }
       can :manage, ThanksgivingSlip, given_by: { chapter_id: user.chapter_id }
+      can :manage, Lead, forum_id: user.forum_id
       can :read, BusinessCategory, forum_id: user.forum_id
       can :manage, Meeting, chapter_id: user.chapter_id
       can :manage, WeeklyPresentation, chapter_id: user.chapter_id
@@ -62,6 +64,8 @@ class Ability
       can :read, Referral, giver: { chapter_id: user.chapter_id }
       can :update, Referral, receiver_id: user.id
       can [ :read, :create ], ThanksgivingSlip, given_by_id: user.id
+      can [ :read, :create ], Lead, created_by_id: user.id
+      can [ :read, :update ], Lead, forum_id: user.forum_id
       can :read, BusinessCategory, forum_id: user.forum_id
       can [ :read, :create, :update ], Meeting, chapter_id: user.chapter_id
       can [ :read, :create, :update ], WeeklyPresentation, chapter_id: user.chapter_id
@@ -79,6 +83,8 @@ class Ability
       can [ :read, :create ], Referral, giver_id: user.id
       can [ :read, :update ], Referral, receiver_id: user.id
       can [ :read, :create ], ThanksgivingSlip, given_by_id: user.id
+      can [ :read, :create ], Lead, created_by_id: user.id
+      can [ :read, :update ], Lead, forum_id: user.forum_id
       can :read, Attendance, user_id: user.id
       can :read, FeePayment, user_id: user.id
       can :read, Meeting, chapter_id: user.chapter_id

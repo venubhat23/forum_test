@@ -7,6 +7,8 @@
   </div>
   <div class="d-flex flex-wrap gap-2">
     <% if can? :update, @event %>
+      <%= button_to "Send Reminder", remind_forum_event_path(forum_slug: @current_forum.slug, id: @event.id), method: :post, class: "btn btn-outline-primary" %>
+      <%= link_to "Take Attendance", attendance_forum_event_path(forum_slug: @current_forum.slug, id: @event.id), class: "btn btn-success" %>
       <%= link_to "Edit", edit_forum_event_path(forum_slug: @current_forum.slug, id: @event.id), class: "btn btn-outline-secondary" %>
       <%= button_to "Delete", forum_event_path(forum_slug: @current_forum.slug, id: @event.id), method: :delete, class: "btn btn-outline-danger",
             data: { turbo_confirm: "Delete this event?" } %>
@@ -23,6 +25,91 @@
   </div>
 </div>
 
+<% if @event.fee_amount.present? %>
+  <div class="card mb-4">
+    <div class="card-header fw-semibold">Fee &amp; Payment Info</div>
+    <div class="card-body">
+      <p class="mb-3">Fee: <strong><%= number_to_currency(@event.fee_amount) %></strong></p>
+      <div class="d-flex flex-wrap gap-4">
+        <% if @event.payment_qr.attached? %>
+          <div>
+            <div class="text-muted small mb-1">Scan to pay</div>
+            <%= image_tag @event.payment_qr, style: "height: 160px;" %>
+          </div>
+        <% end %>
+        <div>
+          <% if @event.payment_upi_id.present? %>
+            <div class="mb-2"><span class="text-muted small">UPI / PhonePe:</span> <strong><%= @event.payment_upi_id %></strong></div>
+          <% end %>
+          <% if @event.payment_bank_details.present? %>
+            <div><span class="text-muted small">Bank details:</span><br><%= simple_format(@event.payment_bank_details) %></div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>
+
+<% if can?(:update, @event) && @event.fee_amount.present? %>
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-lg-4">
+      <div class="mini-stat-card">
+        <div>
+          <div class="mini-stat-label">Paid</div>
+          <div class="mini-stat-value text-success"><%= @event.paid_count %></div>
+        </div>
+        <div class="mini-stat-icon mini-stat-icon-success"><i class="bi bi-check-circle"></i></div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-4">
+      <div class="mini-stat-card">
+        <div>
+          <div class="mini-stat-label">Pending</div>
+          <div class="mini-stat-value text-warning"><%= @event.pending_count %></div>
+        </div>
+        <div class="mini-stat-icon mini-stat-icon-warning"><i class="bi bi-exclamation-circle"></i></div>
+      </div>
+    </div>
+  </div>
+
+  <% fees_by_user = @event.fee_payments.order(:created_at).index_by(&:user_id) %>
+  <div class="card mb-4">
+    <div class="card-header fw-semibold">Registrant Fees</div>
+    <div class="list-group list-group-flush">
+      <% @event.registrants.each do |registrant| %>
+        <% fee = fees_by_user[registrant.id] %>
+        <div class="list-group-item d-flex justify-content-between align-items-center flex-wrap gap-2">
+          <span><%= registrant.display_name %></span>
+          <div class="d-flex align-items-center gap-2">
+            <% if fee&.paid? %>
+              <span class="badge badge-status-active"><i class="bi bi-check-circle-fill me-1"></i>Paid</span>
+            <% else %>
+              <span class="badge badge-status-trial"><i class="bi bi-exclamation-circle-fill me-1"></i>Due</span>
+            <% end %>
+            <% if (wa_link = whatsapp_item_fee_reminder_link(registrant, fee, @event.title, @current_forum)) %>
+              <%= link_to wa_link, class: "icon-btn icon-btn-whatsapp", title: "Remind to pay via WhatsApp", target: "_blank", rel: "noopener" do %>
+                <i class="bi bi-whatsapp"></i>
+              <% end %>
+            <% end %>
+            <% if fee&.pending? %>
+              <%= button_to mark_paid_forum_chapter_fee_payment_path(forum_slug: @current_forum.slug, chapter_id: registrant.chapter_id, id: fee.id), method: :patch, class: "icon-btn icon-btn-success", title: "Mark Paid" do %>
+                <i class="bi bi-check-lg"></i>
+              <% end %>
+            <% elsif fee.nil? %>
+              <%= link_to new_forum_chapter_fee_payment_path(forum_slug: @current_forum.slug, chapter_id: registrant.chapter_id, user_id: registrant.id, fee_type: "event", event_id: @event.id), class: "icon-btn icon-btn-view", title: "Record Fee" do %>
+                <i class="bi bi-cash-coin"></i>
+              <% end %>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+      <% if @event.registrants.empty? %>
+        <div class="list-group-item text-muted text-center py-3">No registrants yet.</div>
+      <% end %>
+    </div>
+  </div>
+<% end %>
+
 <% if @event.gallery.attached? %>
   <div class="card mb-4">
     <div class="card-header fw-semibold">Gallery</div>
@@ -34,8 +121,23 @@
   </div>
 <% end %>
 
+
+<% if can?(:update, @event) && @event.event_registrations.any? %>
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-lg-4">
+      <div class="stats-card">
+        <div class="icon-bg gradient-green"><i class="bi bi-graph-up"></i></div>
+        <div>
+          <div class="stats-value"><%= @event.attendance_percentage %>%</div>
+          <div class="stats-label">Attendance</div>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>
+
 <% if can? :read, EventRegistration %>
-  <div class="card">
+  <div class="card mb-4">
     <div class="card-header fw-semibold">Registrants (<%= @event.event_registrations.count %>)</div>
     <div class="list-group list-group-flush">
       <% @event.event_registrations.includes(:user).each do |reg| %>
@@ -46,6 +148,20 @@
       <% end %>
       <% if @event.event_registrations.empty? %>
         <div class="list-group-item text-muted text-center py-3">No registrations yet.</div>
+      <% end %>
+    </div>
+  </div>
+<% end %>
+
+<% if can? :update, @event %>
+  <div class="card">
+    <div class="card-header fw-semibold">Defaulters (registered but not marked present)</div>
+    <div class="list-group list-group-flush">
+      <% @event.defaulters.each do |registrant| %>
+        <div class="list-group-item"><%= registrant.display_name %> <span class="text-muted small"><%= registrant.email %></span></div>
+      <% end %>
+      <% if @event.defaulters.empty? %>
+        <div class="list-group-item text-muted text-center py-3">Everyone attended, or no registrants yet.</div>
       <% end %>
     </div>
   </div>

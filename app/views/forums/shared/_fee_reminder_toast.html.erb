@@ -1,0 +1,21 @@
+<div class="toast-notification toast-announcement toast-fee-reminder toast-info" style="top: calc(var(--header-height) + 10px + <%= index * 110 %>px);" data-announcement-toast>
+  <div class="toast-notification-content">
+    <div class="d-flex align-items-start">
+      <i class="bi bi-cash-coin me-2"></i>
+      <div>
+        <div class="fw-semibold"><%= item[:title] %></div>
+        <div class="small mb-1"><%= item[:when_text] %></div>
+        <div class="small mb-2">
+          Fee: <strong><%= number_to_currency(item[:fee_amount]) %></strong>
+          <% if item[:paid] %>
+            <span class="badge badge-status-active ms-1"><i class="bi bi-check-circle-fill me-1"></i>Paid</span>
+          <% else %>
+            <span class="badge badge-status-trial ms-1"><i class="bi bi-exclamation-circle-fill me-1"></i>Due</span>
+          <% end %>
+        </div>
+        <%= link_to "View Details", item[:path], class: "btn btn-sm btn-primary" %>
+      </div>
+    </div>
+    <button type="button" class="btn-close ms-3" onclick="closeAnnouncementToast(this)"></button>
+  </div>
+</div>

@@ -63,6 +63,14 @@
     <div class="nav-section">
       <div class="nav-section-title">Engagement</div>
       <ul class="nav-menu">
+        <% if can? :read, Lead %>
+          <li class="nav-item">
+            <%= link_to forum_leads_path(forum_slug: @current_forum.slug), class: "nav-link-modern #{'active' if request.path.start_with?(forum_leads_path(forum_slug: @current_forum.slug))}", data: { tooltip: "Leads" } do %>
+              <div class="nav-icon-modern"><div class="icon-bg gradient-orange"><i class="bi bi-lightbulb"></i></div></div>
+              <span class="nav-text">Leads</span>
+            <% end %>
+          </li>
+        <% end %>
         <li class="nav-item">
           <%= link_to forum_one_to_one_meetings_path(forum_slug: @current_forum.slug), class: "nav-link-modern #{'active' if request.path.start_with?(forum_one_to_one_meetings_path(forum_slug: @current_forum.slug))}", data: { tooltip: "One-to-One" } do %>
             <div class="nav-icon-modern"><div class="icon-bg gradient-purple"><i class="bi bi-people"></i></div></div>

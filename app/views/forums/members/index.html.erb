@@ -16,8 +16,21 @@
   <% end %>
 </div>
 
+<% if @upcoming_event && can?(:update, User) %>
+  <div class="card mb-4">
+    <div class="card-header fw-semibold"><i class="bi bi-calendar-event me-1"></i>Invite a Member to <%= @upcoming_event.title %></div>
+    <div class="card-body">
+      <%= form_with url: invite_to_event_forum_chapter_members_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id), method: :post, local: true, class: "d-flex flex-wrap gap-2" do %>
+        <%= hidden_field_tag :event_id, @upcoming_event.id %>
+        <%= select_tag :member_id, options_from_collection_for_select(@chapter.members.order(:full_name), :id, :full_name), prompt: "Choose a member...", class: "form-select", style: "max-width: 320px;", required: true %>
+        <%= submit_tag "Invite", class: "btn btn-success" %>
+      <% end %>
+    </div>
+  </div>
+<% end %>
+
 <div class="row g-3 mb-4">
-  <div class="col-6 col-lg-4">
+  <div class="col-6 col-lg-3">
     <div class="mini-stat-card">
       <div>
         <div class="mini-stat-label">Total Members</div>
@@ -26,7 +39,7 @@
       <div class="mini-stat-icon mini-stat-icon-primary"><i class="bi bi-people"></i></div>
     </div>
   </div>
-  <div class="col-6 col-lg-4">
+  <div class="col-6 col-lg-3">
     <div class="mini-stat-card">
       <div>
         <div class="mini-stat-label">Active</div>
@@ -35,13 +48,22 @@
       <div class="mini-stat-icon mini-stat-icon-success"><i class="bi bi-check-circle"></i></div>
     </div>
   </div>
-  <div class="col-6 col-lg-4">
+  <div class="col-6 col-lg-3">
     <div class="mini-stat-card">
       <div>
         <div class="mini-stat-label">Suspended</div>
         <div class="mini-stat-value text-danger"><%= @suspended_members %></div>
       </div>
       <div class="mini-stat-icon mini-stat-icon-danger"><i class="bi bi-pause-circle"></i></div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="mini-stat-card">
+      <div>
+        <div class="mini-stat-label">Renewing This Month</div>
+        <div class="mini-stat-value text-warning"><%= @renewing_this_month %></div>
+      </div>
+      <div class="mini-stat-icon mini-stat-icon-warning"><i class="bi bi-arrow-repeat"></i></div>
     </div>
   </div>
 </div>
@@ -67,11 +89,14 @@
           <th>Category</th>
           <th>Speciality</th>
           <th>Role</th>
+          <th>Annual Fee</th>
           <th></th>
         </tr>
       </thead>
       <tbody>
         <% @members.each do |member| %>
+          <% fee = @annual_fees_by_user[member.id] %>
+          <% fee_paid_current = fee&.paid? && member.renews_on.present? && member.renews_on >= Date.current %>
           <tr>
             <td>
               <div class="d-flex align-items-center gap-2">
@@ -96,15 +121,43 @@
                 <% end %>
               <% end %>
             </td>
-            <td class="text-end">
-              <%= link_to forum_chapter_member_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: member.id), class: "icon-btn icon-btn-view", title: "View" do %>
-                <i class="bi bi-eye"></i>
+            <td>
+              <% if fee_paid_current %>
+                <span class="badge badge-status-active"><i class="bi bi-check-circle-fill me-1"></i>Paid</span>
+              <% else %>
+                <span class="badge badge-status-trial"><i class="bi bi-exclamation-circle-fill me-1"></i>Due</span>
               <% end %>
+              <div class="text-muted small mt-1">
+                <%= member.renews_on ? "Renews #{member.renews_on.strftime('%d %b %Y')}" : "Renewal not set" %>
+              </div>
+            </td>
+            <td class="text-end">
+              <div class="d-flex gap-1 justify-content-end">
+                <% if !fee_paid_current && can?(:create, FeePayment) %>
+                  <% if (wa_link = whatsapp_fee_reminder_link(member, fee, @current_forum)) %>
+                    <%= link_to wa_link, class: "icon-btn icon-btn-whatsapp", title: "Remind to pay via WhatsApp", target: "_blank", rel: "noopener" do %>
+                      <i class="bi bi-whatsapp"></i>
+                    <% end %>
+                  <% end %>
+                  <% if fee&.pending? %>
+                    <%= button_to mark_paid_forum_chapter_fee_payment_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: fee.id), method: :patch, class: "icon-btn icon-btn-success", title: "Mark Paid (renews +1 year)" do %>
+                      <i class="bi bi-check-lg"></i>
+                    <% end %>
+                  <% else %>
+                    <%= link_to new_forum_chapter_fee_payment_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, user_id: member.id, fee_type: "annual_membership"), class: "icon-btn icon-btn-view", title: "Record Annual Fee" do %>
+                      <i class="bi bi-cash-coin"></i>
+                    <% end %>
+                  <% end %>
+                <% end %>
+                <%= link_to forum_chapter_member_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: member.id), class: "icon-btn icon-btn-view", title: "View" do %>
+                  <i class="bi bi-eye"></i>
+                <% end %>
+              </div>
             </td>
           </tr>
         <% end %>
         <% if @members.empty? %>
-          <tr><td colspan="8" class="text-center text-muted py-4">No members yet. Add the first one to get started.</td></tr>
+          <tr><td colspan="9" class="text-center text-muted py-4">No members yet. Add the first one to get started.</td></tr>
         <% end %>
       </tbody>
     </table>

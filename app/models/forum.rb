@@ -18,6 +18,7 @@ class Forum < ApplicationRecord
   has_many :membership_plans, dependent: :destroy
   has_many :expenses, dependent: :destroy
   has_many :documents, dependent: :destroy
+  has_many :leads, dependent: :destroy
   has_one :forum_setting, dependent: :destroy
 
   validates :name, presence: true

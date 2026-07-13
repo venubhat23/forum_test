@@ -1,0 +1,48 @@
+<% content_for :title, "Take Attendance" %>
+
+<div class="page-header">
+  <h1 class="page-title h4">Take Attendance</h1>
+  <p class="page-subtitle mb-0"><%= @meeting.meeting_type.titleize %> Meeting &middot; <%= @meeting.scheduled_at.strftime("%d %b %Y") %></p>
+</div>
+
+<div class="row justify-content-center">
+  <div class="col-12 col-lg-8">
+    <%= form_with url: record_attendance_forum_chapter_meeting_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: @meeting.id), method: :post, local: true,
+          data: { controller: "submit-loading", action: "submit->submit-loading#start" } do %>
+      <div class="card mb-3" data-controller="attendance-checklist">
+        <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+          <span class="fw-semibold">Members &amp; Guests</span>
+          <div class="d-flex gap-2">
+            <button type="button" class="btn btn-sm btn-outline-success" data-action="attendance-checklist#markAll">Mark all present</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" data-action="attendance-checklist#clearAll">Clear all</button>
+          </div>
+        </div>
+        <div class="list-group list-group-flush">
+          <% @people.each do |person| %>
+            <% prior = @attendance_by_user[person.id] %>
+            <label class="list-group-item d-flex justify-content-between align-items-center">
+              <span class="d-flex align-items-center gap-2">
+                <span class="row-avatar"><%= person.full_name.first.upcase %></span>
+                <span><%= person.display_name %></span>
+                <span class="badge bg-secondary"><%= person.role.titleize %></span>
+              </span>
+              <input type="checkbox" class="form-check-input" name="present_user_ids[]" value="<%= person.id %>"
+                     <%= "checked" if prior.nil? || prior.present? %> data-attendance-checklist-target="checkbox">
+            </label>
+          <% end %>
+          <% if @people.empty? %>
+            <div class="list-group-item text-muted text-center py-3">No members or guests in this chapter yet.</div>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="d-flex flex-wrap gap-2">
+        <button type="submit" class="btn btn-primary btn-lg" data-submit-loading-target="button" data-loading-text="Saving...">
+          <span data-submit-loading-target="spinner" class="spinner-border spinner-border-sm me-2 d-none" role="status" aria-hidden="true"></span>
+          <span data-submit-loading-target="label">Save Attendance</span>
+        </button>
+        <%= link_to "Cancel", forum_chapter_meeting_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: @meeting.id), class: "btn btn-outline-secondary btn-lg" %>
+      </div>
+    <% end %>
+  </div>
+</div>

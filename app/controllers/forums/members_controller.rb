@@ -11,12 +11,18 @@ module Forums
       @total_members = @chapter.members.count
       @active_members = @chapter.members.where(suspended_at: nil).count
       @suspended_members = @chapter.members.where.not(suspended_at: nil).count
+      @upcoming_event = @current_forum.events.where("starts_at >= ?", Time.current).order(:starts_at).first
+      @renewing_this_month = @chapter.members.where(renews_on: Date.current.beginning_of_month..Date.current.end_of_month).count
 
       @members = @chapter.members.order(role_order_sql, :full_name)
       @members = @members.where("full_name ILIKE ? OR email ILIKE ?", "%#{params[:q]}%", "%#{params[:q]}%") if params[:q].present?
       @members = @members.where(suspended_at: nil) if params[:status] == "active"
       @members = @members.where.not(suspended_at: nil) if params[:status] == "suspended"
       @members = @members.page(params[:page])
+      @annual_fees_by_user = FeePayment.where(fee_type: :annual_membership, user_id: @members.map(&:id))
+                                        .select("DISTINCT ON (user_id) *")
+                                        .order(:user_id, created_at: :desc)
+                                        .index_by(&:user_id)
       respond_to do |format|
         format.html
         format.csv { send_data members_csv(@chapter.members.order(:full_name)), filename: "members-#{@chapter.name.parameterize}-#{Date.current}.csv" }
@@ -105,6 +111,18 @@ module Forums
     def print
       authorize! :read, @member
       render layout: false
+    end
+
+    def invite_to_event
+      authorize! :update, User
+      event = @current_forum.events.find(params[:event_id])
+      member = @chapter.members.find(params[:member_id])
+
+      when_text = event.starts_at.strftime("%d %b %Y at %I:%M %p")
+      venue_text = event.venue.present? ? " at #{event.venue}" : ""
+      member.notifications.create!(body: "You're invited to #{event.title} on #{when_text}#{venue_text}! 🎉")
+
+      redirect_to forum_chapter_members_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id), notice: "#{member.display_name} was invited to #{event.title}."
     end
 
     def import

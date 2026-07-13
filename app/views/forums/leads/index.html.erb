@@ -1,0 +1,118 @@
+<% content_for :title, "Leads · #{@current_forum.name}" %>
+
+<div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+  <div>
+    <h1 class="page-title h4">Leads</h1>
+    <p class="page-subtitle mb-0"><%= @current_forum.name %></p>
+  </div>
+  <%= link_to new_forum_lead_path(forum_slug: @current_forum.slug), class: "btn btn-primary" do %>
+    <i class="bi bi-plus-lg me-1"></i> Create Lead
+  <% end %>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-6 col-lg-3">
+    <div class="mini-stat-card">
+      <div>
+        <div class="mini-stat-label">Total</div>
+        <div class="mini-stat-value text-primary"><%= @total_leads %></div>
+      </div>
+      <div class="mini-stat-icon mini-stat-icon-primary"><i class="bi bi-lightbulb"></i></div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="mini-stat-card">
+      <div>
+        <div class="mini-stat-label">Requested</div>
+        <div class="mini-stat-value text-warning"><%= @requested_leads %></div>
+      </div>
+      <div class="mini-stat-icon mini-stat-icon-warning"><i class="bi bi-hourglass-split"></i></div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="mini-stat-card">
+      <div>
+        <div class="mini-stat-label">Converted</div>
+        <div class="mini-stat-value text-success"><%= @converted_leads %></div>
+      </div>
+      <div class="mini-stat-icon mini-stat-icon-success"><i class="bi bi-trophy"></i></div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="mini-stat-card">
+      <div>
+        <div class="mini-stat-label">Thanksgiving Slips</div>
+        <div class="mini-stat-value text-info"><%= @thanksgiving_leads %></div>
+      </div>
+      <div class="mini-stat-icon mini-stat-icon-info"><i class="bi bi-gift"></i></div>
+    </div>
+  </div>
+</div>
+
+<%= form_with url: forum_leads_path(forum_slug: @current_forum.slug), method: :get, local: true, class: "card mb-3" do %>
+  <div class="card-body d-flex flex-wrap gap-2">
+    <%= select_tag :stage, options_for_select([ [ "All stages", "" ] ] + Lead.stages.keys.map { |s| [ lead_stage_label(s), s ] }, params[:stage]), class: "form-select", style: "max-width: 220px;" %>
+    <%= submit_tag "Filter", class: "btn btn-outline-secondary" %>
+    <%= link_to "Reset", forum_leads_path(forum_slug: @current_forum.slug), class: "btn btn-link" %>
+  </div>
+<% end %>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th>Prospect</th>
+          <th>Business</th>
+          <th>Tagged To</th>
+          <th>Stage</th>
+          <th>Created By</th>
+          <th>Date</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @leads.each do |lead| %>
+          <tr>
+            <td>
+              <div class="d-flex align-items-center gap-2">
+                <span class="row-avatar"><%= lead.prospect_name.first.upcase %></span>
+                <span class="fw-semibold"><%= lead.prospect_name %></span>
+              </div>
+            </td>
+            <td><%= lead.business_name.presence || "—" %></td>
+            <td>
+              <div class="d-flex flex-wrap gap-1">
+                <% lead.tagged_users.each do |tagged| %>
+                  <% claimed_by_this_one = lead.accepted_by_id == tagged.id %>
+                  <span class="lead-tag-chip <%= claimed_by_this_one ? "lead-tag-chip-claimed" : (lead.claimed? ? "lead-tag-chip-taken" : "") %>">
+                    <%= tagged.display_name %>
+                  </span>
+                <% end %>
+              </div>
+            </td>
+            <td><span class="badge <%= lead_stage_badge_class(lead.stage) %>"><%= lead_stage_label(lead.stage) %></span></td>
+            <td><%= lead.created_by.display_name %></td>
+            <td><%= lead.created_at.strftime("%d %b %Y") %></td>
+            <td class="text-end">
+              <% if lead.claimable_by?(current_user) %>
+                <%= button_to accept_forum_lead_path(forum_slug: @current_forum.slug, id: lead.id), method: :patch, class: "btn btn-sm btn-success" do %>
+                  Accept
+                <% end %>
+              <% else %>
+                <%= link_to forum_lead_path(forum_slug: @current_forum.slug, id: lead.id), class: "icon-btn icon-btn-view", title: "View" do %>
+                  <i class="bi bi-eye"></i>
+                <% end %>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+        <% if @leads.empty? %>
+          <tr><td colspan="7" class="text-center text-muted py-4">No leads yet. Create the first one to get started.</td></tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<%= paginate @leads %>

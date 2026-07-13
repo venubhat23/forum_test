@@ -308,3 +308,156 @@
 [data-theme="dark"] .attention-card-label {
   color: var(--text-secondary);
 }
+
+/* ── Calendar ── */
+[data-theme="dark"] .gcal-today-btn {
+  border-color: var(--border-medium);
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .gcal-today-btn:hover {
+  background: var(--bg-accent);
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .gcal-nav-btn {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .gcal-nav-btn:hover {
+  background: rgba(139, 92, 246, 0.18);
+  color: #c4b5fd;
+}
+
+[data-theme="dark"] .gcal-title {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .gcal-legend-item {
+  color: var(--text-muted);
+}
+
+[data-theme="dark"] .gcal-grid-wrap {
+  background: var(--bg-primary);
+  border-color: var(--border-light);
+}
+
+[data-theme="dark"] .gcal-weekday-row {
+  background: var(--bg-accent);
+  border-color: var(--border-light);
+}
+
+[data-theme="dark"] .gcal-weekday {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .gcal-week:not(:last-child) {
+  border-color: var(--border-light);
+}
+
+[data-theme="dark"] .gcal-day {
+  border-color: var(--border-light);
+}
+
+[data-theme="dark"] .gcal-day:hover {
+  background: rgba(102, 126, 234, 0.06);
+}
+
+[data-theme="dark"] .gcal-day-outside {
+  background: rgba(0, 0, 0, 0.15);
+}
+
+[data-theme="dark"] .gcal-day-outside .gcal-day-number span {
+  color: var(--text-muted);
+}
+
+[data-theme="dark"] .gcal-day-number span {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .gcal-chip-meeting { background: rgba(59, 130, 246, 0.22); color: #93c5fd; }
+[data-theme="dark"] .gcal-chip-event   { background: rgba(139, 92, 246, 0.24); color: #c4b5fd; }
+[data-theme="dark"] .gcal-chip-renewal { background: rgba(245, 158, 11, 0.22); color: #fcd34d; }
+
+[data-theme="dark"] .gcal-more {
+  color: var(--text-muted);
+}
+
+[data-theme="dark"] .gcal-modal-content {
+  background: var(--bg-primary);
+}
+
+[data-theme="dark"] .gcal-modal-item:hover {
+  background: var(--bg-accent);
+}
+
+[data-theme="dark"] .gcal-modal-item-title {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .gcal-modal-item-meta {
+  color: var(--text-muted);
+}
+
+[data-theme="dark"] .gcal-modal-item-arrow {
+  color: var(--text-muted);
+}
+
+[data-theme="dark"] .gcal-modal-item-meeting .gcal-modal-item-icon { background: rgba(59, 130, 246, 0.22); color: #93c5fd; }
+[data-theme="dark"] .gcal-modal-item-event   .gcal-modal-item-icon { background: rgba(139, 92, 246, 0.24); color: #c4b5fd; }
+[data-theme="dark"] .gcal-modal-item-renewal .gcal-modal-item-icon { background: rgba(245, 158, 11, 0.22); color: #fcd34d; }
+
+[data-theme="dark"] .gcal-modal-empty {
+  color: var(--text-muted);
+}
+
+/* ── Leads ── */
+[data-theme="dark"] .lead-tag-picker {
+  background: var(--bg-accent);
+  border-color: var(--border-light);
+}
+
+[data-theme="dark"] .lead-tag-group {
+  background: var(--bg-primary);
+  border-color: var(--border-light);
+}
+
+[data-theme="dark"] .lead-tag-group-header {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .lead-tag-option {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .lead-tag-chip {
+  background: rgba(139, 92, 246, 0.22);
+  color: #c4b5fd;
+}
+
+[data-theme="dark"] .lead-tag-chip-claimed {
+  background: rgba(16, 185, 129, 0.22);
+  color: #6ee7b7;
+}
+
+[data-theme="dark"] .lead-tag-chip-taken {
+  background: var(--bg-accent);
+  color: var(--text-muted);
+}
+
+[data-theme="dark"] .lead-stage-step:not(:last-child)::after {
+  background: var(--border-light);
+}
+
+[data-theme="dark"] .lead-stage-dot {
+  background: var(--bg-accent);
+  color: var(--text-muted);
+}
+
+[data-theme="dark"] .lead-stage-name {
+  color: var(--text-muted);
+}
+
+[data-theme="dark"] .lead-stage-step-done .lead-stage-name {
+  color: var(--text-primary);
+}

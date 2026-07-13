@@ -1,0 +1,42 @@
+<% content_for :title, "Give Thanksgiving Slip" %>
+
+<div class="page-header">
+  <h1 class="page-title h4">Give Thanksgiving Slip</h1>
+  <p class="page-subtitle mb-0">For <%= @lead.prospect_name %> &middot; tagged by <%= @lead.created_by.display_name %></p>
+</div>
+
+<div class="row justify-content-center">
+  <div class="col-12 col-lg-6">
+    <div class="card">
+      <div class="card-body p-4">
+        <%= form_with model: @lead, url: give_thanksgiving_forum_lead_path(forum_slug: @current_forum.slug, id: @lead.id), method: :patch, local: true, scope: :lead do |f| %>
+          <% if @lead.errors.any? %>
+            <div class="alert alert-danger"><%= @lead.errors.full_messages.to_sentence %></div>
+          <% end %>
+
+          <div class="mb-3">
+            <%= f.label :thanksgiving_amount, "Business Amount", class: "form-label" %>
+            <%= f.number_field :thanksgiving_amount, step: "0.01", min: "0.01", max: "99999999.99", class: "form-control", required: true %>
+          </div>
+          <div class="mb-3">
+            <%= f.label :thanksgiving_notes, "Notes", class: "form-label" %>
+            <%= f.text_area :thanksgiving_notes, class: "form-control", rows: 3 %>
+          </div>
+          <div class="mb-4">
+            <%= f.label :thanksgiving_proof, "Proof (optional)", class: "form-label" %>
+            <%= f.file_field :thanksgiving_proof, class: "form-control" %>
+          </div>
+
+          <div class="alert alert-info small">
+            This marks the lead as <strong>Converted</strong> and will let you send a WhatsApp thank-you update to <%= @lead.created_by.display_name %>.
+          </div>
+
+          <div class="d-flex flex-wrap gap-2">
+            <%= f.submit "Record Thanksgiving Slip", class: "btn btn-success btn-lg" %>
+            <%= link_to "Cancel", forum_lead_path(forum_slug: @current_forum.slug, id: @lead.id), class: "btn btn-outline-secondary btn-lg" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

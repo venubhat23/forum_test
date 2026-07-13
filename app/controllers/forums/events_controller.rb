@@ -1,6 +1,6 @@
 module Forums
   class EventsController < BaseController
-    before_action :set_event, only: [ :show, :edit, :update, :destroy ]
+    before_action :set_event, only: [ :show, :edit, :update, :destroy, :remind, :attendance, :record_attendance ]
 
     def index
       authorize! :read, Event
@@ -56,6 +56,43 @@ module Forums
       redirect_to forum_events_path(forum_slug: @current_forum.slug), notice: "Event deleted."
     end
 
+    def remind
+      authorize! :update, @event
+
+      if @event.fee_amount.present?
+        paid_user_ids = @event.fee_payments.paid.pluck(:user_id)
+        recipients = @event.registrants.where.not(id: paid_user_ids)
+        amount_text = " Fee: #{helpers.number_to_currency(@event.fee_amount)} — see the event page for payment details."
+      else
+        recipients = @event.registrants
+        amount_text = ""
+      end
+
+      message = "Reminder: #{@event.title} is coming up on #{@event.starts_at.strftime('%d %b %Y at %I:%M %p')}.#{amount_text}"
+      sent_count = recipients.count
+      recipients.find_each { |user| user.notifications.create!(body: message) }
+
+      redirect_to forum_event_path(forum_slug: @current_forum.slug, id: @event.id), notice: "Reminder sent to #{sent_count} registrant(s)."
+    end
+
+    def attendance
+      authorize! :update, @event
+      @registrations = @event.event_registrations.joins(:user).includes(:user).order("users.full_name")
+    end
+
+    def record_attendance
+      authorize! :update, @event
+      present_ids = Array(params[:present_user_ids]).map(&:to_i)
+
+      @event.event_registrations.find_each do |registration|
+        present = present_ids.include?(registration.user_id)
+        registration.update!(attended: present, attended_at: present ? Time.current : nil)
+      end
+
+      redirect_to forum_event_path(forum_slug: @current_forum.slug, id: @event.id),
+        notice: "Attendance recorded for #{@event.event_registrations.count} registrant(s)."
+    end
+
     private
 
     def set_event
@@ -63,7 +100,8 @@ module Forums
     end
 
     def event_params
-      params.require(:event).permit(:title, :event_type, :starts_at, :venue, :registration_opens_at, :registration_closes_at, gallery: [])
+      params.require(:event).permit(:title, :event_type, :starts_at, :venue, :registration_opens_at, :registration_closes_at,
+        :fee_amount, :payment_upi_id, :payment_bank_details, :payment_qr, gallery: [])
     end
   end
 end

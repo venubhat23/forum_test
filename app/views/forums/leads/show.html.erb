@@ -1,0 +1,151 @@
+<% content_for :title, @lead.prospect_name %>
+
+<% is_owner = @lead.accepted_by_id == current_user.id %>
+<% is_creator = @lead.created_by_id == current_user.id %>
+
+<div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+  <div>
+    <h1 class="page-title h4"><%= @lead.prospect_name %></h1>
+    <p class="page-subtitle mb-0">
+      Created by <%= @lead.created_by.display_name %> &middot; <%= @lead.created_at.strftime("%d %b %Y") %>
+    </p>
+  </div>
+  <span class="badge fs-6 <%= lead_stage_badge_class(@lead.stage) %>"><%= lead_stage_label(@lead.stage) %></span>
+</div>
+
+<div class="lead-stage-track mb-4">
+  <% Lead::STAGE_ORDER.each_with_index do |stage, index| %>
+    <% reached = Lead::STAGE_ORDER.index(@lead.stage) && Lead::STAGE_ORDER.index(@lead.stage) >= index %>
+    <div class="lead-stage-step <%= "lead-stage-step-done" if reached %>">
+      <div class="lead-stage-dot"><%= reached ? raw('<i class="bi bi-check-lg"></i>') : index + 1 %></div>
+      <div class="lead-stage-name"><%= lead_stage_label(stage) %></div>
+    </div>
+  <% end %>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-12 col-lg-6">
+    <div class="card h-100">
+      <div class="card-header fw-semibold">Prospect Details</div>
+      <div class="card-body">
+        <dl class="row mb-0">
+          <dt class="col-sm-4">Name</dt><dd class="col-sm-8"><%= @lead.prospect_name %></dd>
+          <dt class="col-sm-4">Phone</dt><dd class="col-sm-8"><%= @lead.prospect_phone.presence || "—" %></dd>
+          <dt class="col-sm-4">Email</dt><dd class="col-sm-8"><%= @lead.prospect_email.presence || "—" %></dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+  <div class="col-12 col-lg-6">
+    <div class="card h-100">
+      <div class="card-header fw-semibold">Business &amp; Other Info</div>
+      <div class="card-body">
+        <dl class="row mb-0">
+          <dt class="col-sm-4">Business</dt><dd class="col-sm-8"><%= @lead.business_name.presence || "—" %></dd>
+          <dt class="col-sm-4">Category</dt><dd class="col-sm-8"><%= @lead.business_category.presence || "—" %></dd>
+          <dt class="col-sm-4">Requirement</dt><dd class="col-sm-8"><%= @lead.requirement.presence || "—" %></dd>
+          <dt class="col-sm-4">Notes</dt><dd class="col-sm-8"><%= @lead.notes.presence || "—" %></dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card mb-4">
+  <div class="card-header fw-semibold">Tagged Members</div>
+  <div class="list-group list-group-flush">
+    <% @lead.lead_taggings.includes(:user).each do |tagging| %>
+      <% member = tagging.user %>
+      <% claimed_by_this_one = @lead.accepted_by_id == member.id %>
+      <div class="list-group-item d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <div class="d-flex align-items-center gap-2">
+          <span class="row-avatar"><%= member.full_name.first.upcase %></span>
+          <span class="fw-semibold"><%= member.display_name %></span>
+          <% if claimed_by_this_one %>
+            <span class="badge bg-success">Claimed this lead</span>
+          <% elsif @lead.claimed? %>
+            <span class="badge bg-secondary">Not available</span>
+          <% else %>
+            <span class="badge badge-status-trial">Awaiting response</span>
+          <% end %>
+        </div>
+        <% if (is_creator || can?(:manage, Lead)) && !claimed_by_this_one && !@lead.claimed? %>
+          <% if (wa_link = whatsapp_lead_request_link(@lead, member)) %>
+            <%= link_to wa_link, class: "icon-btn icon-btn-whatsapp", title: "Remind #{member.display_name} via WhatsApp", target: "_blank", rel: "noopener" do %>
+              <i class="bi bi-whatsapp"></i>
+            <% end %>
+          <% end %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<% if @lead.claimable_by?(current_user) %>
+  <div class="card mb-4 border-success">
+    <div class="card-body d-flex flex-wrap justify-content-between align-items-center gap-2">
+      <div>
+        <div class="fw-semibold">This lead is tagged to you and still up for grabs.</div>
+        <div class="text-muted small">Accept it to start working the prospect — first come, first served.</div>
+      </div>
+      <%= button_to accept_forum_lead_path(forum_slug: @current_forum.slug, id: @lead.id), method: :patch, class: "btn btn-success btn-lg" do %>
+        <i class="bi bi-hand-thumbs-up me-1"></i> Accept Lead
+      <% end %>
+    </div>
+  </div>
+<% end %>
+
+<% if is_owner %>
+  <div class="card mb-4">
+    <div class="card-header fw-semibold">Work This Lead</div>
+    <div class="card-body d-flex flex-wrap gap-2">
+      <% if (wa_link = whatsapp_lead_update_link(@lead)) %>
+        <%= link_to wa_link, class: "btn btn-outline-success", target: "_blank", rel: "noopener" do %>
+          <i class="bi bi-whatsapp me-1"></i> Send Update to <%= @lead.created_by.display_name %>
+        <% end %>
+      <% end %>
+
+      <% if @lead.stage == "accepted" %>
+        <%= button_to advance_forum_lead_path(forum_slug: @current_forum.slug, id: @lead.id, stage: "consulting"), method: :patch, class: "btn btn-outline-primary" do %>
+          Move to Consulting
+        <% end %>
+      <% elsif @lead.stage == "consulting" %>
+        <%= button_to advance_forum_lead_path(forum_slug: @current_forum.slug, id: @lead.id, stage: "doing_business"), method: :patch, class: "btn btn-outline-primary" do %>
+          Move to Doing Business
+        <% end %>
+      <% elsif @lead.stage == "doing_business" %>
+        <%= link_to new_thanksgiving_forum_lead_path(forum_slug: @current_forum.slug, id: @lead.id), class: "btn btn-success" do %>
+          <i class="bi bi-gift me-1"></i> Give Thanksgiving Slip
+        <% end %>
+      <% end %>
+
+      <% unless @lead.converted? %>
+        <%= button_to release_forum_lead_path(forum_slug: @current_forum.slug, id: @lead.id), method: :patch, class: "btn btn-outline-danger",
+              data: { turbo_confirm: "Release this lead back to the pool? Other tagged members will be able to accept it." } do %>
+          Release Lead
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+<% end %>
+
+<% if @lead.converted? %>
+  <div class="card mb-4 border-success">
+    <div class="card-header fw-semibold"><i class="bi bi-gift me-1"></i> Thanksgiving Slip</div>
+    <div class="card-body">
+      <dl class="row mb-0">
+        <dt class="col-sm-3">Amount</dt><dd class="col-sm-9"><%= number_to_currency(@lead.thanksgiving_amount) %></dd>
+        <dt class="col-sm-3">Notes</dt><dd class="col-sm-9"><%= @lead.thanksgiving_notes.presence || "—" %></dd>
+        <dt class="col-sm-3">Given On</dt><dd class="col-sm-9"><%= @lead.thanksgiving_given_at&.strftime("%d %b %Y") %></dd>
+        <% if @lead.thanksgiving_proof.attached? %>
+          <dt class="col-sm-3">Proof</dt>
+          <dd class="col-sm-9"><%= link_to "View Attachment", rails_blob_path(@lead.thanksgiving_proof, disposition: "attachment") %></dd>
+        <% end %>
+      </dl>
+    </div>
+  </div>
+<% end %>
+
+<div class="d-flex flex-wrap gap-2">
+  <%= link_to "Back to Leads", forum_leads_path(forum_slug: @current_forum.slug), class: "btn btn-outline-secondary" %>
+</div>

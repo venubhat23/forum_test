@@ -19,13 +19,20 @@ module Forums
 
     def new
       authorize! :create, FeePayment
-      @fee_payment = FeePayment.new
+      feeable = resolve_feeable
+      @fee_payment = FeePayment.new(user_id: params[:user_id], fee_type: params[:fee_type], feeable: feeable, amount: feeable&.fee_amount)
       @people = billable_people
     end
 
     def create
-      @fee_payment = FeePayment.new(fee_payment_params)
+      @fee_payment = FeePayment.new(fee_payment_params.except(:event_id, :meeting_id))
+      @fee_payment.feeable = resolve_feeable
       authorize! :create, @fee_payment
+
+      if params.dig(:fee_payment, :mark_as_paid) == "1"
+        @fee_payment.status = :paid
+        @fee_payment.paid_on = Date.current
+      end
 
       if @fee_payment.user && @fee_payment.user.chapter_id == @chapter.id && @fee_payment.save
         redirect_to forum_chapter_fee_payments_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id), notice: "Fee recorded for #{@fee_payment.user.display_name}."
@@ -62,8 +69,18 @@ module Forums
       @chapter.users.where(role: [ :member, :guest ]).order(:full_name)
     end
 
+    def resolve_feeable
+      event_id = params[:event_id] || params.dig(:fee_payment, :event_id)
+      meeting_id = params[:meeting_id] || params.dig(:fee_payment, :meeting_id)
+
+      return @current_forum.events.find(event_id) if event_id.present?
+      return @chapter.meetings.find(meeting_id) if meeting_id.present?
+
+      nil
+    end
+
     def fee_payment_params
-      params.require(:fee_payment).permit(:user_id, :fee_type, :amount, :due_date)
+      params.require(:fee_payment).permit(:user_id, :fee_type, :amount, :due_date, :event_id, :meeting_id)
     end
   end
 end

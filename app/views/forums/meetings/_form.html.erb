@@ -31,6 +31,30 @@
     <%= f.label :documents, class: "form-label" %>
     <%= f.file_field :documents, multiple: true, class: "form-control" %>
   </div>
+
+  <h2 class="h6 text-uppercase text-muted mb-3">Fee &amp; Payment Info (optional)</h2>
+  <div class="mb-3">
+    <%= f.label :fee_amount, "Fee Amount", class: "form-label" %>
+    <%= f.number_field :fee_amount, step: 0.01, min: 0, class: "form-control", placeholder: "Leave blank if free" %>
+  </div>
+  <div class="row g-3 mb-3">
+    <div class="col-12 col-sm-6">
+      <%= f.label :payment_upi_id, "UPI / PhonePe ID", class: "form-label" %>
+      <%= f.text_field :payment_upi_id, class: "form-control", placeholder: "e.g. name@upi" %>
+    </div>
+    <div class="col-12 col-sm-6">
+      <%= f.label :payment_qr, "Payment QR Code", class: "form-label" %>
+      <%= f.file_field :payment_qr, class: "form-control", accept: "image/*" %>
+      <% if meeting.payment_qr.attached? %>
+        <div class="form-text">Current QR code: <%= image_tag meeting.payment_qr, style: "height: 60px; margin-top: 4px;" %></div>
+      <% end %>
+    </div>
+  </div>
+  <div class="mb-4">
+    <%= f.label :payment_bank_details, "Bank Account Details", class: "form-label" %>
+    <%= f.text_area :payment_bank_details, class: "form-control", rows: 2, placeholder: "Account name, number, IFSC, bank..." %>
+  </div>
+
   <div class="d-flex flex-wrap gap-2">
     <%= f.submit class: "btn btn-primary btn-lg" %>
     <%= link_to "Cancel", forum_chapter_meetings_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id), class: "btn btn-outline-secondary btn-lg" %>

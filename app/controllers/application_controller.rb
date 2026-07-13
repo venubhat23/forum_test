@@ -10,6 +10,7 @@ class ApplicationController < ActionController::Base
 
   def after_sign_in_path_for(resource)
     session[:seen_announcement_ids] = []
+    session[:seen_fee_reminder_ids] = []
 
     if resource.super_admin?
       super_admin_dashboard_path

@@ -1,57 +1,94 @@
 <% content_for :title, "Calendar" %>
 
-<div class="page-header">
-  <h1 class="page-title h4">Calendar</h1>
-  <p class="page-subtitle mb-0"><%= Date.current.strftime("%B %Y") %></p>
-</div>
+<div class="gcal">
+  <div class="gcal-toolbar">
+    <div class="gcal-toolbar-left">
+      <%= link_to "Today", forum_calendar_path(forum_slug: @current_forum.slug), class: "gcal-today-btn" %>
+      <div class="gcal-nav">
+        <%= link_to forum_calendar_path(forum_slug: @current_forum.slug, year: @month.prev_month.year, month: @month.prev_month.month), class: "gcal-nav-btn", "aria-label": "Previous month" do %>
+          <i class="bi bi-chevron-left"></i>
+        <% end %>
+        <%= link_to forum_calendar_path(forum_slug: @current_forum.slug, year: @month.next_month.year, month: @month.next_month.month), class: "gcal-nav-btn", "aria-label": "Next month" do %>
+          <i class="bi bi-chevron-right"></i>
+        <% end %>
+      </div>
+      <h1 class="gcal-title"><%= @month.strftime("%B %Y") %></h1>
+    </div>
+    <div class="gcal-legend">
+      <span class="gcal-legend-item"><span class="gcal-dot gcal-dot-meeting"></span>Meetings</span>
+      <span class="gcal-legend-item"><span class="gcal-dot gcal-dot-event"></span>Events</span>
+      <span class="gcal-legend-item"><span class="gcal-dot gcal-dot-renewal"></span>Renewals</span>
+    </div>
+  </div>
 
-<div class="row g-3">
-  <div class="col-12 col-lg-4">
-    <div class="card h-100">
-      <div class="card-header fw-semibold">Meetings</div>
-      <div class="list-group list-group-flush">
-        <% @meetings.each do |m| %>
-          <div class="list-group-item">
-            <div class="fw-semibold"><%= m.chapter.name %> &middot; <%= m.meeting_type.titleize %></div>
-            <div class="text-muted small"><%= m.scheduled_at.strftime("%d %b, %H:%M") %></div>
+  <div class="gcal-grid-wrap">
+    <div class="gcal-weekday-row">
+      <% %w[Sun Mon Tue Wed Thu Fri Sat].each do |day_name| %>
+        <div class="gcal-weekday"><%= day_name %></div>
+      <% end %>
+    </div>
+
+    <% @calendar_weeks.each do |week| %>
+      <div class="gcal-week">
+        <% week.each do |date| %>
+          <% items = @items_by_date[date] %>
+          <% in_month = date.month == @month.month %>
+          <% modal_id = "gcal-day-#{date.strftime('%Y%m%d')}" %>
+          <div class="gcal-day<%= " gcal-day-outside" unless in_month %><%= " gcal-day-today" if date == Date.current %>"
+               <% if in_month %>data-bs-toggle="modal" data-bs-target="#<%= modal_id %>" role="button" tabindex="0"<% end %>>
+            <div class="gcal-day-number"><span><%= date.day %></span></div>
+            <div class="gcal-day-events">
+              <% items.first(3).each do |item| %>
+                <% details = calendar_item_details(item) %>
+                <%= link_to details[:title], details[:path], class: "gcal-chip gcal-chip-#{details[:css_class]}",
+                      title: [details[:meta], details[:time]].compact.join(" · "), onclick: "event.stopPropagation()" %>
+              <% end %>
+              <% if items.size > 3 %>
+                <div class="gcal-more">+<%= items.size - 3 %> more</div>
+              <% end %>
+            </div>
           </div>
-        <% end %>
-        <% if @meetings.empty? %>
-          <div class="list-group-item text-muted text-center py-3">No meetings this month.</div>
+
+          <% if in_month %>
+            <div class="modal fade" id="<%= modal_id %>" tabindex="-1" aria-hidden="true">
+              <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content gcal-modal-content">
+                  <div class="modal-header gcal-modal-header">
+                    <div>
+                      <div class="gcal-modal-weekday"><%= date.strftime("%A") %></div>
+                      <div class="gcal-modal-date"><%= date.strftime("%d %B %Y") %></div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body gcal-modal-body">
+                    <% if items.any? %>
+                      <% items.each do |item| %>
+                        <% details = calendar_item_details(item) %>
+                        <%= link_to details[:path], class: "gcal-modal-item gcal-modal-item-#{details[:css_class]}" do %>
+                          <span class="gcal-modal-item-icon"><i class="bi <%= details[:icon] %>"></i></span>
+                          <span class="gcal-modal-item-body">
+                            <span class="gcal-modal-item-title"><%= details[:title] %></span>
+                            <span class="gcal-modal-item-meta">
+                              <% if details[:time] %><i class="bi bi-clock"></i> <%= details[:time] %><% end %>
+                              <% if details[:meta] %><%= " · " if details[:time] %><%= details[:meta] %><% end %>
+                            </span>
+                          </span>
+                          <i class="bi bi-chevron-right gcal-modal-item-arrow"></i>
+                        <% end %>
+                      <% end %>
+                    <% else %>
+                      <div class="gcal-modal-empty">
+                        <i class="bi bi-calendar2-check"></i>
+                        <p>Nothing scheduled for this day.</p>
+                      </div>
+                    <% end %>
+                  </div>
+                </div>
+              </div>
+            </div>
+          <% end %>
         <% end %>
       </div>
-    </div>
-  </div>
-  <div class="col-12 col-lg-4">
-    <div class="card h-100">
-      <div class="card-header fw-semibold">Events</div>
-      <div class="list-group list-group-flush">
-        <% @events.each do |e| %>
-          <div class="list-group-item">
-            <div class="fw-semibold"><%= e.title %></div>
-            <div class="text-muted small"><%= e.starts_at.strftime("%d %b, %H:%M") %></div>
-          </div>
-        <% end %>
-        <% if @events.empty? %>
-          <div class="list-group-item text-muted text-center py-3">No events this month.</div>
-        <% end %>
-      </div>
-    </div>
-  </div>
-  <div class="col-12 col-lg-4">
-    <div class="card h-100">
-      <div class="card-header fw-semibold">Membership Renewals</div>
-      <div class="list-group list-group-flush">
-        <% @renewals.each do |u| %>
-          <div class="list-group-item">
-            <div class="fw-semibold"><%= u.display_name %></div>
-            <div class="text-muted small"><%= u.renews_on.strftime("%d %b") %></div>
-          </div>
-        <% end %>
-        <% if @renewals.empty? %>
-          <div class="list-group-item text-muted text-center py-3">No renewals this month.</div>
-        <% end %>
-      </div>
-    </div>
+    <% end %>
   </div>
 </div>

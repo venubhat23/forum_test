@@ -33,7 +33,107 @@
       </div>
     </div>
   </div>
+  <div class="col-6 col-lg-4">
+    <div class="stats-card">
+      <div class="icon-bg gradient-blue"><i class="bi bi-arrow-repeat"></i></div>
+      <div>
+        <div class="stats-value"><%= @renewing_this_month %></div>
+        <div class="stats-label">Renewing This Month</div>
+      </div>
+    </div>
+  </div>
 </div>
+
+<% if can? :read, Lead %>
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="h6 text-uppercase text-muted mb-0">
+      <%= @lead_stats_scope == :forum ? "Leads (Forum-wide)" : "Your Leads" %>
+    </h2>
+    <%= link_to "View Leads", forum_leads_path(forum_slug: @current_forum.slug), class: "btn btn-sm btn-outline-primary" %>
+  </div>
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3">
+      <div class="mini-stat-card">
+        <div>
+          <div class="mini-stat-label"><%= @lead_stats_scope == :forum ? "Total Leads" : "Created by You" %></div>
+          <div class="mini-stat-value text-primary"><%= @leads_created_count %></div>
+        </div>
+        <div class="mini-stat-icon mini-stat-icon-primary"><i class="bi bi-lightbulb"></i></div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="mini-stat-card">
+        <div>
+          <div class="mini-stat-label"><%= @lead_stats_scope == :forum ? "Requested" : "Requests for You" %></div>
+          <div class="mini-stat-value text-warning"><%= @leads_requested_count %></div>
+        </div>
+        <div class="mini-stat-icon mini-stat-icon-warning"><i class="bi bi-hourglass-split"></i></div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="mini-stat-card">
+        <div>
+          <div class="mini-stat-label">Converted</div>
+          <div class="mini-stat-value text-success"><%= @leads_converted_count %></div>
+        </div>
+        <div class="mini-stat-icon mini-stat-icon-success"><i class="bi bi-trophy"></i></div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="mini-stat-card">
+        <div>
+          <div class="mini-stat-label">Thanksgiving Slips</div>
+          <div class="mini-stat-value text-info"><%= @thanksgiving_slips_count %></div>
+        </div>
+        <div class="mini-stat-icon mini-stat-icon-info"><i class="bi bi-gift"></i></div>
+      </div>
+    </div>
+  </div>
+<% end %>
+
+<% if @attendance_present_this_month %>
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="h6 text-uppercase text-muted mb-0">Attendance (This Month, Forum-wide)</h2>
+  </div>
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3">
+      <div class="mini-stat-card">
+        <div>
+          <div class="mini-stat-label">Meetings/Trainings Present</div>
+          <div class="mini-stat-value text-success"><%= @attendance_present_this_month %></div>
+        </div>
+        <div class="mini-stat-icon mini-stat-icon-success"><i class="bi bi-check-circle"></i></div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="mini-stat-card">
+        <div>
+          <div class="mini-stat-label">Meetings/Trainings Absent</div>
+          <div class="mini-stat-value text-danger"><%= @attendance_absent_this_month %></div>
+        </div>
+        <div class="mini-stat-icon mini-stat-icon-danger"><i class="bi bi-x-circle"></i></div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="mini-stat-card">
+        <div>
+          <div class="mini-stat-label">Event Registrants</div>
+          <div class="mini-stat-value text-primary"><%= @event_attendance_total_this_month %></div>
+        </div>
+        <div class="mini-stat-icon mini-stat-icon-primary"><i class="bi bi-calendar-event"></i></div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="mini-stat-card">
+        <div>
+          <div class="mini-stat-label">Events Attended</div>
+          <div class="mini-stat-value text-info"><%= @event_attendance_present_this_month %></div>
+        </div>
+        <div class="mini-stat-icon mini-stat-icon-info"><i class="bi bi-person-check"></i></div>
+      </div>
+    </div>
+  </div>
+<% end %>
 
 <div class="card">
   <div class="card-header d-flex justify-content-between align-items-center">

@@ -3,9 +3,12 @@ class Meeting < ApplicationRecord
 
   belongs_to :chapter
   has_many :attendances, dependent: :nullify
+  has_many :fee_payments, as: :feeable, dependent: :destroy
   has_many_attached :documents
+  has_one_attached :payment_qr
 
   validates :scheduled_at, presence: true
+  validates :fee_amount, numericality: { greater_than: 0 }, allow_nil: true
 
   after_create :notify_chapter_members
 
@@ -22,10 +25,19 @@ class Meeting < ApplicationRecord
     chapter.members.where.not(id: attended_ids)
   end
 
+  def paid_count
+    fee_payments.paid.count
+  end
+
+  def pending_count
+    fee_payments.pending.count
+  end
+
   private
 
   def notify_chapter_members
     message = "A new #{meeting_type} meeting has been scheduled for #{scheduled_at.strftime('%d %b %Y %H:%M')}."
+    message += " Fee: #{ActiveSupport::NumberHelper.number_to_currency(fee_amount)} — see the meeting page for payment details." if fee_amount.present?
     chapter.members.find_each { |member| member.notifications.create!(body: message) }
   end
 end

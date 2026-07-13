@@ -19,6 +19,11 @@ cloudflare_r2:
   endpoint: <%= ENV["R2_ENDPOINT"] %>
   force_path_style: true
   public: true
+  # aws-sdk-core defaults to sending an extra CRC32 checksum header alongside
+  # the Content-MD5 ActiveStorage already sends; R2 rejects having both
+  # ("You can only specify one non-default checksum at a time").
+  request_checksum_calculation: when_required
+  response_checksum_validation: when_required
 
 # Use bin/rails credentials:edit to set the AWS secrets (as aws:access_key_id|secret_access_key)
 # amazon:

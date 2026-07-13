@@ -8,6 +8,7 @@ class Attendance < ApplicationRecord
 
   belongs_to :user
   belongs_to :meeting, optional: true
+  belongs_to :event, optional: true
 
   validates :event_type, presence: true
   validates :occurred_on, presence: true

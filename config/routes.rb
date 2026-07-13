@@ -125,6 +125,7 @@ Rails.application.routes.draw do
         collection do
           get :import
           post :bulk_import
+          post :invite_to_event
         end
         member do
           patch :suspend
@@ -148,7 +149,13 @@ Rails.application.routes.draw do
           get :print
         end
       end
-      resources :meetings, controller: "forums/meetings", only: [ :index, :new, :create, :show, :edit, :update, :destroy ]
+      resources :meetings, controller: "forums/meetings", only: [ :index, :new, :create, :show, :edit, :update, :destroy ] do
+        member do
+          post :remind
+          get :attendance
+          post :record_attendance
+        end
+      end
       resources :weekly_presentations, controller: "forums/weekly_presentations", only: [ :index, :new, :create, :show, :edit, :update, :destroy ]
       resources :attendances, controller: "forums/attendances", only: [ :index, :new, :create ]
       resources :referrals, controller: "forums/referrals", only: [ :index, :new, :create, :show ] do
@@ -174,7 +181,21 @@ Rails.application.routes.draw do
       end
     end
     resources :office_darshans, controller: "forums/office_darshans", except: [ :edit, :update ]
+    resources :leads, controller: "forums/leads" do
+      member do
+        patch :accept
+        patch :release
+        patch :advance
+        get :new_thanksgiving
+        patch :give_thanksgiving
+      end
+    end
     resources :events, controller: "forums/events" do
+      member do
+        post :remind
+        get :attendance
+        post :record_attendance
+      end
       resources :registrations, controller: "forums/event_registrations", only: [ :index, :create, :destroy ]
     end
     get "calendar", to: "forums/calendar#show"
