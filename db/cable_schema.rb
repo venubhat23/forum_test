@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_13_120000) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_13_130000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -69,7 +69,11 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_13_120000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "meeting_id"
+    t.bigint "event_id"
+    t.index ["event_id"], name: "index_attendances_on_event_id"
     t.index ["meeting_id"], name: "index_attendances_on_meeting_id"
+    t.index ["user_id", "event_id"], name: "index_attendances_on_user_id_and_event_id", unique: true
+    t.index ["user_id", "meeting_id"], name: "index_attendances_on_user_id_and_meeting_id", unique: true
     t.index ["user_id"], name: "index_attendances_on_user_id"
   end
 
@@ -848,6 +852,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_13_120000) do
   add_foreign_key "announcements", "plans"
   add_foreign_key "announcements", "users", column: "created_by_id"
   add_foreign_key "announcements", "users", column: "target_user_id"
+  add_foreign_key "attendances", "events"
   add_foreign_key "attendances", "meetings"
   add_foreign_key "attendances", "users"
   add_foreign_key "banner_documents", "banners"

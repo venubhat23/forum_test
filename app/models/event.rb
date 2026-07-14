@@ -5,6 +5,7 @@ class Event < ApplicationRecord
   has_many :event_registrations, dependent: :destroy
   has_many :registrants, through: :event_registrations, source: :user
   has_many :fee_payments, as: :feeable, dependent: :destroy
+  has_many :attendances, dependent: :destroy
   has_many_attached :gallery
   has_one_attached :payment_qr
 
@@ -26,6 +27,10 @@ class Event < ApplicationRecord
 
   def pending_count
     fee_payments.pending.count
+  end
+
+  def collected_amount
+    fee_payments.paid.sum(:amount)
   end
 
   def attendance_percentage

@@ -11,7 +11,7 @@ module Forums
       @pending_fees = base.where(status: :pending).count
       @total_amount = base.sum(:amount)
 
-      @fee_payments = base.order(created_at: :desc)
+      @fee_payments = base.includes(:user).order(created_at: :desc)
       @fee_payments = @fee_payments.where("users.full_name ILIKE ?", "%#{params[:q]}%") if params[:q].present?
       @fee_payments = @fee_payments.where(status: params[:status]) if params[:status].present?
       @fee_payments = @fee_payments.page(params[:page])

@@ -7,7 +7,8 @@ module Forums
       authorize! :read, Meeting
       all_meetings = @chapter.meetings.to_a
       @total_meetings = all_meetings.size
-      @avg_attendance = all_meetings.any? ? (all_meetings.sum(&:attendance_percentage) / all_meetings.size.to_f).round(1) : 0
+      @attendance_percentages = Meeting.attendance_percentages(all_meetings, @chapter)
+      @avg_attendance = @attendance_percentages.any? ? (@attendance_percentages.values.sum / @attendance_percentages.size.to_f).round(1) : 0
 
       @meetings = @chapter.meetings.order(scheduled_at: :desc)
       @meetings = @meetings.where("venue ILIKE ? OR speaker ILIKE ?", "%#{params[:q]}%", "%#{params[:q]}%") if params[:q].present?

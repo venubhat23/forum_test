@@ -68,6 +68,7 @@
           <th>Plan</th>
           <th>Status</th>
           <th>Chapters</th>
+          <th>Collected</th>
           <th>Created</th>
           <th class="text-end">Actions</th>
         </tr>
@@ -89,6 +90,7 @@
             <% end %></td>
             <td><span class="badge badge-status-<%= forum.status %>"><%= forum.status.titleize %></span></td>
             <td><%= forum.chapters.count %></td>
+            <td><%= number_to_currency(forum.collected_amount) %></td>
             <td><%= forum.created_at.strftime("%d %b %Y") %></td>
             <td class="text-end">
               <div class="d-flex gap-1 justify-content-end">
@@ -109,7 +111,7 @@
           </tr>
         <% end %>
         <% if @forums.empty? %>
-          <tr><td colspan="7" class="text-center text-muted py-4">No forums yet. Create the first one to get started.</td></tr>
+          <tr><td colspan="8" class="text-center text-muted py-4">No forums yet. Create the first one to get started.</td></tr>
         <% end %>
       </tbody>
     </table>

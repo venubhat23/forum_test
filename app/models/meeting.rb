@@ -3,6 +3,7 @@ class Meeting < ApplicationRecord
 
   belongs_to :chapter
   has_many :attendances, dependent: :nullify
+  has_many :weekly_presentations, dependent: :nullify
   has_many :fee_payments, as: :feeable, dependent: :destroy
   has_many_attached :documents
   has_one_attached :payment_qr
@@ -18,6 +19,18 @@ class Meeting < ApplicationRecord
 
     present = attendances.where(present: true).count
     ((present.to_f / total) * 100).round(1)
+  end
+
+  # Bulk version of attendance_percentage for lists of meetings within the same
+  # chapter — avoids a chapter/members/attendances query per meeting.
+  def self.attendance_percentages(meetings, chapter)
+    total = chapter.members.count
+    return Hash.new(0) if total.zero?
+
+    present_counts = Attendance.where(meeting_id: meetings.map(&:id), present: true).group(:meeting_id).count
+    meetings.each_with_object({}) do |meeting, hash|
+      hash[meeting.id] = ((present_counts[meeting.id].to_i.to_f / total) * 100).round(1)
+    end
   end
 
   def defaulters

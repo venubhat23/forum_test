@@ -9,7 +9,7 @@ class Forum < ApplicationRecord
   belongs_to :plan
 
   has_many :chapters, dependent: :destroy
-  has_many :users, dependent: :nullify
+  has_many :users, dependent: :destroy
   has_many :business_categories, dependent: :destroy
   has_many :one_to_one_meetings, dependent: :destroy
   has_many :office_darshans, dependent: :destroy
@@ -19,6 +19,11 @@ class Forum < ApplicationRecord
   has_many :expenses, dependent: :destroy
   has_many :documents, dependent: :destroy
   has_many :leads, dependent: :destroy
+  has_many :referrals, dependent: :destroy
+  has_many :invoices, dependent: :destroy
+  has_many :announcements, dependent: :nullify
+  has_many :support_tickets, dependent: :nullify
+  has_many :forum_requests, dependent: :nullify
   has_one :forum_setting, dependent: :destroy
 
   validates :name, presence: true
@@ -54,6 +59,10 @@ class Forum < ApplicationRecord
 
   def to_param
     slug
+  end
+
+  def collected_amount
+    FeePayment.joins(:user).where(users: { forum_id: id }, status: :paid).sum(:amount)
   end
 
   private

@@ -2,8 +2,10 @@ class Announcement < ApplicationRecord
   enum :audience, { everyone: 0, specific_forum: 1, specific_plan: 2 }, default: :everyone
 
   belongs_to :forum, optional: true
+  belongs_to :chapter, optional: true
   belongs_to :plan, optional: true
   belongs_to :created_by, class_name: "User"
+  belongs_to :target_user, class_name: "User", optional: true
 
   validates :title, presence: true
   validates :body, presence: true

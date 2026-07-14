@@ -14,7 +14,7 @@ module Forums
       @upcoming_event = @current_forum.events.where("starts_at >= ?", Time.current).order(:starts_at).first
       @renewing_this_month = @chapter.members.where(renews_on: Date.current.beginning_of_month..Date.current.end_of_month).count
 
-      @members = @chapter.members.order(role_order_sql, :full_name)
+      @members = @chapter.members.includes(:business_category_ref).order(role_order_sql, :full_name)
       @members = @members.where("full_name ILIKE ? OR email ILIKE ?", "%#{params[:q]}%", "%#{params[:q]}%") if params[:q].present?
       @members = @members.where(suspended_at: nil) if params[:status] == "active"
       @members = @members.where.not(suspended_at: nil) if params[:status] == "suspended"

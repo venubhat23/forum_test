@@ -3,6 +3,7 @@ class SupportTicket < ApplicationRecord
   enum :priority, { low: 0, medium: 1, high: 2 }, default: :medium
 
   belongs_to :forum, optional: true
+  belongs_to :chapter, optional: true
   belongs_to :raised_by, class_name: "User"
   has_many :replies, class_name: "SupportTicketReply", dependent: :destroy
 

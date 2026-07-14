@@ -23,6 +23,10 @@ Rails.application.routes.draw do
         post :impersonate
         post :reset_admin_password
         post :force_logout_admin
+        delete :destroy_permanently
+      end
+      collection do
+        delete :bulk_destroy_permanently
       end
     end
     resources :plans, except: [ :destroy, :show ] do

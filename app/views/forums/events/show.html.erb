@@ -70,6 +70,15 @@
         <div class="mini-stat-icon mini-stat-icon-warning"><i class="bi bi-exclamation-circle"></i></div>
       </div>
     </div>
+    <div class="col-6 col-lg-4">
+      <div class="mini-stat-card">
+        <div>
+          <div class="mini-stat-label">Collected</div>
+          <div class="mini-stat-value text-primary"><%= number_to_currency(@event.collected_amount) %></div>
+        </div>
+        <div class="mini-stat-icon mini-stat-icon-primary"><i class="bi bi-cash-stack"></i></div>
+      </div>
+    </div>
   </div>
 
   <% fees_by_user = @event.fee_payments.order(:created_at).index_by(&:user_id) %>

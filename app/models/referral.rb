@@ -1,13 +1,12 @@
 class Referral < ApplicationRecord
-  enum :referral_type, { self_referral: 0, outside_referral: 1 }
   enum :status, { pending: 0, accepted: 1, rejected: 2, converted: 3 }
 
-  belongs_to :giver, class_name: "User"
-  belongs_to :receiver, class_name: "User"
+  belongs_to :forum, optional: true
+  belongs_to :chapter, optional: true
+  belongs_to :giver, class_name: "User", foreign_key: :referrer_id, inverse_of: :referrals_given
+  belongs_to :receiver, class_name: "User", foreign_key: :referred_user_id, inverse_of: :referrals_received
   has_many :thanksgiving_slips, dependent: :destroy
 
-  validates :prospect_name, presence: true
-  validates :referral_type, presence: true
   validate :giver_and_receiver_differ
   validate :giver_and_receiver_in_same_forum
 
@@ -16,13 +15,13 @@ class Referral < ApplicationRecord
   private
 
   def notify_receiver
-    receiver.notifications.create!(body: "You received a new referral from #{giver.display_name} for #{prospect_name}.")
+    receiver.notifications.create!(body: "You received a new referral from #{giver.display_name}.")
   end
 
   def giver_and_receiver_differ
     return unless giver && receiver
 
-    errors.add(:receiver, "must be a different member than the giver") if giver_id == receiver_id
+    errors.add(:receiver, "must be a different member than the giver") if referrer_id == referred_user_id
   end
 
   def giver_and_receiver_in_same_forum

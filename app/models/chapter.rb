@@ -8,6 +8,15 @@ class Chapter < ApplicationRecord
   has_many :committee_members, -> { where(role: :committee_member) }, class_name: "User"
   has_many :meetings, dependent: :destroy
   has_many :weekly_presentations, dependent: :destroy
+  has_many :events, dependent: :nullify
+  has_many :announcements, dependent: :nullify
+  has_many :support_tickets, dependent: :nullify
+  has_many :membership_applications, dependent: :nullify
+  has_many :referrals, dependent: :nullify
 
   validates :name, presence: true, uniqueness: { scope: :forum_id }
+
+  def collected_amount
+    FeePayment.joins(:user).where(users: { chapter_id: id }, status: :paid).sum(:amount)
+  end
 end

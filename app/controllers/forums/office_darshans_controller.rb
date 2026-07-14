@@ -9,7 +9,7 @@ module Forums
       @scheduled_darshans = base.where(status: :scheduled).count
       @completed_darshans = base.where(status: :completed).count
 
-      @darshans = base.order(visit_date: :desc)
+      @darshans = base.includes(:member).order(visit_date: :desc)
       @darshans = @darshans.where(status: params[:status]) if params[:status].present?
     end
 

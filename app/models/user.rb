@@ -35,14 +35,25 @@ class User < ApplicationRecord
   has_many :invitees, class_name: "User", foreign_key: :invited_by_id, dependent: :nullify, inverse_of: :invited_by
   has_many :fee_payments, dependent: :destroy
   has_many :attendances, dependent: :destroy
-  has_many :referrals_given, class_name: "Referral", foreign_key: :giver_id, dependent: :destroy, inverse_of: :giver
-  has_many :referrals_received, class_name: "Referral", foreign_key: :receiver_id, dependent: :destroy, inverse_of: :receiver
+  has_many :referrals_given, class_name: "Referral", foreign_key: :referrer_id, dependent: :destroy, inverse_of: :giver
+  has_many :referrals_received, class_name: "Referral", foreign_key: :referred_user_id, dependent: :destroy, inverse_of: :receiver
   has_many :thanksgiving_slips_given, class_name: "ThanksgivingSlip", foreign_key: :given_by_id, dependent: :destroy, inverse_of: :given_by
   has_many :notifications, dependent: :destroy
   has_many :created_leads, class_name: "Lead", foreign_key: :created_by_id, dependent: :destroy, inverse_of: :created_by
   has_many :accepted_leads, class_name: "Lead", foreign_key: :accepted_by_id, dependent: :nullify, inverse_of: :accepted_by
   has_many :lead_taggings, dependent: :destroy
   has_many :tagged_leads, through: :lead_taggings, source: :lead
+  has_many :event_registrations, dependent: :destroy
+  has_many :invited_event_registrations, class_name: "EventRegistration", foreign_key: :invited_by_id, dependent: :nullify, inverse_of: false
+  has_many :weekly_presentations, foreign_key: :member_id, dependent: :destroy, inverse_of: :member
+  has_many :office_darshans, foreign_key: :member_id, dependent: :destroy, inverse_of: :member
+  has_many :one_to_one_meetings_as_requester, class_name: "OneToOneMeeting", foreign_key: :requester_id, dependent: :destroy, inverse_of: :requester
+  has_many :one_to_one_meetings_as_requested, class_name: "OneToOneMeeting", foreign_key: :requested_with_id, dependent: :destroy, inverse_of: :requested_with
+  has_many :membership_applications_reviewed, class_name: "MembershipApplication", foreign_key: :reviewed_by_id, dependent: :nullify, inverse_of: :reviewed_by
+  has_many :support_tickets_raised, class_name: "SupportTicket", foreign_key: :raised_by_id, dependent: :nullify, inverse_of: :raised_by
+  has_many :support_ticket_replies, dependent: :nullify
+  has_many :announcements_created, class_name: "Announcement", foreign_key: :created_by_id, dependent: :nullify, inverse_of: :created_by
+  has_many :targeted_announcements, class_name: "Announcement", foreign_key: :target_user_id, dependent: :nullify, inverse_of: :target_user
 
   validates :forum, presence: true, unless: :super_admin?
   validates :chapter, presence: true, if: -> { member? || guest? || committee_member? }

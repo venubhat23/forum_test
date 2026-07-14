@@ -7,7 +7,7 @@ module SuperAdmin
       @active_plans = Plan.active.count
       @archived_plans = Plan.archived.count
 
-      @plans = Plan.ordered
+      @plans = Plan.includes(:forums).ordered
       @plans = @plans.where("name ILIKE ?", "%#{params[:q]}%") if params[:q].present?
       @plans = @plans.where(status: params[:status]) if params[:status].present?
     end

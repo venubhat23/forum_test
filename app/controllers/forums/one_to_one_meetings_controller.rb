@@ -10,7 +10,7 @@ module Forums
       @accepted_meetings = base.where(status: :accepted).count
       @completed_meetings = base.where(status: :completed).count
 
-      @meetings = base.order(scheduled_at: :desc)
+      @meetings = base.includes(:requester, :requested_with).order(scheduled_at: :desc)
       @meetings = @meetings.where(status: params[:status]) if params[:status].present?
     end
 

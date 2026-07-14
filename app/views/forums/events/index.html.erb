@@ -61,6 +61,7 @@
           <th>Date</th>
           <th>Venue</th>
           <th>Registrants</th>
+          <th>Collected</th>
           <th></th>
         </tr>
       </thead>
@@ -77,6 +78,7 @@
             <td><%= event.starts_at.strftime("%d %b %Y %H:%M") %></td>
             <td><%= event.venue %></td>
             <td><%= event.event_registrations.count %></td>
+            <td><%= number_to_currency(event.collected_amount) %></td>
             <td class="text-end">
               <%= link_to forum_event_path(forum_slug: @current_forum.slug, id: event.id), class: "icon-btn icon-btn-view", title: "View" do %>
                 <i class="bi bi-eye"></i>
@@ -85,7 +87,7 @@
           </tr>
         <% end %>
         <% if @events.empty? %>
-          <tr><td colspan="6" class="text-center text-muted py-4">No events yet.</td></tr>
+          <tr><td colspan="7" class="text-center text-muted py-4">No events yet.</td></tr>
         <% end %>
       </tbody>
     </table>

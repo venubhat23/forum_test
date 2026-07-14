@@ -8,7 +8,7 @@ module SuperAdmin
       @published_announcements = Announcement.published.count
       @draft_announcements = @total_announcements - @published_announcements
 
-      @announcements = Announcement.order(created_at: :desc)
+      @announcements = Announcement.includes(:plan).order(created_at: :desc)
       @announcements = @announcements.where("title ILIKE ?", "%#{params[:q]}%") if params[:q].present?
     end
 

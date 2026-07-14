@@ -1,7 +1,7 @@
 module SuperAdmin
   class ForumsController < BaseController
-    before_action :set_forum, only: [ :show, :edit, :update, :destroy, :suspend, :activate, :update_plan,
-                                       :impersonate, :reset_admin_password, :force_logout_admin, :tree ]
+    before_action :set_forum, only: [ :show, :edit, :update, :destroy, :destroy_permanently, :suspend, :activate,
+                                       :update_plan, :impersonate, :reset_admin_password, :force_logout_admin, :tree ]
 
     def index
       @total_forums = Forum.count
@@ -9,7 +9,7 @@ module SuperAdmin
       @trial_forums = Forum.trial.count
       @suspended_forums = Forum.suspended.count
 
-      @forums = Forum.all
+      @forums = Forum.includes(:plan, :chapters)
       @forums = @forums.where("name ILIKE ?", "%#{params[:q]}%") if params[:q].present?
       @forums = @forums.where(status: params[:status]) if params[:status].present?
       @forums = @forums.order(created_at: :desc).page(params[:page])
@@ -80,6 +80,34 @@ module SuperAdmin
       redirect_to super_admin_forums_path, notice: "#{@forum.name} has been archived."
     end
 
+    def destroy_permanently
+      name = @forum.name
+      purge_forum!(@forum)
+      redirect_to super_admin_forums_path, notice: "#{name} and all its data have been permanently deleted."
+    rescue ActiveRecord::InvalidForeignKey, ActiveRecord::RecordNotDestroyed => e
+      redirect_to super_admin_forum_path(@forum), alert: "Could not delete #{name}: #{e.message}"
+    end
+
+    def bulk_destroy_permanently
+      forums = Forum.where(id: params[:forum_ids])
+      deleted = []
+      failed = []
+
+      forums.find_each do |forum|
+        name = forum.name
+        begin
+          purge_forum!(forum)
+          deleted << name
+        rescue ActiveRecord::InvalidForeignKey, ActiveRecord::RecordNotDestroyed => e
+          failed << "#{name} (#{e.message})"
+        end
+      end
+
+      redirect_to super_admin_forums_path,
+        notice: (deleted.any? ? "Permanently deleted: #{deleted.join(', ')}." : nil),
+        alert: (failed.any? ? "Could not delete: #{failed.join('; ')}." : nil)
+    end
+
     def suspend
       @forum.update!(status: :suspended)
       redirect_to super_admin_forum_path(@forum), notice: "#{@forum.name} has been suspended."
@@ -146,6 +174,20 @@ module SuperAdmin
 
     def forum_update_params
       params.require(:forum).permit(:name)
+    end
+
+    # Fully, permanently removes a forum and every associated record.
+    # session_activities has no Rails model (legacy table), so it's cleaned
+    # up directly rather than via an ActiveRecord association.
+    def purge_forum!(forum)
+      user_ids = forum.users.pluck(:id)
+      ActiveRecord::Base.transaction do
+        if user_ids.any?
+          sql = ActiveRecord::Base.sanitize_sql(["DELETE FROM session_activities WHERE user_id IN (?)", user_ids])
+          ActiveRecord::Base.connection.execute(sql)
+        end
+        forum.destroy!
+      end
     end
   end
 end

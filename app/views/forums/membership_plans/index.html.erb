@@ -55,7 +55,7 @@
             </td>
             <td><%= plan.cycle.titleize %></td>
             <td>&#8377;<%= number_with_delimiter(plan.price.to_i) %></td>
-            <td><%= plan.users.count %></td>
+            <td><%= @users_count_by_plan[plan.id].to_i %></td>
             <td class="text-end">
               <% if can? :update, plan %>
                 <div class="d-flex gap-1 justify-content-end">

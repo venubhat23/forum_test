@@ -7,7 +7,7 @@ module Forums
       authorize! :read, WeeklyPresentation
       @total_presentations = @chapter.weekly_presentations.count
 
-      @presentations = @chapter.weekly_presentations.order(scheduled_on: :desc)
+      @presentations = @chapter.weekly_presentations.includes(:member).order(scheduled_on: :desc)
       @presentations = @presentations.joins(:member).where("users.full_name ILIKE ? OR weekly_presentations.topic ILIKE ?", "%#{params[:q]}%", "%#{params[:q]}%") if params[:q].present?
       @presentations = @presentations.page(params[:page])
     end

@@ -8,6 +8,7 @@ module Forums
 
       @plans = @current_forum.membership_plans.order(:name)
       @plans = @plans.where("name ILIKE ?", "%#{params[:q]}%") if params[:q].present?
+      @users_count_by_plan = User.where(membership_plan_id: @plans.select(:id)).group(:membership_plan_id).count
     end
 
     def show

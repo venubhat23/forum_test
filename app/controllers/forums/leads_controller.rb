@@ -19,7 +19,7 @@ module Forums
       @converted_leads = base.where(stage: :converted).count
       @thanksgiving_leads = base.where.not(thanksgiving_given_at: nil).count
 
-      @leads = base.includes(:created_by, :accepted_by, :tagged_users).order(created_at: :desc)
+      @leads = base.includes(:created_by, :tagged_users).order(created_at: :desc)
       @leads = @leads.where(stage: params[:stage]) if params[:stage].present?
       @leads = @leads.page(params[:page])
     end
