@@ -20,6 +20,34 @@
       <%= button_to "Archive", super_admin_forum_path(@forum), method: :delete, class: "btn btn-outline-danger",
             data: { turbo_confirm: "Archive #{@forum.name}? It will be hidden from active use but its data is kept." } %>
     <% end %>
+    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#delete-forever-modal">
+      <i class="bi bi-trash3-fill me-1"></i>Delete Forever
+    </button>
+  </div>
+</div>
+
+<div class="modal fade" id="delete-forever-modal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title text-danger"><i class="bi bi-exclamation-triangle-fill me-2"></i>Permanently delete <%= @forum.name %>?</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>This will <strong>permanently delete</strong> <%= @forum.name %> and <strong>everything in it</strong> —
+        all chapters, members, guests, admins, events, meetings, fees, referrals, documents, and every other
+        associated record. This cannot be undone.</p>
+        <p>Type the forum's name (<strong><%= @forum.name %></strong>) to confirm:</p>
+        <input type="text" class="form-control" id="delete-forever-confirm-input" autocomplete="off"
+               oninput="document.getElementById('delete-forever-submit-btn').disabled = (this.value !== <%= @forum.name.to_json %>)">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+        <%= button_to "Delete Forever", destroy_permanently_super_admin_forum_path(@forum), method: :delete,
+              class: "btn btn-danger", form: { id: "delete-forever-form" },
+              id: "delete-forever-submit-btn", disabled: true %>
+      </div>
+    </div>
   </div>
 </div>
 

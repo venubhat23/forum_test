@@ -50,10 +50,11 @@ class User < ApplicationRecord
   has_many :one_to_one_meetings_as_requester, class_name: "OneToOneMeeting", foreign_key: :requester_id, dependent: :destroy, inverse_of: :requester
   has_many :one_to_one_meetings_as_requested, class_name: "OneToOneMeeting", foreign_key: :requested_with_id, dependent: :destroy, inverse_of: :requested_with
   has_many :membership_applications_reviewed, class_name: "MembershipApplication", foreign_key: :reviewed_by_id, dependent: :nullify, inverse_of: :reviewed_by
-  has_many :support_tickets_raised, class_name: "SupportTicket", foreign_key: :raised_by_id, dependent: :nullify, inverse_of: :raised_by
-  has_many :support_ticket_replies, dependent: :nullify
-  has_many :announcements_created, class_name: "Announcement", foreign_key: :created_by_id, dependent: :nullify, inverse_of: :created_by
+  has_many :support_tickets_raised, class_name: "SupportTicket", foreign_key: :raised_by_id, dependent: :destroy, inverse_of: :raised_by
+  has_many :support_ticket_replies, dependent: :destroy
+  has_many :announcements_created, class_name: "Announcement", foreign_key: :created_by_id, dependent: :destroy, inverse_of: :created_by
   has_many :targeted_announcements, class_name: "Announcement", foreign_key: :target_user_id, dependent: :nullify, inverse_of: :target_user
+  has_many :payments_recorded, class_name: "Payment", foreign_key: :recorded_by_id, dependent: :destroy, inverse_of: :recorded_by
 
   validates :forum, presence: true, unless: :super_admin?
   validates :chapter, presence: true, if: -> { member? || guest? || committee_member? }

@@ -5,10 +5,17 @@
     <h1 class="page-title h4">Forum Management</h1>
     <p class="page-subtitle mb-0">All networking forums on the platform.</p>
   </div>
-  <%= link_to new_super_admin_forum_path, class: "btn btn-primary rounded-pill px-4" do %>
-    <i class="bi bi-plus-lg me-1"></i> Create Forum
-  <% end %>
+  <div class="d-flex flex-wrap gap-2">
+    <button type="button" class="btn btn-outline-danger" id="bulk-delete-btn" disabled data-bs-toggle="modal" data-bs-target="#bulk-delete-modal">
+      <i class="bi bi-trash3-fill me-1"></i>Delete Selected
+    </button>
+    <%= link_to new_super_admin_forum_path, class: "btn btn-primary rounded-pill px-4" do %>
+      <i class="bi bi-plus-lg me-1"></i> Create Forum
+    <% end %>
+  </div>
 </div>
+
+<%= form_with url: bulk_destroy_permanently_super_admin_forums_path, method: :delete, local: true, id: "bulk-delete-form" do %><% end %>
 
 <div class="row g-3 mb-4">
   <div class="col-6 col-lg-3">
@@ -63,6 +70,7 @@
     <table class="table table-hover align-middle mb-0">
       <thead>
         <tr>
+          <th><input type="checkbox" class="form-check-input" id="select-all-forums"></th>
           <th>Forum</th>
           <th>URL</th>
           <th>Plan</th>
@@ -76,6 +84,10 @@
       <tbody>
         <% @forums.each do |forum| %>
           <tr>
+            <td>
+              <input type="checkbox" class="form-check-input forum-select-checkbox" name="forum_ids[]" value="<%= forum.id %>"
+                     form="bulk-delete-form" data-forum-name="<%= forum.name %>">
+            </td>
             <td>
               <div class="d-flex align-items-center gap-2">
                 <span class="row-avatar row-avatar-<%= forum.status %>"><%= forum.name.first.upcase %></span>
@@ -106,12 +118,16 @@
                     <i class="bi bi-archive"></i>
                   <% end %>
                 <% end %>
+                <button type="button" class="icon-btn icon-btn-danger" title="Delete Forever"
+                        onclick="openDeleteForeverModal('<%= destroy_permanently_super_admin_forum_path(forum) %>', <%= forum.name.to_json %>)">
+                  <i class="bi bi-trash3-fill"></i>
+                </button>
               </div>
             </td>
           </tr>
         <% end %>
         <% if @forums.empty? %>
-          <tr><td colspan="8" class="text-center text-muted py-4">No forums yet. Create the first one to get started.</td></tr>
+          <tr><td colspan="9" class="text-center text-muted py-4">No forums yet. Create the first one to get started.</td></tr>
         <% end %>
       </tbody>
     </table>
@@ -119,3 +135,102 @@
 </div>
 
 <%= paginate @forums %>
+
+<div class="modal fade" id="delete-forever-modal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title text-danger"><i class="bi bi-exclamation-triangle-fill me-2"></i>Permanently delete <span id="delete-forever-forum-name"></span>?</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>This will <strong>permanently delete</strong> this forum and <strong>everything in it</strong> —
+        all chapters, members, guests, admins, events, meetings, fees, referrals, documents, and every other
+        associated record. This cannot be undone.</p>
+        <p>Type the forum's name (<strong id="delete-forever-forum-name-2"></strong>) to confirm:</p>
+        <input type="text" class="form-control" id="delete-forever-confirm-input" autocomplete="off" oninput="checkDeleteForeverInput()">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+        <%= button_to "Delete Forever", "#", method: :delete, class: "btn btn-danger", form: { id: "delete-forever-form" }, id: "delete-forever-submit-btn", disabled: true %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="bulk-delete-modal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title text-danger"><i class="bi bi-exclamation-triangle-fill me-2"></i>Permanently delete <span id="bulk-delete-count"></span> forum(s)?</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>This will <strong>permanently delete</strong> the following forums and <strong>everything in them</strong> —
+        all chapters, members, guests, admins, events, meetings, fees, referrals, documents, and every other
+        associated record. This cannot be undone.</p>
+        <ul id="bulk-delete-forum-list" class="mb-3"></ul>
+        <p>Type <strong>DELETE</strong> to confirm:</p>
+        <input type="text" class="form-control" id="bulk-delete-confirm-input" autocomplete="off" oninput="checkBulkDeleteInput()">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-danger" form="bulk-delete-form" id="bulk-delete-submit-btn" disabled>Delete Forever</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function openDeleteForeverModal(url, name) {
+    document.getElementById('delete-forever-forum-name').textContent = name;
+    document.getElementById('delete-forever-forum-name-2').textContent = name;
+    document.getElementById('delete-forever-confirm-input').value = '';
+    document.getElementById('delete-forever-confirm-input').dataset.expected = name;
+    document.getElementById('delete-forever-form').action = url;
+    document.getElementById('delete-forever-submit-btn').disabled = true;
+    new bootstrap.Modal(document.getElementById('delete-forever-modal')).show();
+  }
+
+  function checkDeleteForeverInput() {
+    var input = document.getElementById('delete-forever-confirm-input');
+    document.getElementById('delete-forever-submit-btn').disabled = (input.value !== input.dataset.expected);
+  }
+
+  function checkBulkDeleteInput() {
+    var input = document.getElementById('bulk-delete-confirm-input');
+    document.getElementById('bulk-delete-submit-btn').disabled = (input.value !== 'DELETE');
+  }
+
+  function updateBulkDeleteButton() {
+    var checked = document.querySelectorAll('.forum-select-checkbox:checked');
+    var bulkBtn = document.getElementById('bulk-delete-btn');
+    bulkBtn.disabled = checked.length === 0;
+
+    var list = document.getElementById('bulk-delete-forum-list');
+    list.innerHTML = '';
+    checked.forEach(function(cb) {
+      var li = document.createElement('li');
+      li.textContent = cb.dataset.forumName;
+      list.appendChild(li);
+    });
+    document.getElementById('bulk-delete-count').textContent = checked.length;
+  }
+
+  document.addEventListener('turbo:load', function() {
+    document.querySelectorAll('.forum-select-checkbox').forEach(function(cb) {
+      cb.addEventListener('change', updateBulkDeleteButton);
+    });
+
+    var selectAll = document.getElementById('select-all-forums');
+    if (selectAll) {
+      selectAll.addEventListener('change', function() {
+        document.querySelectorAll('.forum-select-checkbox').forEach(function(cb) { cb.checked = selectAll.checked; });
+        updateBulkDeleteButton();
+      });
+    }
+
+    var bulkInput = document.getElementById('bulk-delete-confirm-input');
+    if (bulkInput) bulkInput.value = '';
+  });
+</script>
