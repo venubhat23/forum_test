@@ -39,6 +39,7 @@ class User < ApplicationRecord
   has_many :referrals_received, class_name: "Referral", foreign_key: :referred_user_id, dependent: :destroy, inverse_of: :receiver
   has_many :thanksgiving_slips_given, class_name: "ThanksgivingSlip", foreign_key: :given_by_id, dependent: :destroy, inverse_of: :given_by
   has_many :notifications, dependent: :destroy
+  has_many :badges, dependent: :destroy
   has_many :created_leads, class_name: "Lead", foreign_key: :created_by_id, dependent: :destroy, inverse_of: :created_by
   has_many :accepted_leads, class_name: "Lead", foreign_key: :accepted_by_id, dependent: :nullify, inverse_of: :accepted_by
   has_many :lead_taggings, dependent: :destroy

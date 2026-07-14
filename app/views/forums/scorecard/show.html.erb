@@ -93,6 +93,28 @@
       </div>
     </div>
   </div>
+
+  <div class="card mb-4">
+    <div class="card-header fw-semibold">My Badges</div>
+    <div class="card-body">
+      <% my_badges = current_user.badges.order(period: :desc).limit(6) %>
+      <% if my_badges.any? %>
+        <div class="d-flex flex-wrap gap-3">
+          <% my_badges.each do |badge| %>
+            <div class="d-flex align-items-center gap-2">
+              <i class="bi <%= badge.icon %> text-warning fs-5"></i>
+              <div>
+                <div class="fw-semibold small"><%= badge.title %></div>
+                <div class="text-muted small"><%= badge.period.strftime("%B %Y") %></div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <p class="text-muted mb-0">No badges yet.</p>
+      <% end %>
+    </div>
+  </div>
 <% else %>
   <div class="card">
     <div class="table-responsive">
@@ -125,6 +147,9 @@
                 <div class="d-flex align-items-center gap-2">
                   <span class="row-avatar"><%= member.full_name.first.upcase %></span>
                   <span class="fw-semibold"><%= member.display_name %></span>
+                  <% (@badges_by_member[member.id] || []).each do |badge| %>
+                    <i class="bi <%= badge.icon %> text-warning" data-tooltip="<%= badge.title %>" title="<%= badge.title %>"></i>
+                  <% end %>
                 </div>
               </td>
               <td class="text-center"><%= stats[:referrals_given] %></td>
@@ -141,6 +166,28 @@
           <% end %>
         </tbody>
       </table>
+    </div>
+  </div>
+
+  <h2 class="h5 mt-4 mb-3">Chapter Trends <span class="text-muted small fw-normal">&middot; last 6 months</span></h2>
+  <div class="row g-3">
+    <div class="col-12 col-lg-6">
+      <div class="card">
+        <div class="card-header fw-semibold">Referral Velocity</div>
+        <div class="card-body"><%= line_chart @referral_trend %></div>
+      </div>
+    </div>
+    <div class="col-12 col-lg-6">
+      <div class="card">
+        <div class="card-header fw-semibold">Attendance Trend</div>
+        <div class="card-body"><%= line_chart @attendance_trend %></div>
+      </div>
+    </div>
+    <div class="col-12 col-lg-6">
+      <div class="card">
+        <div class="card-header fw-semibold">Visitor &rarr; Member Conversion Rate</div>
+        <div class="card-body"><%= line_chart @conversion_rate_trend, suffix: "%" %></div>
+      </div>
     </div>
   </div>
 <% end %>

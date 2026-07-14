@@ -5,8 +5,11 @@ module Forums
       @scope = scope_label
 
       @members = scope_members
-      @stats_by_member = build_stats(@members)
+      @stats_by_member = ScorecardStats.new(members: @members, month: @month).call
       @sorted_members = @members.sort_by { |m| -@stats_by_member[m.id][:business_generated] }
+      @badges_by_member = badges_for_month(@members)
+
+      build_trends(@members) unless @scope == :personal
     end
 
     private
@@ -38,41 +41,26 @@ module Forums
       end
     end
 
-    def build_stats(members)
+    def build_trends(members)
       member_ids = members.map(&:id)
-      date_range = @month.beginning_of_month..@month.end_of_month
-      time_range = date_range.first.beginning_of_day..date_range.last.end_of_day
+      @referral_trend = Referral.where(referrer_id: member_ids).group_by_month(:created_at, last: 6).count
+      @attendance_trend = Attendance.where(user_id: member_ids, event_type: :meeting).group_by_month(:occurred_on, last: 6).count
+      @conversion_rate_trend = conversion_rate_trend
+    end
 
-      referrals_given = Referral.where(referrer_id: member_ids, created_at: time_range).group(:referrer_id).count
-      referrals_received = Referral.where(referred_user_id: member_ids, created_at: time_range).group(:referred_user_id).count
-      leads_created = Lead.where(created_by_id: member_ids, created_at: time_range).group(:created_by_id).count
-      leads_converted = Lead.where(accepted_by_id: member_ids, stage: :converted, thanksgiving_given_at: time_range).group(:accepted_by_id).count
+    def conversion_rate_trend
+      pool = @scope == :chapter ? current_user.chapter.users : @current_forum.users
+      visitors = pool.where("role = ? OR converted_at IS NOT NULL", User.roles[:guest])
+      new_visitors_by_month = visitors.group_by_month(:created_at, last: 6).count
+      converted_by_month = pool.where.not(converted_at: nil).group_by_month(:converted_at, last: 6).count
 
-      one_to_ones_as_requester = OneToOneMeeting.where(status: :completed, requester_id: member_ids, scheduled_at: time_range).group(:requester_id).count
-      one_to_ones_as_requested = OneToOneMeeting.where(status: :completed, requested_with_id: member_ids, scheduled_at: time_range).group(:requested_with_id).count
-
-      chapter_ids = members.map(&:chapter_id).compact.uniq
-      total_meetings_by_chapter = Meeting.where(chapter_id: chapter_ids, scheduled_at: time_range).group(:chapter_id).count
-      attendance_present = Attendance.where(user_id: member_ids, event_type: :meeting, present: true, occurred_on: date_range).group(:user_id).count
-
-      thanksgiving_business = ThanksgivingSlip.where(given_by_id: member_ids, created_at: time_range).group(:given_by_id).sum(:amount)
-      lead_business = Lead.where(accepted_by_id: member_ids, stage: :converted, thanksgiving_given_at: time_range).group(:accepted_by_id).sum(:thanksgiving_amount)
-
-      members.each_with_object({}) do |member, hash|
-        total_meetings = total_meetings_by_chapter[member.chapter_id].to_i
-        present = attendance_present[member.id].to_i
-        attendance_pct = total_meetings.positive? ? ((present.to_f / total_meetings) * 100).round(1) : 0
-
-        hash[member.id] = {
-          referrals_given: referrals_given[member.id].to_i,
-          referrals_received: referrals_received[member.id].to_i,
-          leads_created: leads_created[member.id].to_i,
-          leads_converted: leads_converted[member.id].to_i,
-          one_to_ones: one_to_ones_as_requester[member.id].to_i + one_to_ones_as_requested[member.id].to_i,
-          attendance_pct: attendance_pct,
-          business_generated: thanksgiving_business[member.id].to_i + lead_business[member.id].to_i
-        }
+      new_visitors_by_month.each_with_object({}) do |(month, total), hash|
+        hash[month] = total.positive? ? ((converted_by_month[month].to_i / total.to_f) * 100).round(1) : 0
       end
+    end
+
+    def badges_for_month(members)
+      Badge.where(user_id: members.map(&:id), period: @month.beginning_of_month).group_by(&:user_id)
     end
   end
 end

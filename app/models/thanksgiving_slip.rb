@@ -17,6 +17,6 @@ class ThanksgivingSlip < ApplicationRecord
   def given_by_is_the_receiver
     return unless referral && given_by
 
-    errors.add(:given_by, "must be the member who received the referral") if given_by_id != referral.receiver_id
+    errors.add(:given_by, "must be the member who received the referral") if given_by_id != referral.referred_user_id
   end
 end

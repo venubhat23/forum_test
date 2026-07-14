@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_14_070000) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_14_080000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -75,6 +75,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_14_070000) do
     t.index ["user_id", "event_id"], name: "index_attendances_on_user_id_and_event_id", unique: true
     t.index ["user_id", "meeting_id"], name: "index_attendances_on_user_id_and_meeting_id", unique: true
     t.index ["user_id"], name: "index_attendances_on_user_id"
+  end
+
+  create_table "badges", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "key", null: false
+    t.date "period", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id", "key", "period"], name: "index_badges_on_user_id_and_key_and_period", unique: true
+    t.index ["user_id"], name: "index_badges_on_user_id"
   end
 
   create_table "banner_documents", force: :cascade do |t|
@@ -858,6 +868,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_14_070000) do
   add_foreign_key "attendances", "events"
   add_foreign_key "attendances", "meetings"
   add_foreign_key "attendances", "users"
+  add_foreign_key "badges", "users"
   add_foreign_key "banner_documents", "banners"
   add_foreign_key "business_categories", "business_categories", column: "parent_id"
   add_foreign_key "business_categories", "forums"
