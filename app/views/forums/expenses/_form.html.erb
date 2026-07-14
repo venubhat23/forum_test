@@ -1,4 +1,21 @@
+<% cancel_path = case expense.expenseable
+   when Event
+     forum_event_path(forum_slug: @current_forum.slug, id: expense.expenseable_id)
+   when Meeting
+     forum_chapter_meeting_path(forum_slug: @current_forum.slug, chapter_id: expense.expenseable.chapter_id, id: expense.expenseable_id)
+   else
+     forum_expenses_path(forum_slug: @current_forum.slug)
+   end %>
+
 <%= form_with model: expense, url: url, method: method, local: true do |f| %>
+  <% if expense.expenseable.is_a?(Event) %>
+    <%= f.hidden_field :event_id, value: expense.expenseable_id %>
+    <div class="alert alert-info small">Linked to event: <strong><%= expense.expenseable.title %></strong></div>
+  <% elsif expense.expenseable.is_a?(Meeting) %>
+    <%= f.hidden_field :meeting_id, value: expense.expenseable_id %>
+    <div class="alert alert-info small">Linked to meeting: <strong><%= expense.expenseable.meeting_type.titleize %> Meeting, <%= expense.expenseable.scheduled_at.strftime("%d %b %Y") %></strong></div>
+  <% end %>
+
   <div class="row g-3 mb-3">
     <div class="col-12 col-sm-6">
       <%= f.label :category, class: "form-label" %>
@@ -19,6 +36,6 @@
   </div>
   <div class="d-flex flex-wrap gap-2">
     <%= f.submit class: "btn btn-primary btn-lg" %>
-    <%= link_to "Cancel", forum_expenses_path(forum_slug: @current_forum.slug), class: "btn btn-outline-secondary btn-lg" %>
+    <%= link_to "Cancel", cancel_path, class: "btn btn-outline-secondary btn-lg" %>
   </div>
 <% end %>

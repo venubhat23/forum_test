@@ -5,6 +5,7 @@ class Meeting < ApplicationRecord
   has_many :attendances, dependent: :nullify
   has_many :weekly_presentations, dependent: :nullify
   has_many :fee_payments, as: :feeable, dependent: :destroy
+  has_many :expenses, as: :expenseable, dependent: :destroy
   has_many_attached :documents
   has_one_attached :payment_qr
 
@@ -44,6 +45,18 @@ class Meeting < ApplicationRecord
 
   def pending_count
     fee_payments.pending.count
+  end
+
+  def collected_amount
+    fee_payments.paid.sum(:amount)
+  end
+
+  def total_expenses
+    expenses.sum(:amount)
+  end
+
+  def net_amount
+    collected_amount - total_expenses
   end
 
   private

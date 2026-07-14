@@ -145,6 +145,73 @@
   </div>
 <% end %>
 
+
+<% if can? :update, @meeting %>
+  <div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <span class="fw-semibold">Ledger</span>
+      <%= link_to new_forum_expense_path(forum_slug: @current_forum.slug, meeting_id: @meeting.id), class: "btn btn-sm btn-primary" do %>
+        <i class="bi bi-plus-lg me-1"></i> Add Expense
+      <% end %>
+    </div>
+    <div class="card-body">
+      <div class="row g-3 mb-3">
+        <div class="col-6 col-lg-4">
+          <div class="mini-stat-card">
+            <div>
+              <div class="mini-stat-label">Entry Fees Collected</div>
+              <div class="mini-stat-value text-success"><%= number_to_currency(@meeting.collected_amount) %></div>
+            </div>
+            <div class="mini-stat-icon mini-stat-icon-success"><i class="bi bi-cash-stack"></i></div>
+          </div>
+        </div>
+        <div class="col-6 col-lg-4">
+          <div class="mini-stat-card">
+            <div>
+              <div class="mini-stat-label">Total Expenses</div>
+              <div class="mini-stat-value text-danger"><%= number_to_currency(@meeting.total_expenses) %></div>
+            </div>
+            <div class="mini-stat-icon mini-stat-icon-danger"><i class="bi bi-receipt"></i></div>
+          </div>
+        </div>
+        <div class="col-6 col-lg-4">
+          <div class="mini-stat-card">
+            <div>
+              <div class="mini-stat-label"><%= @meeting.net_amount.negative? ? "Net Loss" : "Net Saved" %></div>
+              <div class="mini-stat-value <%= @meeting.net_amount.negative? ? "text-danger" : "text-primary" %>"><%= number_to_currency(@meeting.net_amount) %></div>
+            </div>
+            <div class="mini-stat-icon mini-stat-icon-primary"><i class="bi bi-piggy-bank"></i></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="list-group list-group-flush">
+        <% @meeting.expenses.order(incurred_on: :desc).each do |expense| %>
+          <div class="list-group-item d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div>
+              <span class="fw-semibold"><%= expense.category %></span>
+              <span class="text-muted small d-block"><%= expense.incurred_on.strftime("%d %b %Y") %><%= " · #{expense.notes}" if expense.notes.present? %></span>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+              <span class="fw-semibold text-danger"><%= number_to_currency(expense.amount) %></span>
+              <%= link_to edit_forum_expense_path(forum_slug: @current_forum.slug, id: expense.id), class: "icon-btn icon-btn-edit", title: "Edit" do %>
+                <i class="bi bi-pencil"></i>
+              <% end %>
+              <%= button_to forum_expense_path(forum_slug: @current_forum.slug, id: expense.id), method: :delete, class: "icon-btn icon-btn-danger", title: "Delete",
+                    data: { turbo_confirm: "Delete this expense?" } do %>
+                <i class="bi bi-trash"></i>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+        <% if @meeting.expenses.empty? %>
+          <div class="list-group-item text-muted text-center py-3">No expenses recorded yet.</div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+<% end %>
+
 <% if @meeting.documents.attached? %>
   <div class="card mb-4">
     <div class="card-header fw-semibold">Documents</div>
