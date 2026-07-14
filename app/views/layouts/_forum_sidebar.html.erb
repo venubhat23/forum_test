@@ -27,6 +27,14 @@
             <span class="nav-text">Events</span>
           <% end %>
         </li>
+        <% unless current_user.guest? %>
+          <li class="nav-item">
+            <%= link_to forum_scorecard_path(forum_slug: @current_forum.slug), class: "nav-link-modern #{'active' if current_page?(forum_scorecard_path(forum_slug: @current_forum.slug))}", data: { tooltip: "Scorecard" } do %>
+              <div class="nav-icon-modern"><div class="icon-bg gradient-yellow"><i class="bi bi-award"></i></div></div>
+              <span class="nav-text">Scorecard</span>
+            <% end %>
+          </li>
+        <% end %>
       </ul>
     </div>
 

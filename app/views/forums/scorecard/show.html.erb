@@ -1,0 +1,146 @@
+<% content_for :title, "Member Scorecard" %>
+
+<div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+  <div>
+    <h1 class="page-title h4">Member Scorecard</h1>
+    <p class="page-subtitle mb-0">
+      <%= @scope == :forum ? "#{@current_forum.name} · Forum-wide" : @scope == :chapter ? "#{current_user.chapter.name}" : "Your activity" %>
+    </p>
+  </div>
+  <div class="d-flex align-items-center gap-2">
+    <%= link_to "Today", forum_scorecard_path(forum_slug: @current_forum.slug), class: "gcal-today-btn" %>
+    <div class="gcal-nav">
+      <%= link_to forum_scorecard_path(forum_slug: @current_forum.slug, year: @month.prev_month.year, month: @month.prev_month.month), class: "gcal-nav-btn", "aria-label": "Previous month" do %>
+        <i class="bi bi-chevron-left"></i>
+      <% end %>
+      <%= link_to forum_scorecard_path(forum_slug: @current_forum.slug, year: @month.next_month.year, month: @month.next_month.month), class: "gcal-nav-btn", "aria-label": "Next month" do %>
+        <i class="bi bi-chevron-right"></i>
+      <% end %>
+    </div>
+    <h2 class="h5 mb-0"><%= @month.strftime("%B %Y") %></h2>
+  </div>
+</div>
+
+<div class="alert alert-info small mb-4">
+  <strong>How this is scored:</strong> Referrals &amp; Leads (given/received), 1-2-1 meetings completed, meeting attendance %, and Business Generated (₹) — the total value of Thanksgiving Slips recorded for closed business, for the selected month.
+  <%= "Ranked by Business Generated." if @scope != :personal %>
+</div>
+
+<% if @scope == :personal %>
+  <% stats = @stats_by_member[current_user.id] %>
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3">
+      <div class="mini-stat-card">
+        <div>
+          <div class="mini-stat-label">Referrals Given</div>
+          <div class="mini-stat-value text-primary"><%= stats[:referrals_given] %></div>
+        </div>
+        <div class="mini-stat-icon mini-stat-icon-primary"><i class="bi bi-arrow-up-right-circle"></i></div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="mini-stat-card">
+        <div>
+          <div class="mini-stat-label">Referrals Received</div>
+          <div class="mini-stat-value text-info"><%= stats[:referrals_received] %></div>
+        </div>
+        <div class="mini-stat-icon mini-stat-icon-info"><i class="bi bi-arrow-down-left-circle"></i></div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="mini-stat-card">
+        <div>
+          <div class="mini-stat-label">Leads Created</div>
+          <div class="mini-stat-value text-primary"><%= stats[:leads_created] %></div>
+        </div>
+        <div class="mini-stat-icon mini-stat-icon-primary"><i class="bi bi-lightbulb"></i></div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="mini-stat-card">
+        <div>
+          <div class="mini-stat-label">Leads Converted</div>
+          <div class="mini-stat-value text-success"><%= stats[:leads_converted] %></div>
+        </div>
+        <div class="mini-stat-icon mini-stat-icon-success"><i class="bi bi-trophy"></i></div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="mini-stat-card">
+        <div>
+          <div class="mini-stat-label">1-2-1 Meetings</div>
+          <div class="mini-stat-value text-info"><%= stats[:one_to_ones] %></div>
+        </div>
+        <div class="mini-stat-icon mini-stat-icon-info"><i class="bi bi-people"></i></div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="mini-stat-card">
+        <div>
+          <div class="mini-stat-label">Attendance</div>
+          <div class="mini-stat-value text-warning"><%= stats[:attendance_pct] %>%</div>
+        </div>
+        <div class="mini-stat-icon mini-stat-icon-warning"><i class="bi bi-calendar-check"></i></div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="mini-stat-card">
+        <div>
+          <div class="mini-stat-label">Business Generated</div>
+          <div class="mini-stat-value text-success"><%= number_to_currency(stats[:business_generated]) %></div>
+        </div>
+        <div class="mini-stat-icon mini-stat-icon-success"><i class="bi bi-cash-stack"></i></div>
+      </div>
+    </div>
+  </div>
+<% else %>
+  <div class="card">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Member</th>
+            <th class="text-center">Referrals Given</th>
+            <th class="text-center">Referrals Received</th>
+            <th class="text-center">Leads Created</th>
+            <th class="text-center">Leads Converted</th>
+            <th class="text-center">1-2-1s</th>
+            <th class="text-center">Attendance</th>
+            <th class="text-end">Business Generated</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @sorted_members.each_with_index do |member, index| %>
+            <% stats = @stats_by_member[member.id] %>
+            <tr>
+              <td>
+                <% if index.zero? && stats[:business_generated].positive? %>
+                  <i class="bi bi-trophy-fill text-warning"></i>
+                <% else %>
+                  <%= index + 1 %>
+                <% end %>
+              </td>
+              <td>
+                <div class="d-flex align-items-center gap-2">
+                  <span class="row-avatar"><%= member.full_name.first.upcase %></span>
+                  <span class="fw-semibold"><%= member.display_name %></span>
+                </div>
+              </td>
+              <td class="text-center"><%= stats[:referrals_given] %></td>
+              <td class="text-center"><%= stats[:referrals_received] %></td>
+              <td class="text-center"><%= stats[:leads_created] %></td>
+              <td class="text-center"><%= stats[:leads_converted] %></td>
+              <td class="text-center"><%= stats[:one_to_ones] %></td>
+              <td class="text-center"><%= stats[:attendance_pct] %>%</td>
+              <td class="text-end fw-semibold text-success"><%= number_to_currency(stats[:business_generated]) %></td>
+            </tr>
+          <% end %>
+          <% if @sorted_members.empty? %>
+            <tr><td colspan="9" class="text-center text-muted py-4">No members yet.</td></tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+<% end %>

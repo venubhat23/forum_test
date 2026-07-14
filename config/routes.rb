@@ -203,6 +203,7 @@ Rails.application.routes.draw do
       resources :registrations, controller: "forums/event_registrations", only: [ :index, :create, :destroy ]
     end
     get "calendar", to: "forums/calendar#show"
+    get "scorecard", to: "forums/scorecard#show"
     get "analytics", to: "forums/analytics#show"
     resources :roles, controller: "forums/roles", only: [ :index ]
     resource :settings, controller: "forums/settings", only: [ :edit, :update ]
