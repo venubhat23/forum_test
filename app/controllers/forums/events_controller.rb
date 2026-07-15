@@ -17,6 +17,9 @@ module Forums
     def show
       authorize! :read, @event
       @registered = @event.event_registrations.exists?(user_id: current_user.id)
+      if can?(:update, @event)
+        @addable_members = @current_forum.users.where.not(id: @event.registrants.select(:id)).order(:full_name)
+      end
     end
 
     def new

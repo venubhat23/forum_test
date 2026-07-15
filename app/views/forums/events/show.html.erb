@@ -215,6 +215,14 @@
 <% if can? :read, EventRegistration %>
   <div class="card mb-4">
     <div class="card-header fw-semibold">Registrants (<%= @event.event_registrations.count %>)</div>
+    <% if @addable_members.present? %>
+      <div class="card-body border-bottom">
+        <%= form_with url: forum_event_registrations_path(forum_slug: @current_forum.slug, event_id: @event.id), method: :post, local: true, class: "d-flex flex-wrap gap-2" do %>
+          <%= select_tag :user_id, options_from_collection_for_select(@addable_members, :id, :display_name), prompt: "Add a member...", class: "form-select", style: "max-width: 280px;" %>
+          <%= submit_tag "Add", class: "btn btn-outline-primary" %>
+        <% end %>
+      </div>
+    <% end %>
     <div class="list-group list-group-flush">
       <% @event.event_registrations.includes(:user).each do |reg| %>
         <div class="list-group-item d-flex justify-content-between align-items-center">

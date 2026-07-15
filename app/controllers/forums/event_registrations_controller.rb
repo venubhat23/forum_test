@@ -8,11 +8,13 @@ module Forums
     end
 
     def create
-      @registration = @event.event_registrations.new(user: current_user)
+      user = params[:user_id].present? ? @current_forum.users.find(params[:user_id]) : current_user
+      @registration = @event.event_registrations.new(user: user)
       authorize! :create, @registration
 
       if @registration.save
-        redirect_to forum_event_path(forum_slug: @current_forum.slug, id: @event.id), notice: "You're registered for #{@event.title}."
+        notice = user == current_user ? "You're registered for #{@event.title}." : "#{user.display_name} was added to #{@event.title}."
+        redirect_to forum_event_path(forum_slug: @current_forum.slug, id: @event.id), notice: notice
       else
         redirect_to forum_event_path(forum_slug: @current_forum.slug, id: @event.id), alert: @registration.errors.full_messages.to_sentence
       end
