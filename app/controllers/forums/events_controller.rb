@@ -32,6 +32,9 @@ module Forums
       authorize! :create, @event
 
       if @event.save
+        @current_forum.users.where(id: Array(params[:member_ids]).reject(&:blank?)).find_each do |user|
+          @event.event_registrations.find_or_create_by(user: user)
+        end
         redirect_to forum_event_path(forum_slug: @current_forum.slug, id: @event.id), notice: "Event created."
       else
         flash.now[:alert] = @event.errors.full_messages.to_sentence

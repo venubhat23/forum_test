@@ -32,6 +32,15 @@
     <%= f.file_field :gallery, multiple: true, class: "form-control", accept: "image/*" %>
   </div>
 
+  <% if event.new_record? %>
+    <div class="mb-4">
+      <%= label_tag :member_ids, "Add Members", class: "form-label" %>
+      <%= select_tag "member_ids[]", options_from_collection_for_select(@current_forum.users.order(:full_name), :id, :display_name),
+            multiple: true, class: "form-select", size: 8 %>
+      <div class="form-text">Hold Ctrl/Cmd to select multiple. You can also add members later from the event page.</div>
+    </div>
+  <% end %>
+
   <h2 class="h6 text-uppercase text-muted mb-3">Fee &amp; Payment Info (optional)</h2>
   <div class="mb-3">
     <%= f.label :fee_amount, "Fee Amount", class: "form-label" %>
