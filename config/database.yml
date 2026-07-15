@@ -88,8 +88,8 @@ test:
 production:
   primary: &primary_production
     <<: *default
-    host: <%= ENV['DB_HOST'] || 'dpg-d94k0vpo3t8c7395ltb0-a.ohio-postgres.render.com' %>
-    port: <%= ENV['DB_PORT'] || 5432 %>
+    host: dpg-d94k0vpo3t8c7395ltb0-a.ohio-postgres.render.com
+    port: 5432
     database: association_test
     username: association_test_user
     password: VvovysfqPiJNhh0fx2xpIAyw7nZR6dzD
