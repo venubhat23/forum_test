@@ -1,0 +1,26 @@
+<% members_by_chapter = members.includes(:chapter).order(:full_name).group_by(&:chapter) %>
+
+<div data-controller="member-picker">
+  <div class="d-flex flex-wrap gap-2 mb-2">
+    <button type="button" class="btn btn-sm btn-outline-primary" data-action="member-picker#selectAll">Select All Forum Members</button>
+    <select data-member-picker-target="chapterFilter" class="form-select form-select-sm" style="max-width: 220px;">
+      <option value="">Select a chapter...</option>
+      <% @current_forum.chapters.order(:name).each do |chapter| %>
+        <option value="<%= chapter.id %>"><%= chapter.name %></option>
+      <% end %>
+    </select>
+    <button type="button" class="btn btn-sm btn-outline-secondary" data-action="member-picker#selectChapter">Select All in Chapter</button>
+    <button type="button" class="btn btn-sm btn-outline-danger" data-action="member-picker#clearAll">Clear</button>
+  </div>
+
+  <select name="<%= field_name %>" multiple class="form-select" size="8" data-member-picker-target="select">
+    <% members_by_chapter.each do |chapter, chapter_members| %>
+      <optgroup label="<%= chapter&.name || "No Chapter" %>">
+        <% chapter_members.each do |member| %>
+          <option value="<%= member.id %>" data-chapter-id="<%= chapter&.id %>"><%= member.display_name %></option>
+        <% end %>
+      </optgroup>
+    <% end %>
+  </select>
+  <div class="form-text">Hold Ctrl/Cmd to select individual members, or use the buttons above for bulk selection.</div>
+</div>

@@ -35,9 +35,7 @@
   <% if event.new_record? %>
     <div class="mb-4">
       <%= label_tag :member_ids, "Add Members", class: "form-label" %>
-      <%= select_tag "member_ids[]", options_from_collection_for_select(@current_forum.users.order(:full_name), :id, :display_name),
-            multiple: true, class: "form-select", size: 8 %>
-      <div class="form-text">Hold Ctrl/Cmd to select multiple. You can also add members later from the event page.</div>
+      <%= render "member_picker", members: @current_forum.users, field_name: "member_ids[]" %>
     </div>
   <% end %>
 

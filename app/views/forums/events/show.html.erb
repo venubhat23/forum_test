@@ -217,9 +217,9 @@
     <div class="card-header fw-semibold">Registrants (<%= @event.event_registrations.count %>)</div>
     <% if @addable_members.present? %>
       <div class="card-body border-bottom">
-        <%= form_with url: forum_event_registrations_path(forum_slug: @current_forum.slug, event_id: @event.id), method: :post, local: true, class: "d-flex flex-wrap gap-2" do %>
-          <%= select_tag :user_id, options_from_collection_for_select(@addable_members, :id, :display_name), prompt: "Add a member...", class: "form-select", style: "max-width: 280px;" %>
-          <%= submit_tag "Add", class: "btn btn-outline-primary" %>
+        <%= form_with url: forum_event_registrations_path(forum_slug: @current_forum.slug, event_id: @event.id), method: :post, local: true do %>
+          <%= render "member_picker", members: @addable_members, field_name: "user_id[]" %>
+          <%= submit_tag "Add Selected", class: "btn btn-outline-primary mt-2" %>
         <% end %>
       </div>
     <% end %>
