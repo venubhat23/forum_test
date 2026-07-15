@@ -4,6 +4,11 @@ class ApplicationController < ActionController::Base
 
   before_action :enforce_account_active!
 
+  # Every page embeds a session-specific CSRF token, so a CDN/proxy caching
+  # the HTML (e.g. Cloudflare) would serve one visitor's token to another,
+  # causing "Can't verify CSRF token authenticity" for everyone else on submit.
+  after_action :prevent_caching
+
   rescue_from CanCan::AccessDenied do |exception|
     redirect_to root_path, alert: exception.message.presence || "You don't have access to that area."
   end
@@ -22,6 +27,10 @@ class ApplicationController < ActionController::Base
   end
 
   private
+
+  def prevent_caching
+    response.headers["Cache-Control"] = "no-store"
+  end
 
   def enforce_account_active!
     return unless user_signed_in?
