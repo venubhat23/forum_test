@@ -7,16 +7,14 @@ local:
   root: <%= Rails.root.join("storage") %>
 
 # Cloudflare R2 (S3-compatible) — used for forum logos and other uploads.
-# Same account/bucket as insurebook_admin. Keys come from ENV, set in .env
-# locally (gitignored) and in Render's dashboard for production — never
-# commit real keys into this file.
+# Same account/bucket as insurebook_admin.
 cloudflare_r2:
   service: S3
-  access_key_id: <%= ENV["R2_ACCESS_KEY_ID"] %>
-  secret_access_key: <%= ENV["R2_SECRET_ACCESS_KEY"] %>
+  access_key_id: 52ed60ae0a0776fb357299dede45ab9f
+  secret_access_key: 5b19ea5dede62f503eebb2b57de7719962f38d6b86ef387f993bcf0d6102f657
   region: auto
-  bucket: <%= ENV.fetch("R2_BUCKET") { "insurebook-uploads" } %>
-  endpoint: <%= ENV["R2_ENDPOINT"] %>
+  bucket: insurebook-uploads
+  endpoint: https://1f8982473cb9a48a41c053ca18db87ca.r2.cloudflarestorage.com
   force_path_style: true
   public: true
   # aws-sdk-core defaults to sending an extra CRC32 checksum header alongside

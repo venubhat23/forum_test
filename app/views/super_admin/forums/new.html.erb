@@ -46,16 +46,23 @@
             <% end %>
           </div>
 
-          <h2 class="h6 text-uppercase text-muted mb-3">Forum Admin Login</h2>
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="h6 text-uppercase text-muted mb-0">Forum Admin Login</h2>
+          </div>
           <div class="mb-3">
             <%= label_tag "admin[email]", "Admin Email", class: "form-label" %>
             <%= email_field_tag "admin[email]", @admin&.email, class: "form-control", placeholder: "admin@example.com", required: true %>
           </div>
-          <div class="row g-3 mb-4">
+          <div class="row g-3 mb-4" data-controller="password-generator">
+            <div class="col-12">
+              <button type="button" class="btn btn-sm btn-outline-primary" data-action="password-generator#generate">
+                <i class="bi bi-magic me-1"></i>Autofill Password
+              </button>
+            </div>
             <div class="col-12 col-sm-6">
               <%= label_tag "admin[password]", "Password", class: "form-label" %>
               <div class="input-group" data-controller="password-toggle">
-                <%= password_field_tag "admin[password]", nil, class: "form-control", required: true, minlength: 6, autocomplete: "new-password", data: { password_toggle_target: "input" } %>
+                <%= password_field_tag "admin[password]", nil, class: "form-control", required: true, minlength: 6, autocomplete: "new-password", data: { password_toggle_target: "input", password_generator_target: "password" } %>
                 <button type="button" class="btn btn-outline-secondary" data-action="password-toggle#toggle" aria-label="Show password" tabindex="-1">
                   <i class="bi bi-eye" data-password-toggle-target="icon"></i>
                 </button>
@@ -64,7 +71,7 @@
             <div class="col-12 col-sm-6">
               <%= label_tag "admin[password_confirmation]", "Confirm Password", class: "form-label" %>
               <div class="input-group" data-controller="password-toggle">
-                <%= password_field_tag "admin[password_confirmation]", nil, class: "form-control", required: true, minlength: 6, autocomplete: "new-password", data: { password_toggle_target: "input" } %>
+                <%= password_field_tag "admin[password_confirmation]", nil, class: "form-control", required: true, minlength: 6, autocomplete: "new-password", data: { password_toggle_target: "input", password_generator_target: "confirmation" } %>
                 <button type="button" class="btn btn-outline-secondary" data-action="password-toggle#toggle" aria-label="Show password confirmation" tabindex="-1">
                   <i class="bi bi-eye" data-password-toggle-target="icon"></i>
                 </button>
