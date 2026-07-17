@@ -51,7 +51,7 @@ module Forums
     end
 
     def pickable_people
-      @chapter.users.where(role: [ :member, :guest, :committee_member, :chapter_admin ]).order(:full_name)
+      @current_forum.users.includes(:chapter).order(:full_name)
     end
 
     def meeting_schedule_params

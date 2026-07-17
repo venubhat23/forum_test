@@ -52,13 +52,25 @@
   </div>
 
   <h2 class="h6 text-uppercase text-muted mb-3">Attendees</h2>
-  <div class="mb-4" data-controller="member-picker">
-    <div class="d-flex flex-wrap gap-2 mb-2">
-      <button type="button" class="btn btn-sm btn-outline-primary" data-action="member-picker#selectAll">Select All</button>
-      <button type="button" class="btn btn-sm btn-outline-danger" data-action="member-picker#clearAll">Clear</button>
+  <% candidates_by_chapter = candidates.group_by(&:chapter) %>
+  <div class="mb-4" data-controller="attendee-picker" data-attendee-picker-chapter-id-value="<%= @chapter.id %>">
+    <div class="mb-2">
+      <%= label_tag nil, "Invite", class: "form-label" %>
+      <select class="form-select" style="max-width: 320px;" data-attendee-picker-target="scope" data-action="attendee-picker#scopeChanged">
+        <option value="custom">Select specific people</option>
+        <option value="chapter">Everyone in <%= @chapter.name %></option>
+        <option value="forum">Everyone in <%= @current_forum.name %></option>
+      </select>
     </div>
-    <%= f.select :attendee_ids, candidates.map { |u| [ u.display_name, u.id ] }, { selected: schedule.attendee_ids }, multiple: true, class: "form-select", size: 8, data: { "member-picker-target": "select" } %>
-    <div class="form-text">Hold Ctrl/Cmd to select individual people, or use the buttons above.</div>
+
+    <%= f.select :attendee_ids,
+          grouped_options_for_select(
+            candidates_by_chapter.map { |chapter, people| [ chapter&.name || "No Chapter", people.map { |p| [ p.display_name, p.id, { data: { chapter_id: chapter&.id } } ] } ] },
+            schedule.attendee_ids
+          ),
+          {},
+          multiple: true, class: "form-select", data: { "attendee-picker-target": "select" } %>
+    <div class="form-text">Pick a scope above, or search and select specific people.</div>
   </div>
 
   <div class="d-flex flex-wrap gap-2">
