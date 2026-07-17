@@ -59,6 +59,7 @@
           <th>Price</th>
           <th>Billing</th>
           <th>Member Limit</th>
+          <th>Chapter Limit</th>
           <th>Status</th>
           <th>Forums</th>
           <th></th>
@@ -77,6 +78,7 @@
             <td>&#8377;<%= number_with_delimiter(plan.price.to_i) %></td>
             <td><%= plan.billing_cycle.titleize %></td>
             <td><%= plan.unlimited_members? ? "Unlimited" : plan.member_limit %></td>
+            <td><%= plan.unlimited_chapters? ? "Unlimited" : plan.chapter_limit %></td>
             <td>
               <% if plan.active? %>
                 <span class="badge bg-success">Active</span>
@@ -104,7 +106,7 @@
           </tr>
         <% end %>
         <% if @plans.empty? %>
-          <tr><td colspan="8" class="text-center text-muted py-4">No plans yet.</td></tr>
+          <tr><td colspan="9" class="text-center text-muted py-4">No plans yet.</td></tr>
         <% end %>
       </tbody>
     </table>

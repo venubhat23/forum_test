@@ -98,6 +98,7 @@ Rails.application.routes.draw do
   scope "/:forum_slug", as: :forum do
     root to: "forums/gateway#show"
     get "dashboard", to: "forums/dashboard#show"
+    get "members", to: "forums/members#all"
     get "apply", to: "membership_applications#new"
     post "apply", to: "membership_applications#create"
     resources :membership_applications, controller: "forums/membership_applications", only: [ :index, :show ] do
@@ -160,6 +161,7 @@ Rails.application.routes.draw do
           post :record_attendance
         end
       end
+      resources :meeting_schedules, controller: "forums/meeting_schedules", only: [ :index, :new, :create, :show, :destroy ]
       resources :weekly_presentations, controller: "forums/weekly_presentations", only: [ :index, :new, :create, :show, :edit, :update, :destroy ]
       resources :attendances, controller: "forums/attendances", only: [ :index, :new, :create ]
       resources :referrals, controller: "forums/referrals", only: [ :index, :new, :create, :show ] do

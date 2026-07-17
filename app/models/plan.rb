@@ -8,11 +8,16 @@ class Plan < ApplicationRecord
   validates :name, presence: true
   validates :price, numericality: { greater_than_or_equal_to: 0 }
   validates :member_limit, numericality: { only_integer: true, greater_than: 0 }, allow_nil: true
+  validates :chapter_limit, numericality: { only_integer: true, greater_than: 0 }, allow_nil: true
   validates :trial_days, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
 
   scope :ordered, -> { order(:position, :name) }
 
   def unlimited_members?
     member_limit.nil?
+  end
+
+  def unlimited_chapters?
+    chapter_limit.nil?
   end
 end

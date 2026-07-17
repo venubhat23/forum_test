@@ -1,0 +1,130 @@
+<% content_for :title, @schedule.title.presence || "#{@schedule.day_name} Meeting Schedule" %>
+
+<div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+  <div>
+    <h1 class="page-title h4"><%= @schedule.title.presence || "#{@schedule.day_name} Meeting Schedule" %></h1>
+    <p class="page-subtitle mb-0"><%= @chapter.name %> &middot; <%= @current_forum.name %></p>
+  </div>
+  <% if can? :destroy, @schedule %>
+    <%= button_to "Cancel Schedule", forum_chapter_meeting_schedule_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: @schedule.id), method: :delete, class: "btn btn-outline-danger",
+          data: { turbo_confirm: "Cancel this schedule? Future meetings will be removed; past meetings stay on record." } %>
+  <% end %>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-6 col-lg-3">
+    <div class="stats-card">
+      <div class="icon-bg gradient-blue"><i class="bi bi-calendar-week"></i></div>
+      <div>
+        <div class="stats-value h6 mb-0">Every <%= @schedule.day_name %></div>
+        <div class="stats-label">Recurs</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="stats-card">
+      <div class="icon-bg gradient-purple"><i class="bi bi-clock"></i></div>
+      <div>
+        <div class="stats-value h6 mb-0"><%= @schedule.start_time.strftime("%I:%M %p") %>–<%= @schedule.end_time.strftime("%I:%M %p") %></div>
+        <div class="stats-label">Time</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="stats-card">
+      <div class="icon-bg gradient-green"><i class="bi bi-calendar3"></i></div>
+      <div>
+        <div class="stats-value h6 mb-0"><%= @schedule.start_date.strftime("%d %b") %> – <%= @schedule.end_date.strftime("%d %b %Y") %></div>
+        <div class="stats-label">Date Range</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="stats-card">
+      <div class="icon-bg gradient-teal"><i class="bi bi-list-check"></i></div>
+      <div>
+        <div class="stats-value"><%= @occurrences.size %></div>
+        <div class="stats-label">Occurrences</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<% if @schedule.venue.present? %>
+  <div class="card mb-4">
+    <div class="card-header fw-semibold">Venue</div>
+    <div class="card-body"><%= @schedule.venue %></div>
+  </div>
+<% end %>
+
+<% if @schedule.agenda.present? %>
+  <div class="card mb-4">
+    <div class="card-header fw-semibold">Agenda</div>
+    <div class="card-body"><%= simple_format(@schedule.agenda) %></div>
+  </div>
+<% end %>
+
+<% if @schedule.notes.present? %>
+  <div class="card mb-4">
+    <div class="card-header fw-semibold">Other Requirements</div>
+    <div class="card-body"><%= simple_format(@schedule.notes) %></div>
+  </div>
+<% end %>
+
+<div class="card mb-4">
+  <div class="card-header fw-semibold">Invited Attendees</div>
+  <div class="list-group list-group-flush">
+    <% @schedule.attendees.order(:full_name).each do |attendee| %>
+      <div class="list-group-item d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <span><%= attendee.display_name %> <span class="text-muted small"><%= attendee.email %></span></span>
+        <% if can?(:update, @schedule) && (wa_link = whatsapp_schedule_invite_link(attendee, @schedule, @current_forum)) %>
+          <%= link_to wa_link, class: "icon-btn icon-btn-whatsapp", title: "Send invite via WhatsApp", target: "_blank", rel: "noopener" do %>
+            <i class="bi bi-whatsapp"></i>
+          <% end %>
+        <% end %>
+      </div>
+    <% end %>
+    <% if @schedule.attendees.empty? %>
+      <div class="list-group-item text-muted text-center py-3">No attendees invited.</div>
+    <% end %>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header fw-semibold">Generated Meetings</div>
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Status</th>
+          <th>Attendance</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @occurrences.each do |meeting| %>
+          <tr>
+            <td><%= meeting.scheduled_at.strftime("%d %b %Y, %I:%M %p") %></td>
+            <td>
+              <% if meeting.scheduled_at.past? %>
+                <span class="badge bg-secondary">Completed</span>
+              <% else %>
+                <span class="badge badge-status-active">Upcoming</span>
+              <% end %>
+            </td>
+            <td><%= meeting.attendance_percentage %>%</td>
+            <td class="text-end">
+              <%= link_to forum_chapter_meeting_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: meeting.id), class: "icon-btn icon-btn-view", title: "View" do %>
+                <i class="bi bi-eye"></i>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+        <% if @occurrences.empty? %>
+          <tr><td colspan="4" class="text-center text-muted py-4">No meetings generated.</td></tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

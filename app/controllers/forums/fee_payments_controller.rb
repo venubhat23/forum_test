@@ -9,6 +9,7 @@ module Forums
       @total_fees = base.count
       @paid_fees = base.where(status: :paid).count
       @pending_fees = base.where(status: :pending).count
+      @partially_paid_fees = base.where(status: :partially_paid).count
       @total_amount = base.sum(:amount)
 
       @fee_payments = base.includes(:user).order(created_at: :desc)
@@ -28,13 +29,10 @@ module Forums
       @fee_payment = FeePayment.new(fee_payment_params.except(:event_id, :meeting_id))
       @fee_payment.feeable = resolve_feeable
       authorize! :create, @fee_payment
-
-      if params.dig(:fee_payment, :mark_as_paid) == "1"
-        @fee_payment.status = :paid
-        @fee_payment.paid_on = Date.current
-      end
+      mark_as_paid = params.dig(:fee_payment, :mark_as_paid) == "1"
 
       if @fee_payment.user && @fee_payment.user.chapter_id == @chapter.id && @fee_payment.save
+        @fee_payment.mark_paid! if mark_as_paid
         redirect_to forum_chapter_fee_payments_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id), notice: "Fee recorded for #{@fee_payment.user.display_name}."
       else
         @fee_payment.errors.add(:user, "must belong to this chapter") if @fee_payment.user && @fee_payment.user.chapter_id != @chapter.id
@@ -46,8 +44,13 @@ module Forums
 
     def mark_paid
       authorize! :update, @fee_payment
-      @fee_payment.mark_paid!(payment_method: params[:payment_method])
-      redirect_to forum_chapter_fee_payments_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id), notice: "Fee marked as paid."
+      received_amount = params[:amount].presence&.to_d || @fee_payment.balance_due
+      @fee_payment.record_payment!(received_amount: received_amount, payment_method: params[:payment_method])
+
+      notice = @fee_payment.paid? ? "Fee marked as paid." : "Partial payment of #{helpers.number_to_currency(received_amount)} recorded. Balance due: #{helpers.number_to_currency(@fee_payment.balance_due)}."
+      redirect_to forum_chapter_fee_payments_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id), notice: notice
+    rescue ArgumentError => e
+      redirect_to forum_chapter_fee_payments_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id), alert: e.message
     end
 
     def print

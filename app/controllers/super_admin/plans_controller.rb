@@ -57,7 +57,7 @@ module SuperAdmin
 
     def plan_params
       features = params.dig(:plan, :features).to_s.split("\n").map(&:strip).reject(&:blank?)
-      params.require(:plan).permit(:key, :name, :price, :billing_cycle, :member_limit, :trial_days, :position)
+      params.require(:plan).permit(:key, :name, :price, :billing_cycle, :member_limit, :chapter_limit, :trial_days, :position)
         .merge(features: features)
     end
   end

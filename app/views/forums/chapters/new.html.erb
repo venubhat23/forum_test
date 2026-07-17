@@ -5,6 +5,12 @@
   <p class="page-subtitle mb-0">Add a chapter under <%= @current_forum.name %>.</p>
 </div>
 
+<% if @current_forum.chapter_limit %>
+  <p class="text-muted small">
+    Chapters on the <%= @current_forum.plan.name %> plan: <%= @current_forum.chapters.count %>/<%= @current_forum.chapter_limit %>
+  </p>
+<% end %>
+
 <div class="row justify-content-center">
   <div class="col-12 col-lg-6">
     <div class="card">

@@ -39,18 +39,21 @@ sample_forums = [
     name: "Riverside Traders Association",
     slug: "riverside-traders",
     status: :active,
+    plan_key: "gold",
     chapters: [ "Downtown", "Harborview", "North Ridge" ]
   },
   {
     name: "Metro Business Guild",
     slug: "metro-business-guild",
     status: :trial,
+    plan_key: "gold",
     chapters: [ "Uptown", "Westside" ]
   },
   {
     name: "Coastal Merchants Network",
     slug: "coastal-merchants",
     status: :suspended,
+    plan_key: "bronze",
     chapters: [ "Old Town" ]
   }
 ]
@@ -59,6 +62,7 @@ sample_forums.each do |forum_attrs|
   forum = Forum.find_or_initialize_by(slug: forum_attrs[:slug])
   forum.name = forum_attrs[:name]
   forum.status = forum_attrs[:status]
+  forum.plan = Plan.find_by!(key: forum_attrs[:plan_key])
   forum.save!
   puts "Forum ready: #{forum.name} (#{forum.slug}) [#{forum.status}]"
 
@@ -99,6 +103,9 @@ sample_forums.each do |forum_attrs|
       committee_member.role = :committee_member
       committee_member.forum = forum
       committee_member.chapter = chapter
+      committee_member.full_name = "Committee Member #{index + 1}"
+      committee_member.phone = "90000000#{index + 1}0"
+      committee_member.designation = User::DESIGNATIONS[index % User::DESIGNATIONS.size]
       committee_member.save!
     end
 
@@ -111,6 +118,8 @@ sample_forums.each do |forum_attrs|
         member.role = :member
         member.forum = forum
         member.chapter = chapter
+        member.full_name = "Sample Member #{index + 1}-#{member_index + 1}"
+        member.phone = "91000000#{index + 1}#{member_index + 1}"
         member.save!
       end
     end
@@ -123,6 +132,10 @@ sample_forums.each do |forum_attrs|
     guest.password_confirmation = SAMPLE_PASSWORD
     guest.role = :guest
     guest.forum = forum
+    guest.chapter = chapters.first
+    guest.full_name = "Guest User"
+    guest.phone = "9200000000"
+    guest.nature_of_business = "Retail"
     guest.save!
   end
 end

@@ -6,7 +6,7 @@ module MembersHelper
   end
 
   def whatsapp_fee_reminder_message(member, fee, forum)
-    amount_text = fee ? " of #{number_to_currency(fee.amount)}" : ""
+    amount_text = fee ? " of #{number_to_currency(fee.balance_due)}" : ""
     due_text = fee&.due_date ? " by *#{fee.due_date.strftime('%d %b %Y')}*" : ""
 
     <<~MSG.strip

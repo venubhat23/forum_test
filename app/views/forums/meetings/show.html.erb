@@ -46,6 +46,18 @@
   </div>
 </div>
 
+<% if @meeting.scheduled_at.past? && @meeting.minutes.blank? && !@meeting.documents.attached? && can?(:update, @meeting) %>
+  <div class="card mb-4 border-warning">
+    <div class="card-body d-flex flex-wrap justify-content-between align-items-center gap-2">
+      <div>
+        <div class="fw-semibold"><i class="bi bi-file-earmark-text me-1"></i> No meeting summary yet</div>
+        <div class="text-muted small">Add minutes and upload any documents from this meeting.</div>
+      </div>
+      <%= link_to "Add Meeting Summary", edit_forum_chapter_meeting_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: @meeting.id), class: "btn btn-warning" %>
+    </div>
+  </div>
+<% end %>
+
 <% if @meeting.agenda.present? %>
   <div class="card mb-4">
     <div class="card-header fw-semibold">Agenda</div>
@@ -118,6 +130,8 @@
           <div class="d-flex align-items-center gap-2">
             <% if fee&.paid? %>
               <span class="badge badge-status-active"><i class="bi bi-check-circle-fill me-1"></i>Paid</span>
+            <% elsif fee&.partially_paid? %>
+              <span class="badge badge-status-partial"><i class="bi bi-exclamation-triangle-fill me-1"></i>Partially Paid</span>
             <% else %>
               <span class="badge badge-status-trial"><i class="bi bi-exclamation-circle-fill me-1"></i>Due</span>
             <% end %>
@@ -126,8 +140,8 @@
                 <i class="bi bi-whatsapp"></i>
               <% end %>
             <% end %>
-            <% if fee&.pending? %>
-              <%= button_to mark_paid_forum_chapter_fee_payment_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: fee.id), method: :patch, class: "icon-btn icon-btn-success", title: "Mark Paid" do %>
+            <% if fee && !fee.paid? %>
+              <%= button_to mark_paid_forum_chapter_fee_payment_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: fee.id), method: :patch, class: "icon-btn icon-btn-success", title: "Mark Paid (full balance)" do %>
                 <i class="bi bi-check-lg"></i>
               <% end %>
             <% elsif fee.nil? %>

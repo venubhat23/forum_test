@@ -7,7 +7,7 @@ module FeePaymentsHelper
   end
 
   def whatsapp_item_fee_reminder_message(person, fee, subject, forum)
-    amount_text = fee ? " of #{number_to_currency(fee.amount)}" : ""
+    amount_text = fee ? " of #{number_to_currency(fee.balance_due)}" : ""
 
     <<~MSG.strip
       Hi #{person.display_name}! 👋

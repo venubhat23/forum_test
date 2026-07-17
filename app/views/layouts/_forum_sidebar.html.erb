@@ -16,6 +16,12 @@
           <% end %>
         </li>
         <li class="nav-item">
+          <%= link_to forum_members_path(forum_slug: @current_forum.slug), class: "nav-link-modern #{'active' if current_page?(forum_members_path(forum_slug: @current_forum.slug))}", data: { tooltip: "Members" } do %>
+            <div class="nav-icon-modern"><div class="icon-bg gradient-teal"><i class="bi bi-people-fill"></i></div></div>
+            <span class="nav-text">Members</span>
+          <% end %>
+        </li>
+        <li class="nav-item">
           <%= link_to forum_calendar_path(forum_slug: @current_forum.slug), class: "nav-link-modern #{'active' if current_page?(forum_calendar_path(forum_slug: @current_forum.slug))}", data: { tooltip: "Calendar" } do %>
             <div class="nav-icon-modern"><div class="icon-bg gradient-blue"><i class="bi bi-calendar3"></i></div></div>
             <span class="nav-text">Calendar</span>
@@ -85,6 +91,15 @@
             <span class="nav-text">One-to-One Meetings</span>
           <% end %>
         </li>
+        <% if can? :read, MeetingSchedule %>
+          <% meeting_schedules_target = current_user.chapter_id.present? ? forum_chapter_meeting_schedules_path(forum_slug: @current_forum.slug, chapter_id: current_user.chapter_id) : forum_chapters_path(forum_slug: @current_forum.slug) %>
+          <li class="nav-item">
+            <%= link_to meeting_schedules_target, class: "nav-link-modern #{'active' if request.path.include?('/meeting_schedules')}", data: { tooltip: "Scheduled Meetings" } do %>
+              <div class="nav-icon-modern"><div class="icon-bg gradient-orange"><i class="bi bi-calendar-week"></i></div></div>
+              <span class="nav-text">Scheduled Meetings</span>
+            <% end %>
+          </li>
+        <% end %>
         <li class="nav-item">
           <%= link_to forum_office_darshans_path(forum_slug: @current_forum.slug), class: "nav-link-modern #{'active' if request.path.start_with?(forum_office_darshans_path(forum_slug: @current_forum.slug))}", data: { tooltip: "Office Darshan" } do %>
             <div class="nav-icon-modern"><div class="icon-bg gradient-indigo"><i class="bi bi-building-check"></i></div></div>

@@ -41,6 +41,15 @@
   <div class="col-6 col-lg-3">
     <div class="mini-stat-card">
       <div>
+        <div class="mini-stat-label">Partially Paid</div>
+        <div class="mini-stat-value text-warning"><%= @partially_paid_fees %></div>
+      </div>
+      <div class="mini-stat-icon mini-stat-icon-warning"><i class="bi bi-pie-chart"></i></div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="mini-stat-card">
+      <div>
         <div class="mini-stat-label">Total Amount</div>
         <div class="mini-stat-value text-info"><%= number_to_currency(@total_amount) %></div>
       </div>
@@ -84,10 +93,15 @@
               </div>
             </td>
             <td><%= fee.fee_type.titleize %></td>
-            <td><%= number_to_currency(fee.amount) %></td>
+            <td>
+              <%= number_to_currency(fee.amount) %>
+              <% if fee.partially_paid? %>
+                <div class="text-muted small">Paid <%= number_to_currency(fee.paid_amount) %> &middot; Balance <%= number_to_currency(fee.balance_due) %></div>
+              <% end %>
+            </td>
             <td><%= fee.due_date&.strftime("%d %b %Y") || "—" %></td>
             <td>
-              <span class="badge <%= fee.paid? ? 'badge-status-active' : 'badge-status-trial' %>"><%= fee.status.titleize %></span>
+              <span class="badge <%= fee.paid? ? 'badge-status-active' : (fee.partially_paid? ? 'badge-status-partial' : 'badge-status-trial') %>"><%= fee.status.titleize %></span>
             </td>
             <td class="text-end">
               <div class="d-flex gap-1 justify-content-end">
@@ -95,9 +109,10 @@
                   <i class="bi bi-receipt"></i>
                 <% end %>
                 <% unless fee.paid? %>
-                  <%= button_to mark_paid_forum_chapter_fee_payment_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: fee.id), method: :patch, class: "icon-btn icon-btn-success", title: "Mark Paid" do %>
+                  <button type="button" class="icon-btn icon-btn-success" title="Record Payment (full or partial)" data-bs-toggle="modal" data-bs-target="#record-payment-<%= fee.id %>">
                     <i class="bi bi-check-lg"></i>
-                  <% end %>
+                  </button>
+                  <%= render "record_payment_modal", fee: fee, user: fee.user %>
                 <% end %>
               </div>
             </td>

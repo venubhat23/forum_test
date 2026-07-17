@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_14_080000) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_17_010002) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -238,6 +238,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_14_080000) do
     t.index ["forum_id"], name: "index_expenses_on_forum_id"
   end
 
+  create_table "fee_payment_transactions", force: :cascade do |t|
+    t.bigint "fee_payment_id", null: false
+    t.decimal "amount", precision: 10, scale: 2, null: false
+    t.integer "payment_method"
+    t.date "paid_on", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["fee_payment_id"], name: "index_fee_payment_transactions_on_fee_payment_id"
+  end
+
   create_table "fee_payments", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.integer "fee_type", null: false
@@ -355,6 +365,34 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_14_080000) do
     t.index ["forum_id"], name: "index_leads_on_forum_id"
   end
 
+  create_table "meeting_schedule_attendees", force: :cascade do |t|
+    t.bigint "meeting_schedule_id", null: false
+    t.bigint "user_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["meeting_schedule_id", "user_id"], name: "index_schedule_attendees_on_schedule_and_user", unique: true
+    t.index ["meeting_schedule_id"], name: "index_meeting_schedule_attendees_on_meeting_schedule_id"
+    t.index ["user_id"], name: "index_meeting_schedule_attendees_on_user_id"
+  end
+
+  create_table "meeting_schedules", force: :cascade do |t|
+    t.bigint "chapter_id", null: false
+    t.bigint "created_by_id", null: false
+    t.string "title"
+    t.integer "day_of_week", null: false
+    t.time "start_time", null: false
+    t.time "end_time", null: false
+    t.date "start_date", null: false
+    t.date "end_date", null: false
+    t.string "venue"
+    t.text "agenda"
+    t.text "notes"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["chapter_id"], name: "index_meeting_schedules_on_chapter_id"
+    t.index ["created_by_id"], name: "index_meeting_schedules_on_created_by_id"
+  end
+
   create_table "meetings", force: :cascade do |t|
     t.bigint "chapter_id", null: false
     t.integer "meeting_type", default: 0, null: false
@@ -368,7 +406,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_14_080000) do
     t.decimal "fee_amount", precision: 10, scale: 2
     t.string "payment_upi_id"
     t.text "payment_bank_details"
+    t.bigint "meeting_schedule_id"
     t.index ["chapter_id"], name: "index_meetings_on_chapter_id"
+    t.index ["meeting_schedule_id"], name: "index_meetings_on_meeting_schedule_id"
   end
 
   create_table "membership_applications", force: :cascade do |t|
@@ -500,6 +540,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_14_080000) do
     t.integer "position", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "chapter_limit"
     t.index ["key"], name: "index_plans_on_key", unique: true
   end
 
@@ -880,6 +921,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_14_080000) do
   add_foreign_key "events", "chapters"
   add_foreign_key "events", "forums"
   add_foreign_key "expenses", "forums"
+  add_foreign_key "fee_payment_transactions", "fee_payments"
   add_foreign_key "fee_payments", "users"
   add_foreign_key "forum_requests", "business_plans"
   add_foreign_key "forum_requests", "forums"
@@ -895,7 +937,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_14_080000) do
   add_foreign_key "leads", "forums"
   add_foreign_key "leads", "users", column: "accepted_by_id"
   add_foreign_key "leads", "users", column: "created_by_id"
+  add_foreign_key "meeting_schedule_attendees", "meeting_schedules"
+  add_foreign_key "meeting_schedule_attendees", "users"
+  add_foreign_key "meeting_schedules", "chapters"
+  add_foreign_key "meeting_schedules", "users", column: "created_by_id"
   add_foreign_key "meetings", "chapters"
+  add_foreign_key "meetings", "meeting_schedules"
   add_foreign_key "membership_applications", "chapters"
   add_foreign_key "membership_applications", "events"
   add_foreign_key "membership_applications", "forums"

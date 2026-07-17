@@ -124,6 +124,9 @@
             <td>
               <% if fee_paid_current %>
                 <span class="badge badge-status-active"><i class="bi bi-check-circle-fill me-1"></i>Paid</span>
+              <% elsif fee&.partially_paid? %>
+                <span class="badge badge-status-partial"><i class="bi bi-exclamation-triangle-fill me-1"></i>Partially Paid</span>
+                <div class="text-muted small mt-1">Balance: <%= number_to_currency(fee.balance_due) %></div>
               <% else %>
                 <span class="badge badge-status-trial"><i class="bi bi-exclamation-circle-fill me-1"></i>Due</span>
               <% end %>
@@ -139,10 +142,11 @@
                       <i class="bi bi-whatsapp"></i>
                     <% end %>
                   <% end %>
-                  <% if fee&.pending? %>
-                    <%= button_to mark_paid_forum_chapter_fee_payment_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: fee.id), method: :patch, class: "icon-btn icon-btn-success", title: "Mark Paid (renews +1 year)" do %>
-                      <i class="bi bi-check-lg"></i>
-                    <% end %>
+                  <% if fee && !fee.paid? %>
+                    <button type="button" class="icon-btn icon-btn-success" title="Record Payment (full or partial)" data-bs-toggle="modal" data-bs-target="#record-payment-<%= fee.id %>">
+                      <i class="bi bi-cash-coin"></i>
+                    </button>
+                    <%= render "forums/fee_payments/record_payment_modal", fee: fee, user: member %>
                   <% else %>
                     <%= link_to new_forum_chapter_fee_payment_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, user_id: member.id, fee_type: "annual_membership"), class: "icon-btn icon-btn-view", title: "Record Annual Fee" do %>
                       <i class="bi bi-cash-coin"></i>

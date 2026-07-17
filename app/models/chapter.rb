@@ -7,6 +7,7 @@ class Chapter < ApplicationRecord
   has_many :guests, -> { where(role: :guest) }, class_name: "User"
   has_many :committee_members, -> { where(role: :committee_member) }, class_name: "User"
   has_many :meetings, dependent: :destroy
+  has_many :meeting_schedules, dependent: :destroy
   has_many :weekly_presentations, dependent: :destroy
   has_many :events, dependent: :nullify
   has_many :announcements, dependent: :nullify
@@ -15,8 +16,19 @@ class Chapter < ApplicationRecord
   has_many :referrals, dependent: :nullify
 
   validates :name, presence: true, uniqueness: { scope: :forum_id }
+  validate :within_forum_chapter_limit, on: :create
 
   def collected_amount
     FeePayment.joins(:user).where(users: { chapter_id: id }, status: :paid).sum(:amount)
+  end
+
+  private
+
+  def within_forum_chapter_limit
+    return unless forum
+
+    if forum.chapter_limit_reached?
+      errors.add(:base, "#{forum.name} has reached its #{forum.plan.name} plan limit of #{forum.chapter_limit} chapters. Ask your platform admin to upgrade the plan.")
+    end
   end
 end

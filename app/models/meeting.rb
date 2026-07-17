@@ -2,6 +2,7 @@ class Meeting < ApplicationRecord
   enum :meeting_type, { weekly: 0, monthly: 1, special: 2 }, default: :weekly
 
   belongs_to :chapter
+  belongs_to :meeting_schedule, optional: true
   has_many :attendances, dependent: :nullify
   has_many :weekly_presentations, dependent: :nullify
   has_many :fee_payments, as: :feeable, dependent: :destroy
@@ -12,7 +13,7 @@ class Meeting < ApplicationRecord
   validates :scheduled_at, presence: true
   validates :fee_amount, numericality: { greater_than: 0 }, allow_nil: true
 
-  after_create :notify_chapter_members
+  after_create :notify_chapter_members, unless: :meeting_schedule_id?
 
   def attendance_percentage
     total = chapter.members.count

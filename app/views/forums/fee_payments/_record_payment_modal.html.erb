@@ -1,0 +1,35 @@
+<% modal_id = "record-payment-#{fee.id}" %>
+<div class="modal fade" id="<%= modal_id %>" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <%= form_with url: mark_paid_forum_chapter_fee_payment_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: fee.id), method: :patch, local: true do %>
+        <div class="modal-header">
+          <h5 class="modal-title mb-0">Record Payment &middot; <%= user.display_name %></h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p class="text-muted mb-3">
+            Total due: <%= number_to_currency(fee.amount) %>
+            <% if fee.paid_amount.positive? %>
+              &middot; Already paid: <%= number_to_currency(fee.paid_amount) %>
+              &middot; Balance: <%= number_to_currency(fee.balance_due) %>
+            <% end %>
+          </p>
+          <div class="mb-3">
+            <label class="form-label">Amount received</label>
+            <%= number_field_tag :amount, fee.balance_due, step: "0.01", min: "0.01", max: fee.balance_due, class: "form-control", required: true %>
+            <div class="form-text">Enter less than the balance to record it as a partial payment.</div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Payment method</label>
+            <%= select_tag :payment_method, options_for_select(FeePayment.payment_methods.keys.map { |k| [ k.titleize, k ] }, fee.payment_method), { include_blank: "Select method" }, class: "form-select" %>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+          <%= submit_tag "Record Payment", class: "btn btn-primary" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,13 @@
+#!/usr/bin/env sh
+
+# Connects to the production database from a local machine.
+#
+# The production DB host in config/database.yml (dpg-d94k0vpo3t8c7395ltb0-a) is
+# Render's internal hostname and only resolves from inside Render's network.
+# This script points at the external hostname instead so `rails c -e production`
+# works from your laptop.
+
+export DB_HOST="${DB_HOST:-dpg-d94k0vpo3t8c7395ltb0-a.ohio-postgres.render.com}"
+export DB_SSLMODE="${DB_SSLMODE:-require}"
+
+exec bin/rails console -e production "$@"

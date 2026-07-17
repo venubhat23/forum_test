@@ -10,6 +10,7 @@ class Forum < ApplicationRecord
 
   has_many :chapters, dependent: :destroy
   has_many :users, dependent: :destroy
+  has_many :members, -> { where(role: :member) }, class_name: "User"
   has_many :business_categories, dependent: :destroy
   has_many :one_to_one_meetings, dependent: :destroy
   has_many :office_darshans, dependent: :destroy
@@ -45,6 +46,14 @@ class Forum < ApplicationRecord
 
   def member_limit_reached?
     member_limit.present? && users.member.count >= member_limit
+  end
+
+  def chapter_limit
+    plan&.chapter_limit
+  end
+
+  def chapter_limit_reached?
+    chapter_limit.present? && chapters.count >= chapter_limit
   end
 
   def trial_days_left

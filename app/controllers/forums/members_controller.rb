@@ -3,8 +3,21 @@ require "roo"
 
 module Forums
   class MembersController < BaseController
-    before_action :set_chapter, except: [ :import, :bulk_import ]
+    before_action :set_chapter, except: [ :import, :bulk_import, :all ]
     before_action :set_member, only: [ :show, :edit, :update, :suspend, :activate, :reset_password, :force_logout, :renew, :print, :update_role ]
+
+    def all
+      authorize! :read, User
+      @total_members = @current_forum.members.count
+      @active_members = @current_forum.members.where(suspended_at: nil).count
+      @suspended_members = @current_forum.members.where.not(suspended_at: nil).count
+
+      @members = @current_forum.members.includes(:chapter, :business_category_ref).order(:full_name)
+      @members = @members.where("full_name ILIKE ? OR email ILIKE ?", "%#{params[:q]}%", "%#{params[:q]}%") if params[:q].present?
+      @members = @members.where(suspended_at: nil) if params[:status] == "active"
+      @members = @members.where.not(suspended_at: nil) if params[:status] == "suspended"
+      @members = @members.page(params[:page])
+    end
 
     def index
       authorize! :read, User

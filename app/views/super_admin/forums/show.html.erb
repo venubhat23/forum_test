@@ -56,7 +56,7 @@
     <div class="stats-card">
       <div class="icon-bg gradient-blue"><i class="bi bi-diagram-3"></i></div>
       <div>
-        <div class="stats-value"><%= @forum.chapters.count %></div>
+        <div class="stats-value"><%= @forum.chapters.count %><%= "/#{@forum.chapter_limit}" if @forum.chapter_limit %></div>
         <div class="stats-label">Chapters</div>
       </div>
     </div>

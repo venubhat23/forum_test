@@ -25,9 +25,15 @@
     </div>
   </div>
 
-  <div class="mb-3">
-    <%= f.label :member_limit, "Member limit (blank = unlimited)", class: "form-label" %>
-    <%= f.number_field :member_limit, class: "form-control", min: 1 %>
+  <div class="row g-3 mb-3">
+    <div class="col-12 col-md-6">
+      <%= f.label :member_limit, "Member limit (blank = unlimited)", class: "form-label" %>
+      <%= f.number_field :member_limit, class: "form-control", min: 1 %>
+    </div>
+    <div class="col-12 col-md-6">
+      <%= f.label :chapter_limit, "Chapter limit (blank = unlimited)", class: "form-label" %>
+      <%= f.number_field :chapter_limit, class: "form-control", min: 1 %>
+    </div>
   </div>
 
   <div class="mb-4">

@@ -1,0 +1,57 @@
+<% content_for :title, "Scheduled Meetings · #{@chapter.name}" %>
+
+<div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+  <div>
+    <h1 class="page-title h4">Scheduled Meetings</h1>
+    <p class="page-subtitle mb-0"><%= @chapter.name %> &middot; <%= @current_forum.name %></p>
+  </div>
+  <div class="d-flex flex-wrap gap-2">
+    <%= link_to forum_chapter_meetings_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id), class: "btn btn-outline-secondary" do %>
+      <i class="bi bi-calendar3 me-1"></i> All Meetings
+    <% end %>
+    <% if can? :create, MeetingSchedule %>
+      <%= link_to new_forum_chapter_meeting_schedule_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id), class: "btn btn-primary" do %>
+        <i class="bi bi-plus-lg me-1"></i> Schedule Meeting
+      <% end %>
+    <% end %>
+  </div>
+</div>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Recurs</th>
+          <th>Date Range</th>
+          <th>Occurrences</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @schedules.each do |schedule| %>
+          <tr>
+            <td>
+              <div class="d-flex align-items-center gap-2">
+                <span class="row-avatar"><i class="bi bi-calendar-week"></i></span>
+                <%= schedule.title.presence || "#{schedule.day_name} Meeting" %>
+              </div>
+            </td>
+            <td>Every <%= schedule.day_name %>, <%= schedule.start_time.strftime("%I:%M %p") %>–<%= schedule.end_time.strftime("%I:%M %p") %></td>
+            <td><%= schedule.start_date.strftime("%d %b %Y") %> – <%= schedule.end_date.strftime("%d %b %Y") %></td>
+            <td><%= schedule.meetings.count %></td>
+            <td class="text-end">
+              <%= link_to forum_chapter_meeting_schedule_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: schedule.id), class: "icon-btn icon-btn-view", title: "View" do %>
+                <i class="bi bi-eye"></i>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+        <% if @schedules.empty? %>
+          <tr><td colspan="5" class="text-center text-muted py-4">No recurring schedules yet.</td></tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -1,0 +1,16 @@
+<% content_for :title, "Schedule Meeting" %>
+
+<div class="page-header">
+  <h1 class="page-title h4">Schedule Meeting</h1>
+  <p class="page-subtitle mb-0"><%= @chapter.name %></p>
+</div>
+
+<div class="row justify-content-center">
+  <div class="col-12 col-lg-8">
+    <div class="card">
+      <div class="card-body p-4">
+        <%= render "form", schedule: @schedule, candidates: @candidates %>
+      </div>
+    </div>
+  </div>
+</div>
