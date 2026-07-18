@@ -56,7 +56,7 @@ module Forums
 
     def meeting_schedule_params
       params.require(:meeting_schedule).permit(:title, :day_of_week, :start_time, :end_time, :start_date, :end_date,
-        :venue, :agenda, :notes, attendee_ids: [])
+        :venue, :agenda, :notes, :fee_amount, attendee_ids: [])
     end
   end
 end

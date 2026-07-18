@@ -51,6 +51,20 @@
     <%= f.text_area :notes, class: "form-control", rows: 2, placeholder: "Anything attendees or the chapter admin should know" %>
   </div>
 
+  <div class="mb-4" data-controller="fee-toggle">
+    <div class="form-check mb-2">
+      <%= check_box_tag "has_entry_fee", "1", schedule.fee_amount.present?, class: "form-check-input",
+            id: "has_entry_fee", data: { action: "fee-toggle#toggle", "fee-toggle-target": "checkbox" } %>
+      <%= label_tag "has_entry_fee", "This meeting has an entry fee", class: "form-check-label" %>
+    </div>
+    <div data-fee-toggle-target="amountWrap" class="<%= "d-none" unless schedule.fee_amount.present? %>">
+      <%= f.label :fee_amount, "Entry Fee Amount", class: "form-label" %>
+      <%= f.number_field :fee_amount, step: 0.01, min: 0.01, class: "form-control", style: "max-width: 220px;",
+            data: { "fee-toggle-target": "amountField" } %>
+      <div class="form-text">Applied to every generated meeting — each occurrence tracks who's paid, just like a regular meeting.</div>
+    </div>
+  </div>
+
   <h2 class="h6 text-uppercase text-muted mb-3">Attendees</h2>
   <% candidates_by_chapter = candidates.group_by(&:chapter) %>
   <div class="mb-4" data-controller="attendee-picker" data-attendee-picker-chapter-id-value="<%= @chapter.id %>">

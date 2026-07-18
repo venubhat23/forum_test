@@ -15,6 +15,7 @@ class MeetingSchedule < ApplicationRecord
 
   validates :day_of_week, inclusion: { in: 0..6 }
   validates :start_time, :end_time, :start_date, :end_date, presence: true
+  validates :fee_amount, numericality: { greater_than: 0 }, allow_nil: true
   validate :end_time_after_start_time
   validate :end_date_within_range
 
@@ -71,7 +72,8 @@ class MeetingSchedule < ApplicationRecord
         meeting_type: :weekly,
         scheduled_at: Time.zone.local(date.year, date.month, date.day, start_time.hour, start_time.min),
         venue: venue,
-        agenda: agenda
+        agenda: agenda,
+        fee_amount: fee_amount
       )
     end
   end
@@ -84,6 +86,7 @@ class MeetingSchedule < ApplicationRecord
       "#{start_time.strftime('%I:%M %p')}–#{end_time.strftime('%I:%M %p')}, " \
       "from #{start_date.strftime('%d %b %Y')} to #{end_date.strftime('%d %b %Y')}" \
       "#{" at #{venue}" if venue.present?}."
+    message += " Entry fee: #{ActiveSupport::NumberHelper.number_to_currency(fee_amount)} per meeting — see each meeting page for payment details." if fee_amount.present?
     attendees.find_each { |user| user.notifications.create!(body: message) }
   end
 
