@@ -1,5 +1,7 @@
 class Invoice < ApplicationRecord
-  enum :status, { draft: 0, pending: 1, paid: 2, overdue: 3, cancelled: 4 }, default: :pending
+  enum :status, { draft: 0, pending: 1, paid: 2, overdue: 3, cancelled: 4, partially_paid: 5 }, default: :pending
+
+  has_secure_token :share_token
 
   belongs_to :forum
   belongs_to :plan, optional: true
@@ -20,17 +22,35 @@ class Invoice < ApplicationRecord
     amount - amount_paid
   end
 
-  def mark_paid!(payment_method:, recorded_by:, reference_number: nil)
+  # Records money received against this invoice. If it covers the remaining
+  # balance the invoice becomes fully paid, otherwise it's left partially paid.
+  # Locks the row so concurrent partial payments can't race past each other.
+  def record_payment!(received_amount:, payment_method:, recorded_by:, reference_number: nil)
     transaction do
+      lock!
+      amount_to_record = [ received_amount.to_d, balance_due ].min
+      raise ArgumentError, "amount must be positive" unless amount_to_record.positive?
+
       payments.create!(
-        amount: balance_due.positive? ? balance_due : amount,
+        amount: amount_to_record,
         payment_method: payment_method,
         paid_on: Date.current,
         reference_number: reference_number,
         recorded_by: recorded_by
       )
-      update!(status: :paid, paid_on: Date.current)
+
+      fully_paid = amount_paid >= amount
+      update!(status: fully_paid ? :paid : :partially_paid, paid_on: fully_paid ? Date.current : paid_on)
     end
+  end
+
+  def mark_paid!(payment_method:, recorded_by:, reference_number: nil)
+    record_payment!(
+      received_amount: balance_due.positive? ? balance_due : amount,
+      payment_method: payment_method,
+      recorded_by: recorded_by,
+      reference_number: reference_number
+    )
   end
 
   private

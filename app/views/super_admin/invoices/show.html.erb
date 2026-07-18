@@ -5,10 +5,20 @@
     <h1 class="page-title h4"><%= @invoice.invoice_number %></h1>
     <p class="page-subtitle mb-0"><%= @invoice.forum.name %></p>
   </div>
-  <div class="d-flex gap-2">
-    <% if @invoice.paid? || @invoice.cancelled? %>
-      <span class="badge badge-status-<%= @invoice.status %> fs-6"><%= @invoice.status.titleize %></span>
-    <% else %>
+  <div class="d-flex flex-wrap gap-2 align-items-center">
+    <span class="badge <%= invoice_status_badge_class(@invoice) %> fs-6"><%= @invoice.status.titleize %></span>
+    <% if (wa_link = whatsapp_invoice_share_link(@invoice)) %>
+      <%= link_to wa_link, class: "btn btn-outline-success", target: "_blank", rel: "noopener" do %>
+        <i class="bi bi-whatsapp me-1"></i> Share
+      <% end %>
+    <% end %>
+    <%= link_to public_invoice_path(@invoice.share_token), class: "btn btn-outline-primary", target: "_blank", rel: "noopener" do %>
+      <i class="bi bi-box-arrow-up-right me-1"></i> Public Invoice
+    <% end %>
+    <button type="button" class="btn btn-outline-secondary" data-clipboard-text="<%= public_invoice_url(@invoice.share_token) %>" onclick="navigator.clipboard.writeText(this.dataset.clipboardText); this.innerHTML = '<i class=\'bi bi-check-lg me-1\'></i> Copied!'; setTimeout(() => this.innerHTML = '<i class=\'bi bi-link-45deg me-1\'></i> Copy Link', 1500);">
+      <i class="bi bi-link-45deg me-1"></i> Copy Link
+    </button>
+    <% unless @invoice.paid? || @invoice.cancelled? %>
       <%= button_to "Cancel Invoice", void_super_admin_invoice_path(@invoice), method: :patch, class: "btn btn-outline-danger",
             data: { turbo_confirm: "Cancel invoice #{@invoice.invoice_number}?" } %>
     <% end %>
@@ -27,19 +37,19 @@
   </div>
   <div class="col-6 col-lg-3">
     <div class="stats-card">
-      <div class="icon-bg gradient-blue"><i class="bi bi-cash"></i></div>
+      <div class="icon-bg gradient-teal"><i class="bi bi-piggy-bank"></i></div>
       <div>
-        <div class="stats-value">&#8377;<%= number_with_delimiter(@invoice.balance_due.to_i) %></div>
-        <div class="stats-label">Balance Due</div>
+        <div class="stats-value">&#8377;<%= number_with_delimiter(@invoice.amount_paid.to_i) %></div>
+        <div class="stats-label">Paid</div>
       </div>
     </div>
   </div>
   <div class="col-6 col-lg-3">
     <div class="stats-card">
-      <div class="icon-bg gradient-purple"><i class="bi bi-shield-check"></i></div>
+      <div class="icon-bg gradient-blue"><i class="bi bi-cash"></i></div>
       <div>
-        <div class="stats-value"><span class="badge badge-status-<%= @invoice.status %>"><%= @invoice.status.titleize %></span></div>
-        <div class="stats-label">Status</div>
+        <div class="stats-value">&#8377;<%= number_with_delimiter(@invoice.balance_due.to_i) %></div>
+        <div class="stats-label">Balance Due</div>
       </div>
     </div>
   </div>
@@ -54,63 +64,144 @@
   </div>
 </div>
 
-<% if @invoice.description.present? %>
-  <div class="card mb-4">
-    <div class="card-header fw-semibold">Description</div>
-    <div class="card-body"><%= @invoice.description %></div>
-  </div>
-<% end %>
-
-<% unless @invoice.paid? || @invoice.cancelled? %>
-  <div class="card mb-4">
-    <div class="card-header fw-semibold">Mark as Paid</div>
-    <div class="card-body">
-      <%= form_with url: mark_paid_super_admin_invoice_path(@invoice), method: :patch, local: true do %>
-        <div class="row g-3 align-items-end">
-          <div class="col-12 col-md-4">
-            <label class="form-label">Payment Method</label>
-            <%= select_tag :payment_method, options_for_select(Payment.payment_methods.keys.map { |k| [ k.titleize, k ] }), class: "form-select" %>
+<div class="row g-4">
+  <div class="col-12 col-lg-7">
+    <div class="card invoice-preview-card">
+      <div class="invoice-preview-topbar"></div>
+      <div class="card-body p-4">
+        <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+          <div>
+            <div class="invoice-brand">Krama Consultancy</div>
+            <div class="text-muted small">Business Network Forum Platform</div>
           </div>
-          <div class="col-12 col-md-4">
-            <label class="form-label">Reference Number (optional)</label>
-            <%= text_field_tag :reference_number, nil, class: "form-control" %>
-          </div>
-          <div class="col-12 col-md-4">
-            <%= submit_tag "Mark Paid", class: "btn btn-success" %>
+          <div class="text-lg-end">
+            <div class="fw-semibold">Invoice <%= @invoice.invoice_number %></div>
+            <div class="text-muted small">Issued <%= @invoice.created_at.strftime("%d %b %Y") %></div>
+            <div class="text-muted small">Due <%= @invoice.due_date.strftime("%d %b %Y") %></div>
           </div>
         </div>
-      <% end %>
+
+        <div class="row g-3 mb-4">
+          <div class="col-12 col-sm-6">
+            <div class="text-uppercase text-muted small fw-semibold mb-1">Billed To</div>
+            <div class="fw-semibold"><%= @invoice.forum.name %></div>
+          </div>
+          <% if @invoice.plan %>
+            <div class="col-12 col-sm-6">
+              <div class="text-uppercase text-muted small fw-semibold mb-1">Plan</div>
+              <div class="fw-semibold"><%= @invoice.plan.name %></div>
+            </div>
+          <% end %>
+        </div>
+
+        <table class="table invoice-items-table mb-4">
+          <thead>
+            <tr>
+              <th>Description</th>
+              <th class="text-end">Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <%= @invoice.description.presence || "#{@invoice.plan&.name || 'Subscription'} charges" %>
+                <% if @invoice.coupon %>
+                  <div class="text-muted small">Coupon applied: <%= @invoice.coupon.code %></div>
+                <% end %>
+              </td>
+              <td class="text-end">&#8377;<%= number_with_delimiter(@invoice.amount.to_i) %></td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td class="text-end fw-semibold">Total</td>
+              <td class="text-end fw-semibold">&#8377;<%= number_with_delimiter(@invoice.amount.to_i) %></td>
+            </tr>
+            <% if @invoice.amount_paid.positive? %>
+              <tr>
+                <td class="text-end text-success">Paid</td>
+                <td class="text-end text-success">&#8211; &#8377;<%= number_with_delimiter(@invoice.amount_paid.to_i) %></td>
+              </tr>
+              <tr class="border-top">
+                <td class="text-end fw-bold">Balance Due</td>
+                <td class="text-end fw-bold">&#8377;<%= number_with_delimiter(@invoice.balance_due.to_i) %></td>
+              </tr>
+            <% end %>
+          </tfoot>
+        </table>
+
+        <p class="text-muted small mb-0">Thank you for being part of the Krama Consultancy network. Share the public link above with the forum admin so they can view and settle this invoice directly.</p>
+      </div>
     </div>
   </div>
-<% end %>
 
-<div class="card">
-  <div class="card-header fw-semibold">Payments</div>
-  <div class="table-responsive">
-    <table class="table align-middle mb-0">
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Amount</th>
-          <th>Method</th>
-          <th>Reference</th>
-          <th>Recorded By</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% @invoice.payments.order(paid_on: :desc).each do |payment| %>
-          <tr>
-            <td><%= payment.paid_on.strftime("%d %b %Y") %></td>
-            <td>&#8377;<%= number_with_delimiter(payment.amount.to_i) %></td>
-            <td><%= payment.payment_method.titleize %></td>
-            <td><%= payment.reference_number.presence || "&mdash;".html_safe %></td>
-            <td><%= payment.recorded_by.email %></td>
-          </tr>
-        <% end %>
-        <% if @invoice.payments.empty? %>
-          <tr><td colspan="5" class="text-center text-muted py-4">No payments recorded yet.</td></tr>
-        <% end %>
-      </tbody>
-    </table>
+  <div class="col-12 col-lg-5">
+    <% unless @invoice.paid? || @invoice.cancelled? %>
+      <div class="card mb-4">
+        <div class="card-header fw-semibold">Record Payment</div>
+        <div class="card-body">
+          <%= form_with url: mark_paid_super_admin_invoice_path(@invoice), method: :patch, local: true do %>
+            <p class="text-muted small mb-3">
+              Balance due: <strong>&#8377;<%= number_with_delimiter(@invoice.balance_due.to_i) %></strong>
+              <% if @invoice.amount_paid.positive? %>
+                &middot; Already paid: &#8377;<%= number_with_delimiter(@invoice.amount_paid.to_i) %>
+              <% end %>
+            </p>
+            <div class="mb-3">
+              <label class="form-label">Amount received</label>
+              <%= number_field_tag :amount, @invoice.balance_due, step: "0.01", min: "0.01", max: @invoice.balance_due, class: "form-control", required: true %>
+              <div class="form-text">Enter less than the balance to record it as a partial payment.</div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Payment Method</label>
+              <%= select_tag :payment_method, options_for_select(Payment.payment_methods.keys.map { |k| [ k.titleize, k ] }), class: "form-select" %>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Reference Number (optional)</label>
+              <%= text_field_tag :reference_number, nil, class: "form-control" %>
+            </div>
+            <%= submit_tag "Record Payment", class: "btn btn-success w-100" %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+    <% if @invoice.description.present? %>
+      <div class="card mb-4">
+        <div class="card-header fw-semibold">Description</div>
+        <div class="card-body"><%= @invoice.description %></div>
+      </div>
+    <% end %>
+
+    <div class="card">
+      <div class="card-header fw-semibold">Payments</div>
+      <div class="table-responsive">
+        <table class="table align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Amount</th>
+              <th>Method</th>
+              <th>Reference</th>
+              <th>Recorded By</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @invoice.payments.order(paid_on: :desc).each do |payment| %>
+              <tr>
+                <td><%= payment.paid_on.strftime("%d %b %Y") %></td>
+                <td>&#8377;<%= number_with_delimiter(payment.amount.to_i) %></td>
+                <td><%= payment.payment_method.titleize %></td>
+                <td><%= payment.reference_number.presence || "&mdash;".html_safe %></td>
+                <td><%= payment.recorded_by.email %></td>
+              </tr>
+            <% end %>
+            <% if @invoice.payments.empty? %>
+              <tr><td colspan="5" class="text-center text-muted py-4">No payments recorded yet.</td></tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
 </div>

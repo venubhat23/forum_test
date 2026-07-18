@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Invoice <%= @invoice.invoice_number %> &middot; <%= @invoice.forum.name %></title>
+  <style>
+    :root { --brand-1: #3b82f6; --brand-2: #8b5cf6; --ink: #1e293b; --muted: #64748b; --line: #e2e8f0; }
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f1f5f9;
+      color: var(--ink);
+      margin: 0;
+      padding: 32px 16px;
+    }
+    .toolbar {
+      max-width: 720px;
+      margin: 0 auto 16px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      border: 1px solid var(--line);
+      background: white;
+      color: var(--ink);
+      cursor: pointer;
+    }
+    .btn-primary { background: linear-gradient(135deg, var(--brand-1), var(--brand-2)); color: white; border: none; }
+    .invoice {
+      max-width: 720px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 16px 40px rgba(0,0,0,0.08);
+    }
+    .topbar { height: 8px; background: linear-gradient(135deg, var(--brand-1), var(--brand-2)); }
+    .invoice-body { padding: 36px; }
+    .header { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; margin-bottom: 28px; }
+    .brand { font-size: 22px; font-weight: 800; background: linear-gradient(135deg, var(--brand-1), var(--brand-2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .brand-sub { color: var(--muted); font-size: 13px; margin-top: 2px; }
+    .meta { text-align: right; font-size: 13px; color: var(--muted); }
+    .meta strong { color: var(--ink); font-size: 15px; display: block; margin-bottom: 4px; }
+    .status-pill {
+      display: inline-block;
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 24px;
+    }
+    .status-paid { background: rgba(16,185,129,0.12); color: #059669; }
+    .status-pending, .status-draft { background: rgba(59,130,246,0.12); color: #2563eb; }
+    .status-overdue { background: rgba(239,68,68,0.12); color: #dc2626; }
+    .status-cancelled { background: rgba(107,114,128,0.12); color: #4b5563; }
+    .status-partially_paid { background: rgba(245,158,11,0.12); color: #d97706; }
+    .row { display: flex; flex-wrap: wrap; gap: 24px; margin-bottom: 28px; }
+    .label { text-transform: uppercase; font-size: 11px; font-weight: 700; letter-spacing: 0.04em; color: var(--muted); margin-bottom: 4px; }
+    .value { font-weight: 600; font-size: 15px; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
+    thead th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); border-top: 2px solid var(--brand-2); border-bottom: 2px solid var(--brand-2); padding: 10px 4px; }
+    thead th:last-child, tfoot td:last-child, td.amount { text-align: right; }
+    tbody td { padding: 12px 4px; border-bottom: 1px solid var(--line); }
+    tfoot td { padding: 6px 4px; border: none; }
+    .total-row td { font-weight: 800; font-size: 17px; padding-top: 12px; }
+    .paid-row td { color: #059669; }
+    .balance-row td { font-weight: 800; border-top: 1px solid var(--line); padding-top: 10px; }
+    .note { margin-top: 28px; padding: 16px; background: #f8fafc; border-radius: 10px; font-size: 13px; color: var(--muted); }
+    .payments-title { font-size: 13px; font-weight: 700; margin: 28px 0 8px; color: var(--ink); }
+    .payments-table td, .payments-table th { font-size: 13px; }
+    @media print {
+      body { background: white; padding: 0; }
+      .toolbar { display: none; }
+      .invoice { box-shadow: none; border-radius: 0; max-width: none; }
+    }
+    @media (max-width: 480px) {
+      .invoice-body { padding: 22px; }
+      .meta { text-align: left; }
+      .header { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <button type="button" class="btn btn-primary" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  </div>
+
+  <div class="invoice">
+    <div class="topbar"></div>
+    <div class="invoice-body">
+      <div class="header">
+        <div>
+          <div class="brand">Krama Consultancy</div>
+          <div class="brand-sub">Business Network Forum Platform</div>
+        </div>
+        <div class="meta">
+          <strong>Invoice <%= @invoice.invoice_number %></strong>
+          Issued <%= @invoice.created_at.strftime("%d %b %Y") %><br>
+          Due <%= @invoice.due_date.strftime("%d %b %Y") %>
+        </div>
+      </div>
+
+      <span class="status-pill status-<%= @invoice.status %>"><%= @invoice.status.titleize %></span>
+
+      <div class="row">
+        <div>
+          <div class="label">Billed To</div>
+          <div class="value"><%= @invoice.forum.name %></div>
+        </div>
+        <% if @invoice.plan %>
+          <div>
+            <div class="label">Plan</div>
+            <div class="value"><%= @invoice.plan.name %></div>
+          </div>
+        <% end %>
+      </div>
+
+      <table>
+        <thead>
+          <tr><th>Description</th><th>Amount</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <%= @invoice.description.presence || "#{@invoice.plan&.name || 'Subscription'} charges" %>
+              <% if @invoice.coupon %>
+                <div style="color: var(--muted); font-size: 12px;">Coupon applied: <%= @invoice.coupon.code %></div>
+              <% end %>
+            </td>
+            <td class="amount">&#8377;<%= number_with_delimiter(@invoice.amount.to_i) %></td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr class="total-row"><td>Total</td><td class="amount">&#8377;<%= number_with_delimiter(@invoice.amount.to_i) %></td></tr>
+          <% if @invoice.amount_paid.positive? %>
+            <tr class="paid-row"><td>Paid</td><td class="amount">&#8211; &#8377;<%= number_with_delimiter(@invoice.amount_paid.to_i) %></td></tr>
+            <tr class="balance-row"><td>Balance Due</td><td class="amount">&#8377;<%= number_with_delimiter(@invoice.balance_due.to_i) %></td></tr>
+          <% end %>
+        </tfoot>
+      </table>
+
+      <% if @invoice.payments.any? %>
+        <div class="payments-title">Payment History</div>
+        <table class="payments-table">
+          <thead>
+            <tr><th>Date</th><th>Method</th><th>Amount</th></tr>
+          </thead>
+          <tbody>
+            <% @invoice.payments.order(:paid_on).each do |payment| %>
+              <tr>
+                <td><%= payment.paid_on.strftime("%d %b %Y") %></td>
+                <td><%= payment.payment_method.titleize %></td>
+                <td class="amount">&#8377;<%= number_with_delimiter(payment.amount.to_i) %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      <% end %>
+
+      <div class="note">
+        <% if @invoice.paid? %>
+          This invoice has been paid in full. Thank you!
+        <% elsif @invoice.cancelled? %>
+          This invoice has been cancelled.
+        <% else %>
+          Please contact Krama Consultancy to complete payment of the balance due above. This invoice was generated for <%= @invoice.forum.name %> and is view-only &mdash; payments are recorded by the platform team.
+        <% end %>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -514,6 +514,42 @@ body.sidebar-collapsed .main-content {
 .badge-plan-gold    { background: rgba(202, 138, 4, 0.12); color: #ca8a04; }
 .badge-plan-diamond { background: rgba(8, 145, 178, 0.12); color: #0891b2; }
 
+/* ── Invoice preview ── */
+.invoice-preview-card {
+  overflow: hidden;
+  border: none;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 8px 24px rgba(0, 0, 0, 0.04);
+}
+
+.invoice-preview-topbar {
+  height: 6px;
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+}
+
+.invoice-brand {
+  font-size: 1.35rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.invoice-items-table thead th {
+  border-top: 2px solid #8b5cf6;
+  border-bottom: 2px solid #8b5cf6;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #64748b;
+}
+
+.invoice-items-table tfoot td {
+  border: none;
+  padding-top: 0.4rem;
+  padding-bottom: 0.4rem;
+}
+
 .plan-option-card {
   cursor: pointer;
   transition: border-color 0.15s ease;

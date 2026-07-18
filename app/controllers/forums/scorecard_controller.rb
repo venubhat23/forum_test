@@ -6,7 +6,7 @@ module Forums
 
       @members = scope_members
       @stats_by_member = ScorecardStats.new(members: @members, month: @month).call
-      @sorted_members = @members.sort_by { |m| -@stats_by_member[m.id][:business_generated] }
+      @sorted_members = @members.sort_by { |m| -@stats_by_member[m.id][:score] }
       @badges_by_member = badges_for_month(@members)
 
       build_trends(@members) unless @scope == :personal

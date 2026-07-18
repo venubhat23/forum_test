@@ -5,7 +5,7 @@ module Forums
 
     def index
       authorize! :read, Referral
-      base = Referral.joins("INNER JOIN users givers ON givers.id = referrals.giver_id")
+      base = Referral.joins("INNER JOIN users givers ON givers.id = referrals.referrer_id")
         .where(givers: { chapter_id: @chapter.id })
 
       @total_referrals = base.count
@@ -63,7 +63,7 @@ module Forums
     end
 
     def set_referral
-      @referral = Referral.joins("INNER JOIN users givers ON givers.id = referrals.giver_id")
+      @referral = Referral.joins("INNER JOIN users givers ON givers.id = referrals.referrer_id")
         .where(givers: { chapter_id: @chapter.id }).find(params[:id])
     end
 

@@ -6,18 +6,7 @@
     </div>
     <div class="col-12 col-md-6">
       <%= f.label :role, class: "form-label" %>
-      <%= f.select :role, User.roles.keys.map { |r| [ r.titleize, r ] }, {}, class: "form-select" %>
-    </div>
-  </div>
-
-  <div class="row g-3 mb-3">
-    <div class="col-12 col-md-6">
-      <%= f.label :forum_id, "Forum (blank for Super Admin)", class: "form-label" %>
-      <%= f.collection_select :forum_id, @forums, :id, :name, { include_blank: true }, class: "form-select" %>
-    </div>
-    <div class="col-12 col-md-6">
-      <%= f.label :chapter_id, "Chapter (id, optional)", class: "form-label" %>
-      <%= f.number_field :chapter_id, class: "form-control" %>
+      <%= f.select :role, User::INTERNAL_ROLES.map { |r| [ r.titleize, r ] }, {}, class: "form-select" %>
     </div>
   </div>
 

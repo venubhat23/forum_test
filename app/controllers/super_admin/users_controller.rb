@@ -3,16 +3,14 @@ module SuperAdmin
     before_action :set_user, only: [ :show, :edit, :update, :destroy, :suspend, :unsuspend, :reset_password, :force_logout ]
 
     def index
-      @total_users = User.count
-      @active_users = User.where(suspended_at: nil).count
-      @suspended_users = User.where.not(suspended_at: nil).count
+      @total_users = User.where(role: User::INTERNAL_ROLES).count
+      @active_users = User.where(role: User::INTERNAL_ROLES, suspended_at: nil).count
+      @suspended_users = User.where(role: User::INTERNAL_ROLES).where.not(suspended_at: nil).count
 
-      @users = User.includes(:forum)
+      @users = User.where(role: User::INTERNAL_ROLES)
       @users = @users.where(role: params[:role]) if params[:role].present?
-      @users = @users.where(forum_id: params[:forum_id]) if params[:forum_id].present?
       @users = @users.where("email ILIKE ?", "%#{params[:q]}%") if params[:q].present?
       @users = @users.order(created_at: :desc).page(params[:page])
-      @forums = Forum.order(:name)
     end
 
     def show
@@ -20,29 +18,38 @@ module SuperAdmin
 
     def new
       @user = User.new(role: :super_admin)
-      @forums = Forum.order(:name)
     end
 
     def create
       @user = User.new(user_params)
+      unless User::INTERNAL_ROLES.include?(@user.role)
+        @user.errors.add(:role, "must be an internal role")
+        flash.now[:alert] = "Invalid role selected."
+        render :new, status: :unprocessable_entity
+        return
+      end
+
       if @user.save
         redirect_to super_admin_user_path(@user), notice: "#{@user.email} was created."
       else
-        @forums = Forum.order(:name)
         flash.now[:alert] = @user.errors.full_messages.to_sentence
         render :new, status: :unprocessable_entity
       end
     end
 
     def edit
-      @forums = Forum.order(:name)
     end
 
     def update
+      unless User::INTERNAL_ROLES.include?(user_update_params[:role] || @user.role)
+        flash.now[:alert] = "Invalid role selected."
+        render :edit, status: :unprocessable_entity
+        return
+      end
+
       if @user.update(user_update_params)
         redirect_to super_admin_user_path(@user), notice: "#{@user.email} was updated."
       else
-        @forums = Forum.order(:name)
         flash.now[:alert] = @user.errors.full_messages.to_sentence
         render :edit, status: :unprocessable_entity
       end
@@ -85,15 +92,15 @@ module SuperAdmin
     private
 
     def set_user
-      @user = User.find(params[:id])
+      @user = User.where(role: User::INTERNAL_ROLES).find(params[:id])
     end
 
     def user_params
-      params.require(:user).permit(:email, :password, :password_confirmation, :role, :forum_id, :chapter_id, :full_name, :phone)
+      params.require(:user).permit(:email, :password, :password_confirmation, :role, :full_name, :phone)
     end
 
     def user_update_params
-      params.require(:user).permit(:email, :role, :forum_id, :chapter_id, :full_name, :phone)
+      params.require(:user).permit(:email, :role, :full_name, :phone)
     end
   end
 end

@@ -6,6 +6,7 @@ module SuperAdmin
       @total_invoices = Invoice.count
       @paid_invoices = Invoice.where(status: :paid).count
       @pending_invoices = Invoice.where(status: :pending).count
+      @partially_paid_invoices = Invoice.where(status: :partially_paid).count
       @overdue_invoices = Invoice.where(status: :overdue).or(Invoice.where("due_date < ? AND status = ?", Date.current, Invoice.statuses[:pending])).count
 
       @invoices = Invoice.includes(:forum).order(created_at: :desc)
@@ -44,12 +45,18 @@ module SuperAdmin
     end
 
     def mark_paid
-      @invoice.mark_paid!(
+      received_amount = params[:amount].presence&.to_d || @invoice.balance_due
+      @invoice.record_payment!(
+        received_amount: received_amount,
         payment_method: params[:payment_method].presence || "other",
         recorded_by: current_user,
         reference_number: params[:reference_number]
       )
-      redirect_to super_admin_invoice_path(@invoice), notice: "Invoice #{@invoice.invoice_number} marked as paid."
+
+      notice = @invoice.paid? ? "Invoice #{@invoice.invoice_number} marked as paid." : "Partial payment of #{helpers.number_to_currency(received_amount, unit: '₹', format: '%u%n')} recorded. Balance due: #{helpers.number_to_currency(@invoice.balance_due, unit: '₹', format: '%u%n')}."
+      redirect_to super_admin_invoice_path(@invoice), notice: notice
+    rescue ArgumentError => e
+      redirect_to super_admin_invoice_path(@invoice), alert: e.message
     end
 
     def void
@@ -61,6 +68,7 @@ module SuperAdmin
 
     def set_invoice
       @invoice = Invoice.find(params[:id])
+      @invoice.regenerate_share_token if @invoice.share_token.blank?
     end
 
     def invoice_params

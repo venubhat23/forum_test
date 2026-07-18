@@ -95,6 +95,8 @@ Rails.application.routes.draw do
 
   resources :forum_requests, only: [ :new, :create ]
 
+  get "invoices/:token", to: "public_invoices#show", as: :public_invoice
+
   scope "/:forum_slug", as: :forum do
     root to: "forums/gateway#show"
     get "dashboard", to: "forums/dashboard#show"

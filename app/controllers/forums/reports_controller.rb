@@ -29,7 +29,7 @@ module Forums
     end
 
     def referrals
-      @referrals = Referral.joins("INNER JOIN users givers ON givers.id = referrals.giver_id")
+      @referrals = Referral.joins("INNER JOIN users givers ON givers.id = referrals.referrer_id")
         .where(givers: { forum_id: @current_forum.id }).order(created_at: :desc)
       respond_with_csv(@referrals, "referrals", [ "Giver", "Receiver", "Prospect", "Type", "Status", "Date" ]) do |r|
         [ r.giver.display_name, r.receiver.display_name, r.prospect_name, r.referral_type, r.status, r.created_at ]
@@ -38,7 +38,7 @@ module Forums
 
     def business_generated
       @slips = ThanksgivingSlip.joins("INNER JOIN referrals ON referrals.id = thanksgiving_slips.referral_id")
-        .joins("INNER JOIN users givers ON givers.id = referrals.giver_id")
+        .joins("INNER JOIN users givers ON givers.id = referrals.referrer_id")
         .where(givers: { forum_id: @current_forum.id }).order("thanksgiving_slips.created_at DESC")
       respond_with_csv(@slips, "business-generated", [ "Given By", "Referral Giver", "Amount", "Date" ]) do |s|
         [ s.given_by.display_name, s.referral.giver.display_name, s.amount, s.created_at ]

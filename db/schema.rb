@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_17_010002) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_18_070629) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -326,10 +326,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_17_010002) do
     t.text "description"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "share_token"
     t.index ["coupon_id"], name: "index_invoices_on_coupon_id"
     t.index ["forum_id"], name: "index_invoices_on_forum_id"
     t.index ["invoice_number"], name: "index_invoices_on_invoice_number", unique: true
     t.index ["plan_id"], name: "index_invoices_on_plan_id"
+    t.index ["share_token"], name: "index_invoices_on_share_token", unique: true
   end
 
   create_table "lead_taggings", force: :cascade do |t|
@@ -389,6 +391,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_17_010002) do
     t.text "notes"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.decimal "fee_amount", precision: 10, scale: 2
     t.index ["chapter_id"], name: "index_meeting_schedules_on_chapter_id"
     t.index ["created_by_id"], name: "index_meeting_schedules_on_created_by_id"
   end

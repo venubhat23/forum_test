@@ -9,6 +9,30 @@ class Ability
       return
     end
 
+    if user.admin?
+      can :access, :super_admin_area
+      can :manage, :all
+      return
+    end
+
+    if user.accountant?
+      can :access, :super_admin_area
+      can :read, :all
+      can :manage, FeePayment
+      can :manage, Payment
+      can :manage, Expense
+      can :manage, Invoice
+      return
+    end
+
+    if user.support_staff?
+      can :access, :super_admin_area
+      can :read, :all
+      can :manage, SupportTicket
+      can :manage, SupportTicketReply
+      return
+    end
+
     return unless user.forum_id.present?
 
     can :access, Forum, id: user.forum_id

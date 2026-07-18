@@ -39,18 +39,6 @@
             <span class="nav-text">Invoices</span>
           <% end %>
         </li>
-        <li class="nav-item">
-          <%= link_to super_admin_payments_path, class: "nav-link-modern #{'active' if request.path.start_with?(super_admin_payments_path)}", data: { tooltip: "Payments" } do %>
-            <div class="nav-icon-modern"><div class="icon-bg gradient-green"><i class="bi bi-cash-stack"></i></div></div>
-            <span class="nav-text">Payments</span>
-          <% end %>
-        </li>
-        <li class="nav-item">
-          <%= link_to super_admin_coupons_path, class: "nav-link-modern #{'active' if request.path.start_with?(super_admin_coupons_path)}", data: { tooltip: "Coupons" } do %>
-            <div class="nav-icon-modern"><div class="icon-bg gradient-indigo"><i class="bi bi-tag"></i></div></div>
-            <span class="nav-text">Coupons</span>
-          <% end %>
-        </li>
       </ul>
     </div>
 
@@ -60,7 +48,7 @@
         <li class="nav-item">
           <%= link_to super_admin_users_path, class: "nav-link-modern #{'active' if request.path.start_with?(super_admin_users_path)}", data: { tooltip: "Users" } do %>
             <div class="nav-icon-modern"><div class="icon-bg gradient-blue"><i class="bi bi-people"></i></div></div>
-            <span class="nav-text">Users</span>
+            <span class="nav-text">Internal Users</span>
           <% end %>
         </li>
         <li class="nav-item">

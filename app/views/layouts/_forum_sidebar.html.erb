@@ -27,56 +27,50 @@
             <span class="nav-text">Calendar</span>
           <% end %>
         </li>
+      </ul>
+    </div>
+
+    <% if current_user.super_admin? %>
+      <div class="nav-section">
+        <div class="nav-section-title">Membership</div>
+        <ul class="nav-menu">
+          <li class="nav-item">
+            <%= link_to forum_membership_applications_path(forum_slug: @current_forum.slug), class: "nav-link-modern #{'active' if request.path.start_with?(forum_membership_applications_path(forum_slug: @current_forum.slug))}", data: { tooltip: "Membership Applications" } do %>
+              <div class="nav-icon-modern"><div class="icon-bg gradient-purple"><i class="bi bi-inbox"></i></div></div>
+              <span class="nav-text">Membership Applications</span>
+            <% end %>
+          </li>
+          <li class="nav-item">
+            <%= link_to forum_membership_plans_path(forum_slug: @current_forum.slug), class: "nav-link-modern #{'active' if request.path.start_with?(forum_membership_plans_path(forum_slug: @current_forum.slug))}", data: { tooltip: "Membership Plans" } do %>
+              <div class="nav-icon-modern"><div class="icon-bg gradient-indigo"><i class="bi bi-card-list"></i></div></div>
+              <span class="nav-text">Membership Plans</span>
+            <% end %>
+          </li>
+          <li class="nav-item">
+            <%= link_to forum_business_categories_path(forum_slug: @current_forum.slug), class: "nav-link-modern #{'active' if request.path.start_with?(forum_business_categories_path(forum_slug: @current_forum.slug))}", data: { tooltip: "Business Categories" } do %>
+              <div class="nav-icon-modern"><div class="icon-bg gradient-blue"><i class="bi bi-tags"></i></div></div>
+              <span class="nav-text">Business Categories</span>
+            <% end %>
+          </li>
+          <li class="nav-item">
+            <%= link_to forum_subscription_path(forum_slug: @current_forum.slug), class: "nav-link-modern #{'active' if current_page?(forum_subscription_path(forum_slug: @current_forum.slug))}", data: { tooltip: "Subscription" } do %>
+              <div class="nav-icon-modern"><div class="icon-bg gradient-indigo"><i class="bi bi-gem"></i></div></div>
+              <span class="nav-text">Subscription</span>
+            <% end %>
+          </li>
+        </ul>
+      </div>
+    <% end %>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Engagement</div>
+      <ul class="nav-menu">
         <li class="nav-item">
           <%= link_to forum_events_path(forum_slug: @current_forum.slug), class: "nav-link-modern #{'active' if request.path.start_with?(forum_events_path(forum_slug: @current_forum.slug))}", data: { tooltip: "Events" } do %>
             <div class="nav-icon-modern"><div class="icon-bg gradient-green"><i class="bi bi-calendar-event"></i></div></div>
             <span class="nav-text">Events</span>
           <% end %>
         </li>
-        <% unless current_user.guest? %>
-          <li class="nav-item">
-            <%= link_to forum_scorecard_path(forum_slug: @current_forum.slug), class: "nav-link-modern #{'active' if current_page?(forum_scorecard_path(forum_slug: @current_forum.slug))}", data: { tooltip: "Scorecard" } do %>
-              <div class="nav-icon-modern"><div class="icon-bg gradient-yellow"><i class="bi bi-award"></i></div></div>
-              <span class="nav-text">Scorecard</span>
-            <% end %>
-          </li>
-        <% end %>
-      </ul>
-    </div>
-
-    <div class="nav-section">
-      <div class="nav-section-title">Membership</div>
-      <ul class="nav-menu">
-        <li class="nav-item">
-          <%= link_to forum_membership_applications_path(forum_slug: @current_forum.slug), class: "nav-link-modern #{'active' if request.path.start_with?(forum_membership_applications_path(forum_slug: @current_forum.slug))}", data: { tooltip: "Membership Applications" } do %>
-            <div class="nav-icon-modern"><div class="icon-bg gradient-purple"><i class="bi bi-inbox"></i></div></div>
-            <span class="nav-text">Membership Applications</span>
-          <% end %>
-        </li>
-        <li class="nav-item">
-          <%= link_to forum_membership_plans_path(forum_slug: @current_forum.slug), class: "nav-link-modern #{'active' if request.path.start_with?(forum_membership_plans_path(forum_slug: @current_forum.slug))}", data: { tooltip: "Membership Plans" } do %>
-            <div class="nav-icon-modern"><div class="icon-bg gradient-indigo"><i class="bi bi-card-list"></i></div></div>
-            <span class="nav-text">Membership Plans</span>
-          <% end %>
-        </li>
-        <li class="nav-item">
-          <%= link_to forum_business_categories_path(forum_slug: @current_forum.slug), class: "nav-link-modern #{'active' if request.path.start_with?(forum_business_categories_path(forum_slug: @current_forum.slug))}", data: { tooltip: "Business Categories" } do %>
-            <div class="nav-icon-modern"><div class="icon-bg gradient-blue"><i class="bi bi-tags"></i></div></div>
-            <span class="nav-text">Business Categories</span>
-          <% end %>
-        </li>
-        <li class="nav-item">
-          <%= link_to forum_subscription_path(forum_slug: @current_forum.slug), class: "nav-link-modern #{'active' if current_page?(forum_subscription_path(forum_slug: @current_forum.slug))}", data: { tooltip: "Subscription" } do %>
-            <div class="nav-icon-modern"><div class="icon-bg gradient-indigo"><i class="bi bi-gem"></i></div></div>
-            <span class="nav-text">Subscription</span>
-          <% end %>
-        </li>
-      </ul>
-    </div>
-
-    <div class="nav-section">
-      <div class="nav-section-title">Engagement</div>
-      <ul class="nav-menu">
         <% if can? :read, Lead %>
           <li class="nav-item">
             <%= link_to forum_leads_path(forum_slug: @current_forum.slug), class: "nav-link-modern #{'active' if request.path.start_with?(forum_leads_path(forum_slug: @current_forum.slug))}", data: { tooltip: "Leads" } do %>
@@ -115,7 +109,7 @@
             <span class="nav-text">Office Darshan</span>
           <% end %>
         </li>
-        <% if can? :read, Announcement %>
+        <% if current_user.super_admin? && can?(:read, Announcement) %>
           <li class="nav-item">
             <%= link_to forum_announcements_path(forum_slug: @current_forum.slug), class: "nav-link-modern #{'active' if request.path.start_with?(forum_announcements_path(forum_slug: @current_forum.slug))}", data: { tooltip: "Announcements" } do %>
               <div class="nav-icon-modern"><div class="icon-bg gradient-purple"><i class="bi bi-megaphone"></i></div></div>
@@ -136,6 +130,14 @@
       <div class="nav-section">
         <div class="nav-section-title">Finance &amp; Insights</div>
         <ul class="nav-menu">
+          <% unless current_user.guest? %>
+            <li class="nav-item">
+              <%= link_to forum_scorecard_path(forum_slug: @current_forum.slug), class: "nav-link-modern #{'active' if current_page?(forum_scorecard_path(forum_slug: @current_forum.slug))}", data: { tooltip: "Scorecard" } do %>
+                <div class="nav-icon-modern"><div class="icon-bg gradient-yellow"><i class="bi bi-award"></i></div></div>
+                <span class="nav-text">Scorecard</span>
+              <% end %>
+            </li>
+          <% end %>
           <li class="nav-item">
             <%= link_to forum_finance_path(forum_slug: @current_forum.slug), class: "nav-link-modern #{'active' if request.path.start_with?(forum_finance_path(forum_slug: @current_forum.slug)) || request.path.start_with?(forum_expenses_path(forum_slug: @current_forum.slug))}", data: { tooltip: "Finance" } do %>
               <div class="nav-icon-modern"><div class="icon-bg gradient-green"><i class="bi bi-cash-stack"></i></div></div>

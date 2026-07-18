@@ -22,8 +22,8 @@
 </div>
 
 <div class="alert alert-info small mb-4">
-  <strong>How this is scored:</strong> Referrals &amp; Leads (given/received), 1-2-1 meetings completed, meeting attendance %, and Business Generated (₹) — the total value of Thanksgiving Slips recorded for closed business, for the selected month.
-  <%= "Ranked by Business Generated." if @scope != :personal %>
+  <strong>How this is scored:</strong> Referrals &amp; Leads (given/received), 1-2-1 meetings completed, meeting attendance %, and Business Generated (₹) all feed into a single Score out of 100, weighted toward converted leads and closed business.
+  <%= "Ranked by Score." if @scope != :personal %>
 </div>
 
 <% if @scope == :personal %>
@@ -92,6 +92,15 @@
         <div class="mini-stat-icon mini-stat-icon-success"><i class="bi bi-cash-stack"></i></div>
       </div>
     </div>
+    <div class="col-6 col-lg-3">
+      <div class="mini-stat-card">
+        <div>
+          <div class="mini-stat-label">Score</div>
+          <div class="mini-stat-value text-warning"><%= stats[:score] %> / 100</div>
+        </div>
+        <div class="mini-stat-icon mini-stat-icon-warning"><i class="bi bi-star-fill"></i></div>
+      </div>
+    </div>
   </div>
 
   <div class="card mb-4">
@@ -130,15 +139,18 @@
             <th class="text-center">1-2-1s</th>
             <th class="text-center">Attendance</th>
             <th class="text-end">Business Generated</th>
+            <th class="text-end">Score</th>
           </tr>
         </thead>
         <tbody>
+          <% top_labels = { 0 => [ "Gold", "text-warning", "bi-trophy-fill" ], 1 => [ "Silver", "text-secondary", "bi-award-fill" ], 2 => [ "Bronze", "text-danger-emphasis", "bi-award-fill" ] } %>
           <% @sorted_members.each_with_index do |member, index| %>
             <% stats = @stats_by_member[member.id] %>
+            <% label = top_labels[index] if stats[:score].positive? %>
             <tr>
               <td>
-                <% if index.zero? && stats[:business_generated].positive? %>
-                  <i class="bi bi-trophy-fill text-warning"></i>
+                <% if label %>
+                  <i class="bi <%= label[1] %> <%= label[2] %>" title="<%= label[0] %>"></i>
                 <% else %>
                   <%= index + 1 %>
                 <% end %>
@@ -147,6 +159,9 @@
                 <div class="d-flex align-items-center gap-2">
                   <span class="row-avatar"><%= member.full_name.first.upcase %></span>
                   <span class="fw-semibold"><%= member.display_name %></span>
+                  <% if label %>
+                    <span class="badge bg-light <%= label[1] %> border" data-tooltip="<%= label[0] %>"><%= label[0] %></span>
+                  <% end %>
                   <% (@badges_by_member[member.id] || []).each do |badge| %>
                     <i class="bi <%= badge.icon %> text-warning" data-tooltip="<%= badge.title %>" title="<%= badge.title %>"></i>
                   <% end %>
@@ -159,10 +174,11 @@
               <td class="text-center"><%= stats[:one_to_ones] %></td>
               <td class="text-center"><%= stats[:attendance_pct] %>%</td>
               <td class="text-end fw-semibold text-success"><%= number_to_currency(stats[:business_generated]) %></td>
+              <td class="text-end fw-semibold"><%= stats[:score] %></td>
             </tr>
           <% end %>
           <% if @sorted_members.empty? %>
-            <tr><td colspan="9" class="text-center text-muted py-4">No members yet.</td></tr>
+            <tr><td colspan="10" class="text-center text-muted py-4">No members yet.</td></tr>
           <% end %>
         </tbody>
       </table>

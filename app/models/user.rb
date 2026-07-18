@@ -4,8 +4,11 @@ class User < ApplicationRecord
   devise :database_authenticatable,
          :recoverable, :rememberable, :validatable
 
-  enum :role, { super_admin: 0, forum_admin: 1, chapter_admin: 2, committee_member: 3, member: 4, guest: 5 }
+  enum :role, { super_admin: 0, forum_admin: 1, chapter_admin: 2, committee_member: 3, member: 4, guest: 5, admin: 6, accountant: 7, support_staff: 8 }
   enum :membership_status, { pending: 0, active: 1, suspended: 2 }, prefix: :membership
+
+  # Internal (Krama Consultancy staff) roles: not tied to any Forum tenant, managed from super_admin/users.
+  INTERNAL_ROLES = %w[super_admin admin accountant support_staff].freeze
 
   DESIGNATIONS = [ "President", "Vice President", "Associate Vice President", "Secretary", "Treasurer", "Coordinator" ].freeze
 
@@ -57,7 +60,7 @@ class User < ApplicationRecord
   has_many :targeted_announcements, class_name: "Announcement", foreign_key: :target_user_id, dependent: :nullify, inverse_of: :target_user
   has_many :payments_recorded, class_name: "Payment", foreign_key: :recorded_by_id, dependent: :destroy, inverse_of: :recorded_by
 
-  validates :forum, presence: true, unless: :super_admin?
+  validates :forum, presence: true, unless: -> { INTERNAL_ROLES.include?(role) }
   validates :chapter, presence: true, if: -> { member? || guest? || committee_member? }
   validates :full_name, presence: true, if: -> { member? || guest? || committee_member? }
   validates :phone, presence: true, if: -> { member? || guest? || committee_member? }
@@ -76,6 +79,10 @@ class User < ApplicationRecord
   def designation_rank
     rank = DESIGNATIONS.index(designation)
     rank.nil? ? DESIGNATIONS.size : rank
+  end
+
+  def internal?
+    INTERNAL_ROLES.include?(role)
   end
 
   def suspended?

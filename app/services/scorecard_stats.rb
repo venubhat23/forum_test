@@ -1,4 +1,16 @@
 class ScorecardStats
+  # Out of 100. Leads converted and business generated carry the most weight
+  # since they reflect closed value, not just activity volume.
+  COUNT_WEIGHTS = {
+    referrals_given: 15,
+    referrals_received: 10,
+    leads_created: 10,
+    leads_converted: 20,
+    one_to_ones: 15,
+    business_generated: 15
+  }.freeze
+  ATTENDANCE_WEIGHT = 15
+
   def initialize(members:, month:)
     @members = members
     @month = month
@@ -24,7 +36,7 @@ class ScorecardStats
     thanksgiving_business = ThanksgivingSlip.where(given_by_id: member_ids, created_at: time_range).group(:given_by_id).sum(:amount)
     lead_business = Lead.where(accepted_by_id: member_ids, stage: :converted, thanksgiving_given_at: time_range).group(:accepted_by_id).sum(:thanksgiving_amount)
 
-    @members.each_with_object({}) do |member, hash|
+    stats = @members.each_with_object({}) do |member, hash|
       total_meetings = total_meetings_by_chapter[member.chapter_id].to_i
       present = attendance_present[member.id].to_i
       attendance_pct = total_meetings.positive? ? ((present.to_f / total_meetings) * 100).round(1) : 0
@@ -39,5 +51,29 @@ class ScorecardStats
         business_generated: thanksgiving_business[member.id].to_i + lead_business[member.id].to_i
       }
     end
+
+    apply_scores(stats)
+  end
+
+  private
+
+  # Min-max normalizes each count-based metric against the best performer in
+  # the group (so no member can be judged against an absolute target), then
+  # combines the normalized metrics with COUNT_WEIGHTS. Attendance is already
+  # a percentage, so it's weighted directly instead of being re-normalized.
+  def apply_scores(stats)
+    maxes = COUNT_WEIGHTS.keys.to_h { |key| [ key, stats.values.map { |s| s[key] }.max.to_f ] }
+
+    stats.each_value do |member_stats|
+      points = COUNT_WEIGHTS.sum do |key, weight|
+        max = maxes[key]
+        max.positive? ? (member_stats[key] / max) * weight : 0
+      end
+      points += (member_stats[:attendance_pct] / 100.0) * ATTENDANCE_WEIGHT
+
+      member_stats[:score] = points.round(1)
+    end
+
+    stats
   end
 end
