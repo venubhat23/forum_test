@@ -18,6 +18,7 @@ module SuperAdmin
     def new
       @invoice = Invoice.new(due_date: 7.days.from_now.to_date)
       @forums = Forum.order(:name)
+      @plans = Plan.ordered.active
     end
 
     def create
@@ -36,6 +37,7 @@ module SuperAdmin
         redirect_to super_admin_invoice_path(@invoice), notice: "Invoice #{@invoice.invoice_number} created."
       else
         @forums = Forum.order(:name)
+        @plans = Plan.ordered.active
         flash.now[:alert] = @invoice.errors.full_messages.to_sentence
         render :new, status: :unprocessable_entity
       end

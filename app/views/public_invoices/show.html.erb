@@ -46,8 +46,15 @@
     }
     .topbar { height: 8px; background: linear-gradient(135deg, var(--brand-1), var(--brand-2)); }
     .invoice-body { padding: 36px; }
-    .header { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; margin-bottom: 28px; }
-    .brand { font-size: 22px; font-weight: 800; background: linear-gradient(135deg, var(--brand-1), var(--brand-2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .header { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; margin-bottom: 24px; }
+    .brand-row { display: flex; align-items: center; gap: 12px; }
+    .brand-mark {
+      width: 44px; height: 44px; flex: none; border-radius: 12px;
+      background: linear-gradient(135deg, var(--brand-1), var(--brand-2));
+      color: white; display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 18px;
+    }
+    .brand { font-size: 20px; font-weight: 800; color: var(--ink); }
     .brand-sub { color: var(--muted); font-size: 13px; margin-top: 2px; }
     .meta { text-align: right; font-size: 13px; color: var(--muted); }
     .meta strong { color: var(--ink); font-size: 15px; display: block; margin-bottom: 4px; }
@@ -59,13 +66,33 @@
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.04em;
-      margin-bottom: 24px;
+      margin-top: 8px;
     }
     .status-paid { background: rgba(16,185,129,0.12); color: #059669; }
     .status-pending, .status-draft { background: rgba(59,130,246,0.12); color: #2563eb; }
     .status-overdue { background: rgba(239,68,68,0.12); color: #dc2626; }
     .status-cancelled { background: rgba(107,114,128,0.12); color: #4b5563; }
     .status-partially_paid { background: rgba(245,158,11,0.12); color: #d97706; }
+    .hero {
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;
+      background: linear-gradient(135deg, rgba(59,130,246,0.08), rgba(139,92,246,0.08));
+      border: 1px solid rgba(139,92,246,0.14);
+      border-radius: 14px;
+      padding: 20px 24px;
+      margin-bottom: 28px;
+    }
+    .hero .label { margin-bottom: 6px; }
+    .hero .amount {
+      font-size: 32px; font-weight: 800; line-height: 1;
+      background: linear-gradient(135deg, var(--brand-1), var(--brand-2));
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .hero .due { text-align: right; font-size: 13px; color: var(--muted); }
+    .hero .due strong { display: block; color: var(--ink); font-size: 15px; }
+    .hero-paid { background: rgba(16,185,129,0.08); border-color: rgba(16,185,129,0.18); }
+    .hero-paid .amount { background: none; -webkit-text-fill-color: initial; color: #059669; }
+    .hero-cancelled { background: rgba(107,114,128,0.06); border-color: rgba(107,114,128,0.16); }
+    .hero-cancelled .amount { background: none; -webkit-text-fill-color: initial; color: #6b7280; }
     .row { display: flex; flex-wrap: wrap; gap: 24px; margin-bottom: 28px; }
     .label { text-transform: uppercase; font-size: 11px; font-weight: 700; letter-spacing: 0.04em; color: var(--muted); margin-bottom: 4px; }
     .value { font-weight: 600; font-size: 15px; }
@@ -89,6 +116,8 @@
       .invoice-body { padding: 22px; }
       .meta { text-align: left; }
       .header { flex-direction: column; }
+      .hero { flex-direction: column; align-items: flex-start; }
+      .hero .due { text-align: left; }
     }
   </style>
 </head>
@@ -101,18 +130,44 @@
     <div class="topbar"></div>
     <div class="invoice-body">
       <div class="header">
-        <div>
-          <div class="brand">Krama Consultancy</div>
-          <div class="brand-sub">Business Network Forum Platform</div>
+        <div class="brand-row">
+          <div class="brand-mark">K</div>
+          <div>
+            <div class="brand">Krama Consultancy</div>
+            <div class="brand-sub">Business Network Forum Platform</div>
+          </div>
         </div>
         <div class="meta">
           <strong>Invoice <%= @invoice.invoice_number %></strong>
           Issued <%= @invoice.created_at.strftime("%d %b %Y") %><br>
           Due <%= @invoice.due_date.strftime("%d %b %Y") %>
+          <div><span class="status-pill status-<%= @invoice.status %>"><%= @invoice.status.titleize %></span></div>
         </div>
       </div>
 
-      <span class="status-pill status-<%= @invoice.status %>"><%= @invoice.status.titleize %></span>
+      <div class="hero<%= @invoice.paid? ? ' hero-paid' : @invoice.cancelled? ? ' hero-cancelled' : '' %>">
+        <div>
+          <div class="label">
+            <% if @invoice.paid? %>
+              Paid in Full
+            <% elsif @invoice.cancelled? %>
+              Cancelled
+            <% elsif @invoice.amount_paid.positive? %>
+              Balance Due
+            <% else %>
+              Amount Due
+            <% end %>
+          </div>
+          <div class="amount">&#8377;<%= number_with_delimiter((@invoice.paid? || @invoice.cancelled? ? @invoice.amount : @invoice.balance_due).to_i) %></div>
+        </div>
+        <div class="due">
+          <% if @invoice.paid? %>
+            Paid on<br><strong><%= @invoice.paid_on&.strftime("%d %b %Y") %></strong>
+          <% else %>
+            Due by<br><strong><%= @invoice.due_date.strftime("%d %b %Y") %></strong>
+          <% end %>
+        </div>
+      </div>
 
       <div class="row">
         <div>
