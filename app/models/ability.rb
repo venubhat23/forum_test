@@ -98,7 +98,8 @@ class Ability
       can [ :read, :create, :update ], WeeklyPresentation, chapter_id: user.chapter_id
       can [ :read, :create ], OneToOneMeeting, requester_id: user.id
       can [ :read, :update ], OneToOneMeeting, requested_with_id: user.id
-      can :read, OfficeDarshan, member_id: user.id
+      can [ :read, :create, :complete, :thank ], OfficeDarshan, host_id: user.id
+      can [ :read, :update, :complete, :thank ], OfficeDarshan, visitor_id: user.id
       can :read, Event, forum_id: user.forum_id
       can [ :read, :create, :destroy ], EventRegistration, user_id: user.id
       can :read, MembershipPlan, forum_id: user.forum_id
@@ -119,7 +120,8 @@ class Ability
       can :read, WeeklyPresentation, chapter_id: user.chapter_id
       can [ :read, :create ], OneToOneMeeting, requester_id: user.id
       can [ :read, :update ], OneToOneMeeting, requested_with_id: user.id
-      can :read, OfficeDarshan, member_id: user.id
+      can [ :read, :create, :complete, :thank ], OfficeDarshan, host_id: user.id
+      can [ :read, :update, :complete, :thank ], OfficeDarshan, visitor_id: user.id
       can :read, Event, forum_id: user.forum_id
       can [ :read, :create, :destroy ], EventRegistration, user_id: user.id
       can :read, MembershipPlan, forum_id: user.forum_id

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_18_070629) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_19_050000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -261,6 +261,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_18_070629) do
     t.integer "payment_method"
     t.string "feeable_type"
     t.bigint "feeable_id"
+    t.integer "duration_years"
+    t.boolean "lifetime", default: false, null: false
     t.index ["feeable_type", "feeable_id"], name: "index_fee_payments_on_feeable"
     t.index ["invoice_number"], name: "index_fee_payments_on_invoice_number", unique: true
     t.index ["user_id"], name: "index_fee_payments_on_user_id"
@@ -481,14 +483,18 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_18_070629) do
 
   create_table "office_darshans", force: :cascade do |t|
     t.bigint "forum_id", null: false
-    t.bigint "member_id", null: false
-    t.date "visit_date", null: false
     t.integer "status", default: 0, null: false
     t.text "notes"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "host_id", null: false
+    t.bigint "visitor_id", null: false
+    t.datetime "scheduled_at", null: false
+    t.datetime "confirmed_at"
+    t.datetime "thanked_at"
     t.index ["forum_id"], name: "index_office_darshans_on_forum_id"
-    t.index ["member_id"], name: "index_office_darshans_on_member_id"
+    t.index ["host_id"], name: "index_office_darshans_on_host_id"
+    t.index ["visitor_id"], name: "index_office_darshans_on_visitor_id"
   end
 
   create_table "one_to_one_meetings", force: :cascade do |t|
@@ -875,6 +881,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_18_070629) do
     t.bigint "role_id"
     t.bigint "user_role_id"
     t.string "original_password"
+    t.string "service_area"
+    t.string "capacity"
+    t.boolean "lifetime_member", default: false, null: false
     t.index ["business_category_id"], name: "index_users_on_business_category_id"
     t.index ["chapter_id"], name: "index_users_on_chapter_id"
     t.index ["email"], name: "index_users_on_email", unique: true
@@ -955,7 +964,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_18_070629) do
   add_foreign_key "membership_plans", "forums"
   add_foreign_key "notifications", "users"
   add_foreign_key "office_darshans", "forums"
-  add_foreign_key "office_darshans", "users", column: "member_id"
+  add_foreign_key "office_darshans", "users", column: "host_id"
+  add_foreign_key "office_darshans", "users", column: "visitor_id"
   add_foreign_key "one_to_one_meetings", "forums"
   add_foreign_key "one_to_one_meetings", "users", column: "requested_with_id"
   add_foreign_key "one_to_one_meetings", "users", column: "requester_id"

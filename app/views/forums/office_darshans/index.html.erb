@@ -7,13 +7,13 @@
   </div>
   <% if can? :create, OfficeDarshan %>
     <%= link_to new_forum_office_darshan_path(forum_slug: @current_forum.slug), class: "btn btn-primary" do %>
-      <i class="bi bi-plus-lg me-1"></i> Schedule Visit
+      <i class="bi bi-plus-lg me-1"></i> Invite to Office Darshan
     <% end %>
   <% end %>
 </div>
 
 <div class="row g-3 mb-4">
-  <div class="col-6 col-lg-4">
+  <div class="col-6 col-lg-3">
     <div class="mini-stat-card">
       <div>
         <div class="mini-stat-label">Total</div>
@@ -22,16 +22,25 @@
       <div class="mini-stat-icon mini-stat-icon-primary"><i class="bi bi-building-check"></i></div>
     </div>
   </div>
-  <div class="col-6 col-lg-4">
+  <div class="col-6 col-lg-3">
     <div class="mini-stat-card">
       <div>
-        <div class="mini-stat-label">Scheduled</div>
-        <div class="mini-stat-value text-warning"><%= @scheduled_darshans %></div>
+        <div class="mini-stat-label">Invited</div>
+        <div class="mini-stat-value text-warning"><%= @invited_darshans %></div>
       </div>
       <div class="mini-stat-icon mini-stat-icon-warning"><i class="bi bi-hourglass-split"></i></div>
     </div>
   </div>
-  <div class="col-6 col-lg-4">
+  <div class="col-6 col-lg-3">
+    <div class="mini-stat-card">
+      <div>
+        <div class="mini-stat-label">Accepted</div>
+        <div class="mini-stat-value text-info"><%= @accepted_darshans %></div>
+      </div>
+      <div class="mini-stat-icon mini-stat-icon-info"><i class="bi bi-check2"></i></div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
     <div class="mini-stat-card">
       <div>
         <div class="mini-stat-label">Completed</div>
@@ -55,8 +64,9 @@
     <table class="table table-hover align-middle mb-0">
       <thead>
         <tr>
-          <th>Member</th>
-          <th>Visit Date</th>
+          <th>Host</th>
+          <th>Visitor</th>
+          <th>Scheduled</th>
           <th>Status</th>
           <th></th>
         </tr>
@@ -66,11 +76,12 @@
           <tr>
             <td>
               <div class="d-flex align-items-center gap-2">
-                <span class="row-avatar"><%= d.member.display_name.first.upcase %></span>
-                <span class="fw-semibold"><%= d.member.display_name %></span>
+                <span class="row-avatar"><%= d.host.display_name.first.upcase %></span>
+                <span class="fw-semibold"><%= d.host.display_name %></span>
               </div>
             </td>
-            <td><%= d.visit_date.strftime("%d %b %Y") %></td>
+            <td><%= d.visitor.display_name %></td>
+            <td><%= d.scheduled_at.strftime("%d %b %Y %H:%M") %></td>
             <td><span class="badge bg-secondary"><%= d.status.titleize %></span></td>
             <td class="text-end">
               <%= link_to forum_office_darshan_path(forum_slug: @current_forum.slug, id: d.id), class: "icon-btn icon-btn-view", title: "View" do %>
@@ -80,7 +91,7 @@
           </tr>
         <% end %>
         <% if @darshans.empty? %>
-          <tr><td colspan="4" class="text-center text-muted py-4">No office visits scheduled yet.</td></tr>
+          <tr><td colspan="5" class="text-center text-muted py-4">No office darshan visits yet.</td></tr>
         <% end %>
       </tbody>
     </table>

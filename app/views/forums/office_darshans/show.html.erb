@@ -1,15 +1,54 @@
-<% content_for :title, "Office Darshan · #{@darshan.member.display_name}" %>
+<% content_for :title, "Office Darshan · #{@darshan.host.display_name} & #{@darshan.visitor.display_name}" %>
 
 <div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-2">
   <div>
-    <h1 class="page-title h4"><%= @darshan.member.display_name %></h1>
-    <p class="page-subtitle mb-0"><%= @darshan.visit_date.strftime("%d %b %Y") %> &middot; <span class="badge bg-secondary"><%= @darshan.status.titleize %></span></p>
+    <h1 class="page-title h4"><%= @darshan.host.display_name %> &rarr; <%= @darshan.visitor.display_name %></h1>
+    <p class="page-subtitle mb-0"><%= @darshan.scheduled_at.strftime("%d %b %Y %H:%M") %> &middot; <span class="badge bg-secondary"><%= @darshan.status.titleize %></span></p>
   </div>
-  <% if can? :destroy, @darshan %>
-    <%= button_to "Delete", forum_office_darshan_path(forum_slug: @current_forum.slug, id: @darshan.id), method: :delete, class: "btn btn-outline-danger",
-          data: { turbo_confirm: "Delete this visit record?" } %>
-  <% end %>
+  <div class="d-flex flex-wrap gap-2">
+    <% if can?(:update, @darshan) && @darshan.invited? %>
+      <%= button_to "Accept", accept_forum_office_darshan_path(forum_slug: @current_forum.slug, id: @darshan.id), method: :patch, class: "btn btn-success" %>
+      <%= button_to "Decline", decline_forum_office_darshan_path(forum_slug: @current_forum.slug, id: @darshan.id), method: :patch, class: "btn btn-outline-danger" %>
+    <% elsif can?(:complete, @darshan) && @darshan.accepted? %>
+      <%= button_to "Mark Successfully Visited", complete_forum_office_darshan_path(forum_slug: @current_forum.slug, id: @darshan.id), method: :patch, class: "btn btn-primary" %>
+    <% end %>
+    <% if @darshan.completed? && can?(:thank, @darshan) %>
+      <%= button_to "Send Thank You", thank_forum_office_darshan_path(forum_slug: @current_forum.slug, id: @darshan.id), method: :patch, class: "btn btn-outline-success" %>
+    <% end %>
+    <% if can? :destroy, @darshan %>
+      <%= button_to "Delete", forum_office_darshan_path(forum_slug: @current_forum.slug, id: @darshan.id), method: :delete, class: "btn btn-outline-danger",
+            data: { turbo_confirm: "Delete this visit record?" } %>
+    <% end %>
+  </div>
 </div>
+
+<div class="row g-3 mb-4">
+  <div class="col-12 col-sm-6">
+    <div class="card h-100">
+      <div class="card-header fw-semibold">Host</div>
+      <div class="card-body d-flex align-items-center gap-2">
+        <span class="row-avatar"><%= @darshan.host.display_name.first.upcase %></span>
+        <span><%= @darshan.host.display_name %></span>
+      </div>
+    </div>
+  </div>
+  <div class="col-12 col-sm-6">
+    <div class="card h-100">
+      <div class="card-header fw-semibold">Visitor</div>
+      <div class="card-body d-flex align-items-center gap-2">
+        <span class="row-avatar"><%= @darshan.visitor.display_name.first.upcase %></span>
+        <span><%= @darshan.visitor.display_name %></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<% if @darshan.confirmed_at.present? || @darshan.thanked_at.present? %>
+  <p class="text-muted small">
+    <% if @darshan.confirmed_at.present? %>Confirmed <%= @darshan.confirmed_at.strftime("%d %b %Y %H:%M") %><% end %>
+    <% if @darshan.thanked_at.present? %> &middot; Thank-you sent <%= @darshan.thanked_at.strftime("%d %b %Y %H:%M") %><% end %>
+  </p>
+<% end %>
 
 <% if @darshan.photos.attached? %>
   <div class="card mb-4">

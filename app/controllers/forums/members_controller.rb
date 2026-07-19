@@ -45,6 +45,8 @@ module Forums
     def show
       authorize! :read, @member
       @fee_payments = @member.fee_payments.order(created_at: :desc)
+      @pending_annual_fee = @fee_payments.find { |f| f.annual_membership? && !f.paid? }
+      @paid_annual_fee = @fee_payments.find { |f| f.annual_membership? && f.paid? }
     end
 
     def new

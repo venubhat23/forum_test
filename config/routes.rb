@@ -189,7 +189,14 @@ Rails.application.routes.draw do
         patch :complete
       end
     end
-    resources :office_darshans, controller: "forums/office_darshans", except: [ :edit, :update ]
+    resources :office_darshans, controller: "forums/office_darshans", except: [ :edit, :update ] do
+      member do
+        patch :accept
+        patch :decline
+        patch :complete
+        patch :thank
+      end
+    end
     resources :leads, controller: "forums/leads" do
       member do
         patch :accept

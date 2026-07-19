@@ -154,7 +154,8 @@ class User < ApplicationRecord
   has_many :event_registrations, dependent: :destroy
   has_many :invited_event_registrations, class_name: "EventRegistration", foreign_key: :invited_by_id, dependent: :nullify, inverse_of: false
   has_many :weekly_presentations, foreign_key: :member_id, dependent: :destroy, inverse_of: :member
-  has_many :office_darshans, foreign_key: :member_id, dependent: :destroy, inverse_of: :member
+  has_many :office_darshans_as_host, class_name: "OfficeDarshan", foreign_key: :host_id, dependent: :destroy, inverse_of: :host
+  has_many :office_darshans_as_visitor, class_name: "OfficeDarshan", foreign_key: :visitor_id, dependent: :destroy, inverse_of: :visitor
   has_many :one_to_one_meetings_as_requester, class_name: "OneToOneMeeting", foreign_key: :requester_id, dependent: :destroy, inverse_of: :requester
   has_many :one_to_one_meetings_as_requested, class_name: "OneToOneMeeting", foreign_key: :requested_with_id, dependent: :destroy, inverse_of: :requested_with
   has_many :membership_applications_reviewed, class_name: "MembershipApplication", foreign_key: :reviewed_by_id, dependent: :nullify, inverse_of: :reviewed_by

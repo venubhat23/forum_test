@@ -33,7 +33,13 @@ module Forums
 
       if @fee_payment.user && @fee_payment.user.chapter_id == @chapter.id && @fee_payment.save
         @fee_payment.mark_paid! if mark_as_paid
-        redirect_to forum_chapter_fee_payments_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id), notice: "Fee recorded for #{@fee_payment.user.display_name}."
+        notice = mark_as_paid ? "Payment received from #{@fee_payment.user.display_name}. 🎉" : "Fee recorded for #{@fee_payment.user.display_name}."
+        destination = if @fee_payment.annual_membership? && @fee_payment.user.member?
+          forum_chapter_member_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: @fee_payment.user_id)
+        else
+          forum_chapter_fee_payments_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id)
+        end
+        redirect_to destination, notice: notice
       else
         @fee_payment.errors.add(:user, "must belong to this chapter") if @fee_payment.user && @fee_payment.user.chapter_id != @chapter.id
         @people = billable_people
@@ -83,7 +89,7 @@ module Forums
     end
 
     def fee_payment_params
-      params.require(:fee_payment).permit(:user_id, :fee_type, :amount, :due_date, :event_id, :meeting_id)
+      params.require(:fee_payment).permit(:user_id, :fee_type, :amount, :due_date, :event_id, :meeting_id, :duration_years, :lifetime)
     end
   end
 end
