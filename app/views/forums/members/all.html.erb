@@ -103,8 +103,9 @@
               <div class="d-flex gap-1 justify-content-end align-items-center">
                 <% if !fee_paid_current && can?(:create, FeePayment) && member.chapter_id.present? %>
                   <% if fee %>
-                    <button type="button" class="btn btn-sm btn-success" title="Record Payment (full or partial)" data-bs-toggle="modal" data-bs-target="#record-payment-<%= fee.id %>">
-                      Pay
+                    <%= button_to "Full Pay", mark_paid_forum_chapter_fee_payment_path(forum_slug: @current_forum.slug, chapter_id: member.chapter_id, id: fee.id), method: :patch, class: "btn btn-sm btn-success", title: "Mark full balance as paid", data: { turbo_confirm: "Mark #{number_to_currency(fee.balance_due)} as fully paid for #{member.display_name}?" } %>
+                    <button type="button" class="btn btn-sm btn-outline-success" title="Record a partial payment" data-bs-toggle="modal" data-bs-target="#record-payment-<%= fee.id %>">
+                      Partial Pay
                     </button>
                     <%= render "forums/fee_payments/record_payment_modal", fee: fee, user: member %>
                   <% else %>

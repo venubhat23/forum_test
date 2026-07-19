@@ -11,7 +11,7 @@ module Forums
       credit_transactions = FeePaymentTransaction
         .joins(:fee_payment)
         .where(fee_payments: { user_id: user_ids })
-        .includes(fee_payment: [ :user, :feeable ])
+        .preload(fee_payment: [ :user, :feeable ])
 
       debit_expenses = @current_forum.expenses
 
