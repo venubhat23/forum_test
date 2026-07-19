@@ -94,12 +94,25 @@
                 <span class="badge badge-status-active"><i class="bi bi-check-circle-fill me-1"></i>Paid</span>
               <% elsif fee&.partially_paid? %>
                 <span class="badge badge-status-partial"><i class="bi bi-exclamation-triangle-fill me-1"></i>Partially Paid</span>
+                <div class="text-muted small mt-1">Pending: <%= number_to_currency(fee.balance_due) %></div>
               <% else %>
                 <span class="badge badge-status-trial"><i class="bi bi-exclamation-circle-fill me-1"></i>Not Paid</span>
               <% end %>
             </td>
             <td class="text-end">
-              <div class="d-flex gap-1 justify-content-end">
+              <div class="d-flex gap-1 justify-content-end align-items-center">
+                <% if !fee_paid_current && can?(:create, FeePayment) && member.chapter_id.present? %>
+                  <% if fee %>
+                    <button type="button" class="btn btn-sm btn-success" title="Record Payment (full or partial)" data-bs-toggle="modal" data-bs-target="#record-payment-<%= fee.id %>">
+                      Pay
+                    </button>
+                    <%= render "forums/fee_payments/record_payment_modal", fee: fee, user: member %>
+                  <% else %>
+                    <%= link_to new_forum_chapter_fee_payment_path(forum_slug: @current_forum.slug, chapter_id: member.chapter_id, user_id: member.id, fee_type: "annual_membership"), class: "btn btn-sm btn-primary", title: "Collect Annual Fee" do %>
+                      Pay
+                    <% end %>
+                  <% end %>
+                <% end %>
                 <% if fee && member.chapter_id.present? %>
                   <%= link_to print_forum_chapter_fee_payment_path(forum_slug: @current_forum.slug, chapter_id: member.chapter_id, id: fee.id), class: "icon-btn icon-btn-view", title: "Invoice", target: "_blank" do %>
                     <i class="bi bi-receipt"></i>

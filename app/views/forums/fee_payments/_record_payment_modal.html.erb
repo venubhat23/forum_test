@@ -2,7 +2,7 @@
 <div class="modal fade" id="<%= modal_id %>" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
-      <%= form_with url: mark_paid_forum_chapter_fee_payment_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: fee.id), method: :patch, local: true do %>
+      <%= form_with url: mark_paid_forum_chapter_fee_payment_path(forum_slug: @current_forum.slug, chapter_id: fee.user.chapter_id, id: fee.id), method: :patch, local: true do %>
         <div class="modal-header">
           <h5 class="modal-title mb-0">Record Payment &middot; <%= user.display_name %></h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
