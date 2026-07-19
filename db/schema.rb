@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_18_070629) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_19_041707) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -261,6 +261,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_18_070629) do
     t.integer "payment_method"
     t.string "feeable_type"
     t.bigint "feeable_id"
+    t.integer "duration_years"
+    t.boolean "lifetime", default: false, null: false
     t.index ["feeable_type", "feeable_id"], name: "index_fee_payments_on_feeable"
     t.index ["invoice_number"], name: "index_fee_payments_on_invoice_number", unique: true
     t.index ["user_id"], name: "index_fee_payments_on_user_id"
@@ -875,6 +877,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_18_070629) do
     t.bigint "role_id"
     t.bigint "user_role_id"
     t.string "original_password"
+    t.string "service_area"
+    t.string "capacity"
+    t.boolean "lifetime_member", default: false, null: false
     t.index ["business_category_id"], name: "index_users_on_business_category_id"
     t.index ["chapter_id"], name: "index_users_on_chapter_id"
     t.index ["email"], name: "index_users_on_email", unique: true

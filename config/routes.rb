@@ -146,6 +146,7 @@ Rails.application.routes.draw do
       end
       resources :guests, controller: "forums/guests", only: [ :index, :new, :create, :show, :edit, :update, :destroy ] do
         member do
+          get :convert
           patch :convert_to_member
         end
       end

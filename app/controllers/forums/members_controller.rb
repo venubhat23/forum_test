@@ -44,6 +44,7 @@ module Forums
 
     def show
       authorize! :read, @member
+      @fee_payments = @member.fee_payments.order(created_at: :desc)
     end
 
     def new
@@ -201,13 +202,13 @@ module Forums
     def member_params
       params.require(:member).permit(:full_name, :email, :phone, :password, :password_confirmation,
         :business_name, :business_category, :speciality, :designation, :gst_number, :pan_number, :aadhaar_number,
-        :website, :address, :experience_years, :date_of_birth, :business_category_id, :photo, kyc_documents: [])
+        :website, :address, :city, :service_area, :capacity, :experience_years, :date_of_birth, :business_category_id, :photo, kyc_documents: [])
     end
 
     def member_update_params
       params.require(:member).permit(:full_name, :email, :phone,
         :business_name, :business_category, :speciality, :designation, :gst_number, :pan_number, :aadhaar_number,
-        :website, :address, :experience_years, :date_of_birth, :business_category_id, :photo, kyc_documents: [])
+        :website, :address, :city, :service_area, :capacity, :experience_years, :date_of_birth, :business_category_id, :photo, kyc_documents: [])
     end
 
     def members_csv(members)

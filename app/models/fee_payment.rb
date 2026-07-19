@@ -57,9 +57,16 @@ class FeePayment < ApplicationRecord
 
   private
 
-  # Paying the annual membership fee renews the member for another year.
+  # Paying the annual membership fee renews the member. Defaults to one year,
+  # but a longer multi-year term or a lifetime membership can be recorded on
+  # the fee itself (see the "convert guest to member" flow).
   def extend_membership_renewal
-    user.update!(renews_on: 1.year.from_now.to_date, membership_status: :active)
+    if lifetime?
+      user.update!(renews_on: nil, lifetime_member: true, membership_status: :active)
+    else
+      years = duration_years.to_i.positive? ? duration_years.to_i : 1
+      user.update!(renews_on: years.years.from_now.to_date, lifetime_member: false, membership_status: :active)
+    end
   end
 
   def assign_invoice_number

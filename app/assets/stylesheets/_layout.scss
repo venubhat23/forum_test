@@ -1431,3 +1431,14 @@ nav.pagination span.page.gap {
 .lead-stage-step-done .lead-stage-name {
   color: #1e293b;
 }
+
+.lead-stage-step-active .lead-stage-dot {
+  background: #ffffff;
+  border: 2px solid #667eea;
+  color: #667eea;
+  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15);
+}
+
+.lead-stage-step-active .lead-stage-name {
+  color: #1e293b;
+}

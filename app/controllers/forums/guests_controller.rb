@@ -1,7 +1,7 @@
 module Forums
   class GuestsController < BaseController
     before_action :set_chapter
-    before_action :set_guest, only: [ :show, :edit, :update, :destroy, :convert_to_member ]
+    before_action :set_guest, only: [ :show, :edit, :update, :destroy, :convert, :convert_to_member ]
 
     def index
       authorize! :read, User
@@ -58,14 +58,27 @@ module Forums
       redirect_to forum_chapter_guests_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id), notice: "#{@guest.display_name} was removed."
     end
 
+    # Step 1 of the conversion wizard: the business-details form.
+    def convert
+      authorize! :update, @guest
+    end
+
+    # Step 2: save the full business profile and flip the guest to a member.
+    # The member then lands on their profile with the "collect membership
+    # fee" and "send welcome message" steps still to go.
     def convert_to_member
       authorize! :update, @guest
+      @guest.assign_attributes(guest_conversion_params)
       @guest.role = :member
       @guest.converted_at = Time.current
+
       if @guest.save
-        redirect_to forum_chapter_member_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: @guest.id), notice: "#{@guest.display_name} is now a member."
+        redirect_to forum_chapter_member_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: @guest.id),
+          notice: "🎉 #{@guest.display_name} is now a member! Next: collect the membership fee below."
       else
-        redirect_to forum_chapter_guest_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: @guest.id), alert: @guest.errors.full_messages.to_sentence
+        @guest.role = :guest
+        flash.now[:alert] = @guest.errors.full_messages.to_sentence
+        render :convert, status: :unprocessable_entity
       end
     end
 
@@ -87,6 +100,13 @@ module Forums
     def guest_update_params
       params.require(:guest).permit(:full_name, :email, :phone, :nature_of_business,
         :business_category, :speciality, :invited_by_id)
+    end
+
+    def guest_conversion_params
+      params.require(:guest).permit(:full_name, :email, :phone, :date_of_birth, :photo,
+        :business_name, :business_category, :speciality, :business_category_id, :designation,
+        :website, :gst_number, :pan_number, :aadhaar_number, :address, :city,
+        :service_area, :capacity, kyc_documents: [])
     end
   end
 end

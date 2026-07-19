@@ -1,0 +1,12 @@
+<%# locals: step (1..3), current step in the guest-to-member conversion wizard %>
+<% steps = [ "Business Profile", "Membership Fee", "Welcome" ] %>
+<div class="lead-stage-track mb-4">
+  <% steps.each_with_index do |name, index| %>
+    <% position = index + 1 %>
+    <% state = position < step ? "done" : (position == step ? "active" : "upcoming") %>
+    <div class="lead-stage-step <%= "lead-stage-step-#{state}" %>">
+      <div class="lead-stage-dot"><%= state == "done" ? raw('<i class="bi bi-check-lg"></i>') : position %></div>
+      <div class="lead-stage-name"><%= name %></div>
+    </div>
+  <% end %>
+</div>

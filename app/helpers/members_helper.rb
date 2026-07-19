@@ -19,4 +19,25 @@ module MembersHelper
       Thank you! 🙏
     MSG
   end
+
+  # Builds a wa.me click-to-chat link with a congratulatory welcome message,
+  # sent once a newly converted member's membership fee has been paid.
+  def whatsapp_welcome_link(member, forum)
+    whatsapp_link(member.phone, whatsapp_welcome_message(member, forum))
+  end
+
+  def whatsapp_welcome_message(member, forum)
+    validity_text = member.lifetime_member? ? "a *lifetime member*" : "a member until *#{member.renews_on&.strftime('%d %b %Y')}*"
+
+    <<~MSG.strip
+      🎉 Congratulations #{member.display_name}! 🎊
+
+      Your membership fee has been received and you are now officially #{validity_text} of #{forum.name}, #{member.chapter&.name} chapter!
+
+      We're thrilled to have #{member.business_name.presence || "your business"} join our network. Welcome aboard, and here's to many great connections and referrals ahead! 🤝
+
+      Warm regards,
+      #{forum.name}
+    MSG
+  end
 end
