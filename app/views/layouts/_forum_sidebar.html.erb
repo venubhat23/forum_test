@@ -35,6 +35,14 @@
             <span class="nav-text">Calendar</span>
           <% end %>
         </li>
+        <% if can? :create, Chapter %>
+          <li class="nav-item">
+            <%= link_to new_forum_bulk_import_path(forum_slug: @current_forum.slug), class: "nav-link-modern #{'active' if request.path.start_with?(new_forum_bulk_import_path(forum_slug: @current_forum.slug))}", data: { tooltip: "Bulk Import" } do %>
+              <div class="nav-icon-modern"><div class="icon-bg gradient-cyan"><i class="bi bi-file-earmark-arrow-up"></i></div></div>
+              <span class="nav-text">Bulk Import</span>
+            <% end %>
+          </li>
+        <% end %>
       </ul>
     </div>
 

@@ -183,6 +183,9 @@ Rails.application.routes.draw do
       end
     end
     resources :business_categories, controller: "forums/business_categories", except: [ :show ]
+    resource :bulk_import, controller: "forums/bulk_imports", only: [ :new, :create ] do
+      get :sample
+    end
     resources :one_to_one_meetings, controller: "forums/one_to_one_meetings", only: [ :index, :new, :create, :show, :destroy ] do
       member do
         patch :accept

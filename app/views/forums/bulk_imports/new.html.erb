@@ -1,0 +1,39 @@
+<% content_for :title, "Bulk Import" %>
+
+<div class="page-header">
+  <h1 class="page-title h4">Bulk Import Chapters &amp; Members</h1>
+  <p class="page-subtitle mb-0"><%= @current_forum.name %></p>
+</div>
+
+<div class="row justify-content-center">
+  <div class="col-12 col-lg-7">
+    <div class="card">
+      <div class="card-body p-4">
+        <p class="text-muted small">
+          Upload a <code>.csv</code> or <code>.xlsx</code> file with columns:
+          <code>chapter_name</code>, <code>full_name</code>, <code>email</code>, <code>phone</code>, <code>business_name</code>.
+          A chapter is created automatically the first time its name appears if it doesn't already exist in this forum.
+          A random password is generated for each imported member.
+        </p>
+        <p class="text-muted small">
+          <strong>The whole sheet is imported as one batch.</strong> If any row fails, nothing in the file is saved —
+          fix the reported rows and re-upload.
+        </p>
+        <p class="mb-4">
+          <%= link_to sample_forum_bulk_import_path(forum_slug: @current_forum.slug), class: "btn btn-outline-secondary" do %>
+            <i class="bi bi-download me-1"></i> Download Sample CSV
+          <% end %>
+        </p>
+        <%= form_with url: forum_bulk_import_path(forum_slug: @current_forum.slug), method: :post, local: true, multipart: true, data: { turbo: false } do %>
+          <div class="mb-4">
+            <%= file_field_tag :file, accept: ".xlsx,.xls,.csv", class: "form-control", required: true %>
+          </div>
+          <div class="d-flex flex-wrap gap-2">
+            <%= submit_tag "Import", class: "btn btn-primary btn-lg" %>
+            <%= link_to "Cancel", forum_chapters_path(forum_slug: @current_forum.slug), class: "btn btn-outline-secondary btn-lg" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
