@@ -1,0 +1,117 @@
+<%
+  persisted = @invoice.persisted?
+  autofilled = persisted ? "false" : "true"
+  current_month = Date.current.month
+  current_year = Date.current.year
+%>
+
+<div class="card invoice-form-card mb-4">
+  <div class="invoice-preview-topbar"></div>
+  <div class="card-body p-4">
+    <%= form_with model: @invoice,
+          url: (persisted ? super_admin_invoice_path(@invoice) : super_admin_invoices_path),
+          method: (persisted ? :patch : :post),
+          local: true,
+          data: { controller: "invoice-form" } do |f| %>
+
+      <%= f.hidden_field :plan_id, data: { invoice_form_target: "planIdField" } %>
+
+      <div class="mb-4">
+        <div class="text-uppercase text-muted small fw-semibold mb-2"><i class="bi bi-buildings me-1"></i> Forum &amp; Plan</div>
+        <div class="row g-3">
+          <div class="col-12 col-md-6">
+            <%= f.label :forum_id, "Forum", class: "form-label" %>
+            <select name="invoice[forum_id]" id="invoice_forum_id" class="form-select" required
+                    data-invoice-form-target="forumSelect" data-action="change->invoice-form#forumChanged">
+              <option value="">Select forum</option>
+              <% @forums.each do |forum| %>
+                <option value="<%= forum.id %>"
+                        data-plan-id="<%= forum.plan_id %>"
+                        data-plan-name="<%= forum.plan&.name %>"
+                        data-plan-price="<%= forum.plan&.price.to_f %>"
+                        <%= "selected" if @invoice.forum_id == forum.id %>>
+                  <%= forum.name %>
+                </option>
+              <% end %>
+            </select>
+          </div>
+          <div class="col-12 col-md-6">
+            <div class="form-label d-block">Plan</div>
+            <div class="form-control-plaintext fw-semibold" data-invoice-form-target="planName">
+              <%= @invoice.forum&.plan ? "#{@invoice.forum.plan.name} plan" : "Select a forum to auto-load its plan" %>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <div class="text-uppercase text-muted small fw-semibold mb-2"><i class="bi bi-calendar-range me-1"></i> Billing Period</div>
+        <div class="row g-3 align-items-end">
+          <div class="col-6 col-md-3">
+            <label class="form-label">Month</label>
+            <select class="form-select" data-invoice-form-target="monthSelect" data-action="change->invoice-form#periodChanged">
+              <% Date::MONTHNAMES.compact.each_with_index do |name, idx| %>
+                <option value="<%= idx + 1 %>" <%= "selected" if (idx + 1) == current_month %>><%= name %></option>
+              <% end %>
+            </select>
+          </div>
+          <div class="col-6 col-md-3">
+            <label class="form-label">Year</label>
+            <select class="form-select" data-invoice-form-target="yearSelect" data-action="change->invoice-form#periodChanged">
+              <% ((current_year - 1)..(current_year + 1)).each do |yr| %>
+                <option value="<%= yr %>" <%= "selected" if yr == current_year %>><%= yr %></option>
+              <% end %>
+            </select>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="text-uppercase text-muted small fw-semibold mb-1">From</div>
+            <div class="fw-semibold" data-invoice-form-target="periodFrom">&mdash;</div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="text-uppercase text-muted small fw-semibold mb-1">To</div>
+            <div class="fw-semibold" data-invoice-form-target="periodTo">&mdash;</div>
+          </div>
+        </div>
+        <div class="form-text mt-2">Pick the billing month &amp; year — the period, due date and description below fill in automatically.</div>
+      </div>
+
+      <div class="mb-4">
+        <div class="text-uppercase text-muted small fw-semibold mb-2"><i class="bi bi-cash-coin me-1"></i> Amount &amp; Due Date</div>
+        <div class="row g-3">
+          <div class="col-12 col-md-6">
+            <%= f.label :amount, "Amount (INR)", class: "form-label" %>
+            <%= f.number_field :amount, class: "form-control", step: "0.01", min: 0, required: true,
+                  data: { invoice_form_target: "amountField", action: "input->invoice-form#markManual", autofilled: autofilled } %>
+            <div class="form-text">Auto-filled from the forum's plan — edit to override.</div>
+          </div>
+          <div class="col-12 col-md-6">
+            <%= f.label :due_date, class: "form-label" %>
+            <%= f.date_field :due_date, class: "form-control", required: true,
+                  data: { invoice_form_target: "dueDateField", action: "input->invoice-form#markManual", autofilled: autofilled } %>
+            <div class="form-text">Auto-set to the last day of the billing period.</div>
+          </div>
+        </div>
+
+        <% unless persisted %>
+          <div class="row g-3 mt-1">
+            <div class="col-12 col-md-6">
+              <%= label_tag :coupon_code, "Coupon code (optional)", class: "form-label" %>
+              <%= text_field_tag :coupon_code, nil, class: "form-control text-uppercase" %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+
+      <div class="mb-4">
+        <div class="text-uppercase text-muted small fw-semibold mb-2"><i class="bi bi-card-text me-1"></i> Description</div>
+        <%= f.text_area :description, class: "form-control", rows: 3,
+              data: { invoice_form_target: "descriptionField", action: "input->invoice-form#markManual", autofilled: autofilled } %>
+      </div>
+
+      <div class="d-flex flex-wrap gap-2">
+        <%= f.submit (persisted ? "Update Invoice" : "Create Invoice"), class: "btn btn-primary btn-lg" %>
+        <%= link_to "Cancel", (persisted ? super_admin_invoice_path(@invoice) : super_admin_invoices_path), class: "btn btn-outline-secondary btn-lg" %>
+      </div>
+    <% end %>
+  </div>
+</div>

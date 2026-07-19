@@ -515,7 +515,8 @@ body.sidebar-collapsed .main-content {
 .badge-plan-diamond { background: rgba(8, 145, 178, 0.12); color: #0891b2; }
 
 /* ── Invoice preview ── */
-.invoice-preview-card {
+.invoice-preview-card,
+.invoice-form-card {
   overflow: hidden;
   border: none;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 8px 24px rgba(0, 0, 0, 0.04);

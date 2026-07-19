@@ -18,6 +18,13 @@ class Invoice < ApplicationRecord
     payments.sum(:amount)
   end
 
+  # Editing or deleting an invoice after money has been recorded against it
+  # would silently corrupt payment history, so both actions are blocked once
+  # any payment exists.
+  def locked_for_edits?
+    payments.exists?
+  end
+
   def balance_due
     amount - amount_paid
   end

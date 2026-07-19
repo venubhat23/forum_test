@@ -18,6 +18,15 @@
     <button type="button" class="btn btn-outline-secondary" data-clipboard-text="<%= public_invoice_url(@invoice.share_token) %>" onclick="navigator.clipboard.writeText(this.dataset.clipboardText); this.innerHTML = '<i class=\'bi bi-check-lg me-1\'></i> Copied!'; setTimeout(() => this.innerHTML = '<i class=\'bi bi-link-45deg me-1\'></i> Copy Link', 1500);">
       <i class="bi bi-link-45deg me-1"></i> Copy Link
     </button>
+    <% unless @invoice.locked_for_edits? %>
+      <%= link_to edit_super_admin_invoice_path(@invoice), class: "btn btn-outline-primary" do %>
+        <i class="bi bi-pencil me-1"></i> Edit
+      <% end %>
+      <%= button_to super_admin_invoice_path(@invoice), method: :delete, class: "btn btn-outline-danger",
+            data: { turbo_confirm: "Delete invoice #{@invoice.invoice_number}? This cannot be undone." } do %>
+        <i class="bi bi-trash me-1"></i> Delete
+      <% end %>
+    <% end %>
     <% unless @invoice.paid? || @invoice.cancelled? %>
       <%= button_to "Cancel Invoice", void_super_admin_invoice_path(@invoice), method: :patch, class: "btn btn-outline-danger",
             data: { turbo_confirm: "Cancel invoice #{@invoice.invoice_number}?" } %>

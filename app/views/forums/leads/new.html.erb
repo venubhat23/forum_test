@@ -53,24 +53,22 @@
             <%= f.text_area :notes, class: "form-control", rows: 2 %>
           </div>
 
-          <h2 class="h6 text-uppercase text-muted mb-2">Tag Members</h2>
-          <p class="text-muted small mb-2">Pick everyone this lead is relevant to. The first person to accept claims it — everyone else will see it's already taken.</p>
+          <h2 class="h6 text-uppercase text-muted mb-2">Tag Member</h2>
+          <p class="text-muted small mb-2">Pick the one person this lead should go to.</p>
 
           <div class="lead-tag-picker mb-4" data-controller="lead-tagging">
             <div class="d-flex flex-wrap gap-2 mb-2">
-              <button type="button" class="btn btn-sm btn-outline-secondary" data-action="lead-tagging#selectAll">Tag entire forum</button>
-              <button type="button" class="btn btn-sm btn-outline-secondary" data-action="lead-tagging#clearAll">Clear all</button>
+              <button type="button" class="btn btn-sm btn-outline-secondary" data-action="lead-tagging#clearAll">Clear</button>
             </div>
             <div class="lead-tag-list">
               <% @taggable_members.group_by(&:chapter).each do |chapter, members| %>
                 <div class="lead-tag-group">
                   <div class="lead-tag-group-header">
                     <span><%= chapter&.name || "No Chapter" %></span>
-                    <button type="button" class="btn btn-sm btn-link p-0" data-action="lead-tagging#selectChapter" data-chapter-id="<%= chapter&.id %>">Tag chapter</button>
                   </div>
                   <% members.each do |member| %>
                     <label class="lead-tag-option">
-                      <input type="checkbox" name="lead[tagged_user_ids][]" value="<%= member.id %>" data-lead-tagging-target="checkbox" data-chapter-id="<%= chapter&.id %>">
+                      <input type="radio" name="lead[tagged_user_ids][]" value="<%= member.id %>" data-lead-tagging-target="checkbox" data-chapter-id="<%= chapter&.id %>">
                       <span><%= member.display_name %></span>
                     </label>
                   <% end %>

@@ -47,7 +47,7 @@ Rails.application.routes.draw do
         patch :activate
       end
     end
-    resources :invoices, only: [ :index, :new, :create, :show ] do
+    resources :invoices, only: [ :index, :new, :create, :show, :edit, :update, :destroy ] do
       member do
         patch :mark_paid
         patch :void

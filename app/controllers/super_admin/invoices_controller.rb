@@ -1,6 +1,6 @@
 module SuperAdmin
   class InvoicesController < BaseController
-    before_action :set_invoice, only: [ :show, :mark_paid, :void ]
+    before_action :set_invoice, only: [ :show, :edit, :update, :destroy, :mark_paid, :void ]
 
     def index
       @total_invoices = Invoice.count
@@ -44,6 +44,40 @@ module SuperAdmin
     def show
     end
 
+    def edit
+      if @invoice.locked_for_edits?
+        redirect_to super_admin_invoice_path(@invoice), alert: "Invoice #{@invoice.invoice_number} can't be edited because a payment has already been recorded against it."
+        return
+      end
+      @forums = Forum.order(:name)
+    end
+
+    def update
+      if @invoice.locked_for_edits?
+        redirect_to super_admin_invoice_path(@invoice), alert: "Invoice #{@invoice.invoice_number} can't be edited because a payment has already been recorded against it."
+        return
+      end
+
+      if @invoice.update(invoice_params)
+        redirect_to super_admin_invoice_path(@invoice), notice: "Invoice #{@invoice.invoice_number} updated."
+      else
+        @forums = Forum.order(:name)
+        flash.now[:alert] = @invoice.errors.full_messages.to_sentence
+        render :edit, status: :unprocessable_entity
+      end
+    end
+
+    def destroy
+      if @invoice.locked_for_edits?
+        redirect_to super_admin_invoice_path(@invoice), alert: "Invoice #{@invoice.invoice_number} can't be deleted because a payment has already been recorded against it."
+        return
+      end
+
+      invoice_number = @invoice.invoice_number
+      @invoice.destroy
+      redirect_to super_admin_invoices_path, notice: "Invoice #{invoice_number} deleted."
+    end
+
     def mark_paid
       received_amount = params[:amount].presence&.to_d || @invoice.balance_due
       @invoice.record_payment!(
@@ -68,7 +102,7 @@ module SuperAdmin
 
     def set_invoice
       @invoice = Invoice.find(params[:id])
-      @invoice.regenerate_share_token if @invoice.share_token.blank?
+      @invoice.regenerate_share_token if action_name == "show" && @invoice.share_token.blank?
     end
 
     def invoice_params

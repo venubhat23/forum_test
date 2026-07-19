@@ -1,47 +1,14 @@
 <% content_for :title, "Create Invoice" %>
 
-<div class="page-header">
-  <h1 class="page-title h4">Create Invoice</h1>
+<div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+  <div>
+    <h1 class="page-title h4"><i class="bi bi-file-earmark-plus me-2"></i>Create Invoice</h1>
+    <p class="page-subtitle mb-0">Pick a forum and billing period — the plan, amount, due date and description load automatically.</p>
+  </div>
 </div>
 
 <div class="row justify-content-center">
-  <div class="col-12 col-lg-8">
-    <div class="card">
-      <div class="card-body p-4">
-        <%= form_with model: @invoice, url: super_admin_invoices_path, method: :post, local: true do |f| %>
-          <div class="row g-3 mb-3">
-            <div class="col-12 col-md-6">
-              <%= f.label :forum_id, "Forum", class: "form-label" %>
-              <%= f.collection_select :forum_id, @forums, :id, :name, { prompt: true }, class: "form-select", required: true %>
-            </div>
-            <div class="col-12 col-md-6">
-              <%= f.label :amount, "Amount (INR)", class: "form-label" %>
-              <%= f.number_field :amount, class: "form-control", step: "0.01", min: 0, required: true %>
-            </div>
-          </div>
-
-          <div class="row g-3 mb-3">
-            <div class="col-12 col-md-6">
-              <%= f.label :due_date, class: "form-label" %>
-              <%= f.date_field :due_date, class: "form-control", required: true %>
-            </div>
-            <div class="col-12 col-md-6">
-              <%= label_tag :coupon_code, "Coupon code (optional)", class: "form-label" %>
-              <%= text_field_tag :coupon_code, nil, class: "form-control text-uppercase" %>
-            </div>
-          </div>
-
-          <div class="mb-4">
-            <%= f.label :description, class: "form-label" %>
-            <%= f.text_area :description, class: "form-control", rows: 3 %>
-          </div>
-
-          <div class="d-flex flex-wrap gap-2">
-            <%= f.submit "Create Invoice", class: "btn btn-primary btn-lg" %>
-            <%= link_to "Cancel", super_admin_invoices_path, class: "btn btn-outline-secondary btn-lg" %>
-          </div>
-        <% end %>
-      </div>
-    </div>
+  <div class="col-12 col-lg-9">
+    <%= render "form" %>
   </div>
 </div>
