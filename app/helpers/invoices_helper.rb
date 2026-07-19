@@ -15,6 +15,8 @@ module InvoicesHelper
   # Builds a wa.me click-to-chat link with a pre-filled message sharing the
   # invoice's public link, addressed to the billed forum's admin.
   def whatsapp_invoice_share_link(invoice)
+    return nil if invoice.share_token.blank?
+
     admin = invoice.forum.users.find_by(role: :forum_admin)
     whatsapp_link(admin&.phone, whatsapp_invoice_share_message(invoice))
   end
