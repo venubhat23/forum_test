@@ -111,6 +111,7 @@ Rails.application.routes.draw do
     end
     resources :membership_plans, controller: "forums/membership_plans", except: [ :show ]
     get "finance", to: "forums/finance#show"
+    get "ledger", to: "forums/ledger#show"
     resources :expenses, controller: "forums/expenses", except: [ :show ]
     resources :documents, controller: "forums/documents", except: [ :show, :edit, :update ]
     resources :announcements, controller: "forums/announcements", only: [ :index, :new, :create, :destroy ]

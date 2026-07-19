@@ -84,10 +84,7 @@
         <tr>
           <th>Name</th>
           <th>Email</th>
-          <th>Phone</th>
           <th>Business</th>
-          <th>Category</th>
-          <th>Speciality</th>
           <th>Role</th>
           <th>Annual Fee</th>
           <th></th>
@@ -101,14 +98,14 @@
             <td>
               <div class="d-flex align-items-center gap-2">
                 <span class="row-avatar"><%= member.full_name.first.upcase %></span>
-                <span class="fw-semibold"><%= member.full_name %></span>
+                <div>
+                  <span class="fw-semibold d-block"><%= member.full_name %></span>
+                  <span class="text-muted small"><%= member.phone %></span>
+                </div>
               </div>
             </td>
             <td><%= member.email %></td>
-            <td><%= member.phone %></td>
             <td><%= member.business_name %></td>
-            <td><%= member.business_category_id ? member.business_category_ref&.name : member.business_category %></td>
-            <td><%= member.speciality %></td>
             <td>
               <% if member.designation.present? %>
                 <span class="badge bg-primary"><%= member.designation %></span>
@@ -161,7 +158,7 @@
           </tr>
         <% end %>
         <% if @members.empty? %>
-          <tr><td colspan="9" class="text-center text-muted py-4">No members yet. Add the first one to get started.</td></tr>
+          <tr><td colspan="6" class="text-center text-muted py-4">No members yet. Add the first one to get started.</td></tr>
         <% end %>
       </tbody>
     </table>

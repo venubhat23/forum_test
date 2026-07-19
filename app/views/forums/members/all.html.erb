@@ -52,17 +52,19 @@
       <thead>
         <tr>
           <th>Name</th>
-          <th>Email</th>
           <th>Phone</th>
           <th>Chapter</th>
           <th>Business</th>
           <th>Role</th>
           <th>Status</th>
-          <th></th>
+          <th>Invoice</th>
+          <th>Action</th>
         </tr>
       </thead>
       <tbody>
         <% @members.each do |member| %>
+          <% fee = @annual_fees_by_user[member.id] %>
+          <% fee_paid_current = fee&.paid? && member.renews_on.present? && member.renews_on >= Date.current %>
           <tr>
             <td>
               <div class="d-flex align-items-center gap-2">
@@ -70,7 +72,6 @@
                 <span class="fw-semibold"><%= member.full_name %></span>
               </div>
             </td>
-            <td><%= member.email %></td>
             <td><%= member.phone %></td>
             <td><%= member.chapter&.name %></td>
             <td><%= member.business_name %></td>
@@ -88,12 +89,28 @@
                 <span class="badge badge-status-active">Active</span>
               <% end %>
             </td>
-            <td class="text-end">
-              <% if member.chapter_id.present? %>
-                <%= link_to forum_chapter_member_path(forum_slug: @current_forum.slug, chapter_id: member.chapter_id, id: member.id), class: "icon-btn icon-btn-view", title: "View" do %>
-                  <i class="bi bi-eye"></i>
-                <% end %>
+            <td>
+              <% if fee_paid_current %>
+                <span class="badge badge-status-active"><i class="bi bi-check-circle-fill me-1"></i>Paid</span>
+              <% elsif fee&.partially_paid? %>
+                <span class="badge badge-status-partial"><i class="bi bi-exclamation-triangle-fill me-1"></i>Partially Paid</span>
+              <% else %>
+                <span class="badge badge-status-trial"><i class="bi bi-exclamation-circle-fill me-1"></i>Not Paid</span>
               <% end %>
+            </td>
+            <td class="text-end">
+              <div class="d-flex gap-1 justify-content-end">
+                <% if fee && member.chapter_id.present? %>
+                  <%= link_to print_forum_chapter_fee_payment_path(forum_slug: @current_forum.slug, chapter_id: member.chapter_id, id: fee.id), class: "icon-btn icon-btn-view", title: "Invoice", target: "_blank" do %>
+                    <i class="bi bi-receipt"></i>
+                  <% end %>
+                <% end %>
+                <% if member.chapter_id.present? %>
+                  <%= link_to forum_chapter_member_path(forum_slug: @current_forum.slug, chapter_id: member.chapter_id, id: member.id), class: "icon-btn icon-btn-view", title: "View" do %>
+                    <i class="bi bi-eye"></i>
+                  <% end %>
+                <% end %>
+              </div>
             </td>
           </tr>
         <% end %>

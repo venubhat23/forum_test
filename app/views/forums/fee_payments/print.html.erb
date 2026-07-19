@@ -1,31 +1,277 @@
+<% member = @fee_payment.user %>
+<% brand = @current_forum.forum_setting&.theme_color.presence || "#4f46e5" %>
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Invoice <%= @fee_payment.invoice_number %></title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Invoice <%= @fee_payment.invoice_number %> &middot; <%= member.display_name %></title>
   <style>
-    body { font-family: -apple-system, sans-serif; padding: 32px; max-width: 600px; margin: 0 auto; }
-    h1 { font-size: 20px; }
-    table { width: 100%; border-collapse: collapse; margin-top: 16px; }
-    td, th { padding: 8px; border-bottom: 1px solid #ddd; text-align: left; }
-    .total { font-weight: bold; font-size: 16px; }
-    @media print { body { padding: 0; } }
+    :root {
+      --brand: <%= brand %>;
+      --brand-2: color-mix(in srgb, var(--brand) 55%, #a855f7);
+      --ink: #1e293b;
+      --muted: #64748b;
+      --line: #e2e8f0;
+      --soft: #f8fafc;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f1f5f9;
+      color: var(--ink);
+      margin: 0;
+      padding: 32px 16px;
+    }
+    .toolbar { max-width: 780px; margin: 0 auto 16px; display: flex; justify-content: flex-end; gap: 8px; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px; padding: 10px 18px; border-radius: 8px;
+      font-size: 14px; font-weight: 600; text-decoration: none; border: 1px solid var(--line);
+      background: white; color: var(--ink); cursor: pointer;
+    }
+    .btn-primary { background: linear-gradient(135deg, var(--brand), var(--brand-2)); color: white; border: none; }
+    .btn-whatsapp { background: #25d366; color: white; border: none; }
+    .invoice {
+      max-width: 780px; margin: 0 auto; background: white; border-radius: 18px; overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 20px 48px rgba(0,0,0,0.10);
+    }
+    .topbar { height: 10px; background: linear-gradient(135deg, var(--brand), var(--brand-2)); }
+    .invoice-body { padding: 40px; }
+    .header { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; margin-bottom: 8px; }
+    .brand-row { display: flex; align-items: center; gap: 12px; }
+    .brand-logo { width: 48px; height: 48px; border-radius: 12px; object-fit: cover; box-shadow: 0 4px 12px rgba(0,0,0,0.12); }
+    .brand-logo-fallback {
+      width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(135deg, var(--brand), var(--brand-2)); color: white; font-weight: 800; font-size: 18px;
+    }
+    .brand { font-size: 22px; font-weight: 800; background: linear-gradient(135deg, var(--brand), var(--brand-2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .brand-sub { color: var(--muted); font-size: 13px; margin-top: 2px; }
+    .meta { text-align: right; font-size: 13px; color: var(--muted); }
+    .meta strong { color: var(--ink); font-size: 15px; display: block; margin-bottom: 4px; }
+    .status-pill {
+      display: inline-block; padding: 6px 14px; border-radius: 999px; font-size: 12px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.04em; margin: 18px 0 26px;
+    }
+    .status-paid { background: rgba(16,185,129,0.12); color: #059669; }
+    .status-pending { background: rgba(59,130,246,0.12); color: #2563eb; }
+    .status-partially_paid { background: rgba(245,158,11,0.12); color: #d97706; }
+
+    .member-card {
+      display: flex; align-items: center; gap: 16px; padding: 20px;
+      background: var(--soft); border-radius: 14px; margin-bottom: 28px;
+    }
+    .member-photo { width: 64px; height: 64px; border-radius: 50%; object-fit: cover; border: 3px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.12); flex-shrink: 0; }
+    .member-photo-fallback {
+      width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(135deg, var(--brand), var(--brand-2)); color: white; font-weight: 800; font-size: 22px; flex-shrink: 0;
+    }
+    .member-name { font-size: 17px; font-weight: 700; }
+    .member-sub { color: var(--muted); font-size: 13px; margin-top: 2px; }
+
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px 24px; margin-bottom: 28px; }
+    .label { text-transform: uppercase; font-size: 10.5px; font-weight: 700; letter-spacing: 0.05em; color: var(--muted); margin-bottom: 3px; }
+    .value { font-weight: 600; font-size: 14px; word-break: break-word; }
+    .value.empty { color: #cbd5e1; font-weight: 400; }
+
+    table { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
+    thead th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); border-top: 2px solid var(--brand-2); border-bottom: 2px solid var(--brand-2); padding: 10px 4px; }
+    thead th:last-child, tfoot td:last-child, td.amount { text-align: right; }
+    tbody td { padding: 12px 4px; border-bottom: 1px solid var(--line); }
+    tfoot td { padding: 6px 4px; border: none; }
+    .total-row td { font-weight: 800; font-size: 17px; padding-top: 12px; }
+    .paid-row td { color: #059669; }
+    .balance-row td { font-weight: 800; border-top: 1px solid var(--line); padding-top: 10px; }
+
+    .note {
+      margin-top: 28px; padding: 16px 18px; background: var(--soft); border-radius: 12px; font-size: 13px;
+      color: var(--muted); border-left: 4px solid var(--brand);
+    }
+    .payments-title { font-size: 13px; font-weight: 700; margin: 28px 0 8px; color: var(--ink); }
+    .payments-table td, .payments-table th { font-size: 13px; }
+
+    .footer { margin-top: 32px; padding-top: 18px; border-top: 1px dashed var(--line); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+    .footer-brand { font-size: 12px; color: var(--muted); }
+    .qr-hint { font-size: 12px; color: var(--muted); }
+
+    @media print {
+      body { background: white; padding: 0; }
+      .toolbar { display: none; }
+      .invoice { box-shadow: none; border-radius: 0; max-width: none; }
+    }
+    @media (max-width: 560px) {
+      .invoice-body { padding: 24px; }
+      .meta { text-align: left; }
+      .header { flex-direction: column; }
+      .grid { grid-template-columns: repeat(2, 1fr); }
+      .member-card { flex-wrap: wrap; }
+    }
   </style>
 </head>
 <body>
-  <h1><%= @current_forum.name %></h1>
-  <p>Invoice #<%= @fee_payment.invoice_number %></p>
-
-  <table>
-    <tr><th>Billed To</th><td><%= @fee_payment.user.display_name %> (<%= @fee_payment.user.email %>)</td></tr>
-    <tr><th>Fee Type</th><td><%= @fee_payment.fee_type.titleize %></td></tr>
-    <tr><th>Due Date</th><td><%= @fee_payment.due_date&.strftime("%d %b %Y") %></td></tr>
-    <tr><th>Status</th><td><%= @fee_payment.status.titleize %></td></tr>
-    <% if @fee_payment.paid? %>
-      <tr><th>Paid On</th><td><%= @fee_payment.paid_on&.strftime("%d %b %Y") %></td></tr>
-      <tr><th>Payment Method</th><td><%= @fee_payment.payment_method&.titleize || "—" %></td></tr>
+  <div class="toolbar">
+    <% if (wa_link = whatsapp_link(member.phone, "Hi #{member.display_name}! Here is your membership fee invoice #{@fee_payment.invoice_number} (#{number_to_currency(@fee_payment.amount)}) from #{@current_forum.name}. #{@fee_payment.paid? ? 'Payment received with thanks! 🙏' : 'Kindly complete the payment at your earliest convenience.'}")) %>
+      <%= link_to wa_link, class: "btn btn-whatsapp", target: "_blank", rel: "noopener" do %>
+        📱 Share on WhatsApp
+      <% end %>
     <% end %>
-    <tr class="total"><th>Amount</th><td><%= number_to_currency(@fee_payment.amount) %></td></tr>
-  </table>
+    <button type="button" class="btn btn-primary" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  </div>
+
+  <div class="invoice">
+    <div class="topbar"></div>
+    <div class="invoice-body">
+      <div class="header">
+        <div class="brand-row">
+          <% if @current_forum.forum_setting&.logo&.attached? %>
+            <%= image_tag @current_forum.forum_setting.logo.variant(resize_to_fill: [ 96, 96 ]), class: "brand-logo" %>
+          <% else %>
+            <div class="brand-logo-fallback"><%= @current_forum.name.first.upcase %></div>
+          <% end %>
+          <div>
+            <div class="brand"><%= @current_forum.name %></div>
+            <div class="brand-sub"><%= @chapter.name %> Chapter &middot; Membership Fee Invoice</div>
+          </div>
+        </div>
+        <div class="meta">
+          <strong>Invoice <%= @fee_payment.invoice_number %></strong>
+          Issued <%= @fee_payment.created_at.strftime("%d %b %Y") %><br>
+          <% if @fee_payment.due_date %>Due <%= @fee_payment.due_date.strftime("%d %b %Y") %><% end %>
+        </div>
+      </div>
+
+      <span class="status-pill status-<%= @fee_payment.status %>">
+        <%= @fee_payment.paid? ? "✓ Paid in Full" : @fee_payment.status.titleize %>
+      </span>
+
+      <div class="member-card">
+        <% if member.photo.attached? %>
+          <%= image_tag member.photo.variant(resize_to_fill: [ 128, 128 ]), class: "member-photo" %>
+        <% else %>
+          <div class="member-photo-fallback"><%= member.display_name.first.upcase %></div>
+        <% end %>
+        <div>
+          <div class="member-name"><%= member.display_name %></div>
+          <div class="member-sub">
+            <%= member.business_name.presence || "&mdash;".html_safe %>
+            <% if member.designation.present? %> &middot; <%= member.designation %><% end %>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div>
+          <div class="label">Phone</div>
+          <div class="value <%= 'empty' unless member.phone.present? %>"><%= member.phone.presence || "Not provided" %></div>
+        </div>
+        <div>
+          <div class="label">Email</div>
+          <div class="value <%= 'empty' unless member.email.present? %>"><%= member.email.presence || "Not provided" %></div>
+        </div>
+        <div>
+          <div class="label">Website</div>
+          <div class="value <%= 'empty' unless member.website.present? %>"><%= member.website.presence || "Not provided" %></div>
+        </div>
+        <div>
+          <div class="label">Business Category</div>
+          <div class="value <%= 'empty' unless (member.business_category_id ? member.business_category_ref&.name : member.business_category).present? %>">
+            <%= (member.business_category_id ? member.business_category_ref&.name : member.business_category).presence || "Not provided" %>
+          </div>
+        </div>
+        <div>
+          <div class="label">Speciality</div>
+          <div class="value <%= 'empty' unless member.speciality.present? %>"><%= member.speciality.presence || "Not provided" %></div>
+        </div>
+        <div>
+          <div class="label">Business Capacity</div>
+          <div class="value <%= 'empty' unless member.capacity.present? %>"><%= member.capacity.presence || "Not provided" %></div>
+        </div>
+        <div>
+          <div class="label">Service Area</div>
+          <div class="value <%= 'empty' unless member.service_area.present? %>"><%= member.service_area.presence || "Not provided" %></div>
+        </div>
+        <div>
+          <div class="label">Location</div>
+          <div class="value <%= 'empty' unless member.city.present? %>"><%= member.city.presence || "Not provided" %></div>
+        </div>
+        <div>
+          <div class="label">Address</div>
+          <div class="value <%= 'empty' unless member.address.present? %>"><%= member.address.presence || "Not provided" %></div>
+        </div>
+        <div>
+          <div class="label">GST Number</div>
+          <div class="value <%= 'empty' unless member.gst_number.present? %>"><%= member.gst_number.presence || "Not provided" %></div>
+        </div>
+        <div>
+          <div class="label">PAN Number</div>
+          <div class="value <%= 'empty' unless member.pan_number.present? %>"><%= member.pan_number.presence || "Not provided" %></div>
+        </div>
+        <div>
+          <div class="label">Aadhaar Number</div>
+          <div class="value <%= 'empty' unless member.aadhaar_number.present? %>"><%= member.aadhaar_number.presence || "Not provided" %></div>
+        </div>
+      </div>
+
+      <table>
+        <thead>
+          <tr><th>Description</th><th>Amount</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <%= @fee_payment.fee_type.titleize %>
+              <% if @fee_payment.annual_membership? %>
+                <div style="color: var(--muted); font-size: 12px;">
+                  <%= @fee_payment.lifetime? ? "One-time Lifetime Membership" : "Covers #{@fee_payment.duration_years || 1} year(s)" %>
+                  <% if member.renews_on && !@fee_payment.lifetime? %> &middot; valid until <%= member.renews_on.strftime("%d %b %Y") %><% end %>
+                </div>
+              <% end %>
+            </td>
+            <td class="amount">&#8377;<%= number_with_delimiter(@fee_payment.amount.to_i) %></td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr class="total-row"><td>Total</td><td class="amount">&#8377;<%= number_with_delimiter(@fee_payment.amount.to_i) %></td></tr>
+          <% if @fee_payment.paid_amount.positive? %>
+            <tr class="paid-row"><td>Paid</td><td class="amount">&#8211; &#8377;<%= number_with_delimiter(@fee_payment.paid_amount.to_i) %></td></tr>
+            <tr class="balance-row"><td>Balance Due</td><td class="amount">&#8377;<%= number_with_delimiter(@fee_payment.balance_due.to_i) %></td></tr>
+          <% end %>
+        </tfoot>
+      </table>
+
+      <% if @fee_payment.fee_payment_transactions.any? %>
+        <div class="payments-title">Payment History</div>
+        <table class="payments-table">
+          <thead>
+            <tr><th>Date</th><th>Method</th><th>Amount</th></tr>
+          </thead>
+          <tbody>
+            <% @fee_payment.fee_payment_transactions.order(:paid_on).each do |txn| %>
+              <tr>
+                <td><%= txn.paid_on.strftime("%d %b %Y") %></td>
+                <td><%= txn.payment_method&.titleize || "&mdash;".html_safe %></td>
+                <td class="amount">&#8377;<%= number_with_delimiter(txn.amount.to_i) %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      <% end %>
+
+      <div class="note">
+        <% if @fee_payment.paid? %>
+          🎉 This membership fee has been paid in full. Thank you for being part of <%= @current_forum.name %>!
+        <% elsif @fee_payment.partially_paid? %>
+          A partial payment has been received. The remaining balance of <strong>&#8377;<%= number_with_delimiter(@fee_payment.balance_due.to_i) %></strong> is still due.
+        <% else %>
+          Kindly complete the payment of <strong>&#8377;<%= number_with_delimiter(@fee_payment.amount.to_i) %></strong> at your earliest convenience to keep your membership active without interruption.
+        <% end %>
+      </div>
+
+      <div class="footer">
+        <div class="footer-brand"><%= @current_forum.name %> &middot; <%= @chapter.name %> Chapter</div>
+        <div class="qr-hint">Invoice #<%= @fee_payment.invoice_number %></div>
+      </div>
+    </div>
+  </div>
 
   <script>window.onload = () => window.print();</script>
 </body>

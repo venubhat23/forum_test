@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_19_041707) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_19_050000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -483,14 +483,18 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_19_041707) do
 
   create_table "office_darshans", force: :cascade do |t|
     t.bigint "forum_id", null: false
-    t.bigint "member_id", null: false
-    t.date "visit_date", null: false
     t.integer "status", default: 0, null: false
     t.text "notes"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "host_id", null: false
+    t.bigint "visitor_id", null: false
+    t.datetime "scheduled_at", null: false
+    t.datetime "confirmed_at"
+    t.datetime "thanked_at"
     t.index ["forum_id"], name: "index_office_darshans_on_forum_id"
-    t.index ["member_id"], name: "index_office_darshans_on_member_id"
+    t.index ["host_id"], name: "index_office_darshans_on_host_id"
+    t.index ["visitor_id"], name: "index_office_darshans_on_visitor_id"
   end
 
   create_table "one_to_one_meetings", force: :cascade do |t|

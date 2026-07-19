@@ -9,6 +9,14 @@
             <span class="nav-text">Dashboard</span>
           <% end %>
         </li>
+        <% if can? :read, Expense %>
+          <li class="nav-item">
+            <%= link_to forum_ledger_path(forum_slug: @current_forum.slug), class: "nav-link-modern #{'active' if current_page?(forum_ledger_path(forum_slug: @current_forum.slug))}", data: { tooltip: "Ledger" } do %>
+              <div class="nav-icon-modern"><div class="icon-bg gradient-green"><i class="bi bi-journal-text"></i></div></div>
+              <span class="nav-text">Ledger</span>
+            <% end %>
+          </li>
+        <% end %>
         <li class="nav-item">
           <%= link_to forum_chapters_path(forum_slug: @current_forum.slug), class: "nav-link-modern #{'active' if request.path.start_with?(forum_chapters_path(forum_slug: @current_forum.slug))}", data: { tooltip: "Chapters" } do %>
             <div class="nav-icon-modern"><div class="icon-bg gradient-purple"><i class="bi bi-diagram-3"></i></div></div>

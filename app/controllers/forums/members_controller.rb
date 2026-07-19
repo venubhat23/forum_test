@@ -17,6 +17,10 @@ module Forums
       @members = @members.where(suspended_at: nil) if params[:status] == "active"
       @members = @members.where.not(suspended_at: nil) if params[:status] == "suspended"
       @members = @members.page(params[:page])
+      @annual_fees_by_user = FeePayment.where(fee_type: :annual_membership, user_id: @members.map(&:id))
+                                        .select("DISTINCT ON (user_id) *")
+                                        .order(:user_id, created_at: :desc)
+                                        .index_by(&:user_id)
     end
 
     def index
