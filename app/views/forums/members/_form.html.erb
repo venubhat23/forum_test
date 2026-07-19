@@ -38,14 +38,17 @@
     <%= f.label :business_name, "Business Name", class: "form-label" %>
     <%= f.text_field :business_name, class: "form-control" %>
   </div>
-  <div class="row g-3 mb-3">
+  <div class="row g-3 mb-3" data-controller="business-category"
+       data-business-category-categories-value="<%= User::BUSINESS_CATEGORIES.to_json %>"
+       data-business-category-selected-value="<%= member.speciality %>">
     <div class="col-12 col-sm-6">
       <%= f.label :business_category, "Business Category", class: "form-label" %>
-      <%= f.select :business_category, User::BUSINESS_CATEGORIES, { include_blank: true }, class: "form-select" %>
+      <%= f.select :business_category, User::BUSINESS_CATEGORIES.keys, {}, class: "form-select",
+            data: { business_category_target: "category", action: "change->business-category#categoryChanged" } %>
     </div>
     <div class="col-12 col-sm-6">
       <%= f.label :speciality, class: "form-label" %>
-      <%= f.select :speciality, User::SPECIALITIES, { include_blank: true }, class: "form-select" %>
+      <%= f.select :speciality, [], {}, class: "form-select", data: { business_category_target: "speciality" } %>
     </div>
   </div>
   <div class="row g-3 mb-3">
