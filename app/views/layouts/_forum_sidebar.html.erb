@@ -251,6 +251,14 @@
               <% end %>
             </li>
           <% end %>
+          <% if can? :read, Invoice %>
+            <li class="nav-item">
+              <%= link_to forum_invoices_path(forum_slug: @current_forum.slug), class: "nav-link-modern #{'active' if request.path.start_with?(forum_invoices_path(forum_slug: @current_forum.slug))}", data: { tooltip: "Invoices" } do %>
+                <div class="nav-icon-modern"><div class="icon-bg gradient-blue"><i class="bi bi-receipt"></i></div></div>
+                <span class="nav-text">Invoices</span>
+              <% end %>
+            </li>
+          <% end %>
           <li class="nav-item">
             <%= link_to forum_reports_path(forum_slug: @current_forum.slug), class: "nav-link-modern #{'active' if request.path.start_with?(forum_reports_path(forum_slug: @current_forum.slug))}", data: { tooltip: "Reports" } do %>
               <div class="nav-icon-modern"><div class="icon-bg gradient-blue"><i class="bi bi-file-earmark-bar-graph"></i></div></div>

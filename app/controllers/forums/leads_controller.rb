@@ -1,6 +1,6 @@
 module Forums
   class LeadsController < BaseController
-    before_action :set_lead, only: [ :show, :accept, :release, :advance, :new_thanksgiving, :give_thanksgiving ]
+    before_action :set_lead, only: [ :show, :edit, :update, :accept, :release, :advance, :new_thanksgiving, :give_thanksgiving ]
 
     def index
       authorize! :read, Lead
@@ -59,6 +59,23 @@ module Forums
       end
     end
 
+    def edit
+      authorize! :update, @lead
+      require_creator!
+    end
+
+    def update
+      authorize! :update, @lead
+      require_creator!
+
+      if @lead.update(lead_params)
+        redirect_to forum_lead_path(forum_slug: @current_forum.slug, id: @lead.id), notice: "Lead updated."
+      else
+        flash.now[:alert] = @lead.errors.full_messages.to_sentence
+        render :edit, status: :unprocessable_entity
+      end
+    end
+
     def accept
       authorize! :update, @lead
       raise CanCan::AccessDenied, "You are not tagged on this lead." unless @lead.tagged_users.include?(current_user)
@@ -114,6 +131,10 @@ module Forums
 
     def require_owner!
       raise CanCan::AccessDenied, "Only the member who accepted this lead can do that." unless @lead.accepted_by_id == current_user.id
+    end
+
+    def require_creator!
+      raise CanCan::AccessDenied, "Only the member who created this lead can edit it." unless @lead.created_by_id == current_user.id || can?(:manage, Lead)
     end
 
     def taggable_members

@@ -1,0 +1,31 @@
+<% content_for :title, "Edit Lead" %>
+
+<div class="page-header">
+  <h1 class="page-title h4">Edit Lead</h1>
+  <p class="page-subtitle mb-0"><%= @current_forum.name %></p>
+</div>
+
+<div class="row justify-content-center">
+  <div class="col-12 col-lg-8">
+    <div class="card">
+      <div class="card-body p-4">
+        <%= form_with model: @lead, url: forum_lead_path(forum_slug: @current_forum.slug, id: @lead.id), method: :patch, local: true, scope: :lead,
+              data: { controller: "submit-loading", action: "submit->submit-loading#start" } do |f| %>
+          <% if @lead.errors.any? %>
+            <div class="alert alert-danger"><%= @lead.errors.full_messages.to_sentence %></div>
+          <% end %>
+
+          <%= render "fields", f: f %>
+
+          <div class="d-flex flex-wrap gap-2">
+            <button type="submit" class="btn btn-primary btn-lg" data-submit-loading-target="button" data-loading-text="Saving...">
+              <span data-submit-loading-target="spinner" class="spinner-border spinner-border-sm me-2 d-none" role="status" aria-hidden="true"></span>
+              <span data-submit-loading-target="label">Save Changes</span>
+            </button>
+            <%= link_to "Cancel", forum_lead_path(forum_slug: @current_forum.slug, id: @lead.id), class: "btn btn-outline-secondary btn-lg" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

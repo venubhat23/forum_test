@@ -40,9 +40,9 @@
           <% end %>
         </li>
         <li class="nav-item">
-          <%= link_to edit_super_admin_whatsapp_template_path, class: "nav-link-modern #{'active' if request.path.start_with?('/super_admin/whatsapp_template')}", data: { tooltip: "WhatsApp Template" } do %>
+          <%= link_to super_admin_whatsapp_templates_path, class: "nav-link-modern #{'active' if request.path.start_with?('/super_admin/whatsapp_templates')}", data: { tooltip: "WhatsApp Templates" } do %>
             <div class="nav-icon-modern"><div class="icon-bg gradient-green"><i class="bi bi-whatsapp"></i></div></div>
-            <span class="nav-text">WhatsApp Template</span>
+            <span class="nav-text">WhatsApp Templates</span>
           <% end %>
         </li>
       </ul>

@@ -6,6 +6,7 @@ class Invoice < ApplicationRecord
   belongs_to :forum
   belongs_to :plan, optional: true
   belongs_to :coupon, optional: true
+  belongs_to :user, optional: true
   has_many :payments, dependent: :destroy
 
   validates :amount, numericality: { greater_than: 0 }
@@ -13,6 +14,17 @@ class Invoice < ApplicationRecord
   validates :invoice_number, uniqueness: true
 
   before_validation :assign_invoice_number, on: :create
+
+  # True for invoices a forum/chapter admin raises against one of their
+  # members, as opposed to the platform-level invoices super admins raise
+  # against a forum for its subscription.
+  def member_invoice?
+    user_id.present?
+  end
+
+  def billed_to_name
+    user&.display_name || forum.name
+  end
 
   def amount_paid
     payments.sum(:amount)

@@ -3,11 +3,11 @@
 <div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-2">
   <div>
     <h1 class="page-title h4"><%= @invoice.invoice_number %></h1>
-    <p class="page-subtitle mb-0"><%= @invoice.forum.name %></p>
+    <p class="page-subtitle mb-0"><%= @invoice.user.display_name %></p>
   </div>
   <div class="d-flex flex-wrap gap-2 align-items-center">
     <span class="badge <%= invoice_status_badge_class(@invoice) %> fs-6"><%= @invoice.status.titleize %></span>
-    <% if (wa_link = whatsapp_invoice_share_link(@invoice)) %>
+    <% if (wa_link = whatsapp_member_invoice_share_link(@invoice)) %>
       <%= link_to wa_link, class: "btn btn-outline-success", target: "_blank", rel: "noopener" do %>
         <i class="bi bi-whatsapp me-1"></i> Share
       <% end %>
@@ -18,17 +18,19 @@
     <button type="button" class="btn btn-outline-secondary" data-clipboard-text="<%= public_invoice_url(@invoice.share_token) %>" onclick="navigator.clipboard.writeText(this.dataset.clipboardText); this.innerHTML = '<i class=\'bi bi-check-lg me-1\'></i> Copied!'; setTimeout(() => this.innerHTML = '<i class=\'bi bi-link-45deg me-1\'></i> Copy Link', 1500);">
       <i class="bi bi-link-45deg me-1"></i> Copy Link
     </button>
-    <% unless @invoice.locked_for_edits? %>
-      <%= link_to edit_super_admin_invoice_path(@invoice), class: "btn btn-outline-primary" do %>
+    <% if can?(:update, @invoice) && !@invoice.locked_for_edits? %>
+      <%= link_to edit_forum_invoice_path(forum_slug: @current_forum.slug, id: @invoice), class: "btn btn-outline-primary" do %>
         <i class="bi bi-pencil me-1"></i> Edit
       <% end %>
-      <%= button_to super_admin_invoice_path(@invoice), method: :delete, class: "btn btn-outline-danger",
+    <% end %>
+    <% if can?(:destroy, @invoice) && !@invoice.locked_for_edits? %>
+      <%= button_to forum_invoice_path(forum_slug: @current_forum.slug, id: @invoice), method: :delete, class: "btn btn-outline-danger",
             data: { turbo_confirm: "Delete invoice #{@invoice.invoice_number}? This cannot be undone." } do %>
         <i class="bi bi-trash me-1"></i> Delete
       <% end %>
     <% end %>
-    <% unless @invoice.paid? || @invoice.cancelled? %>
-      <%= button_to "Cancel Invoice", void_super_admin_invoice_path(@invoice), method: :patch, class: "btn btn-outline-danger",
+    <% if can?(:update, @invoice) && !@invoice.paid? && !@invoice.cancelled? %>
+      <%= button_to "Cancel Invoice", void_forum_invoice_path(forum_slug: @current_forum.slug, id: @invoice), method: :patch, class: "btn btn-outline-danger",
             data: { turbo_confirm: "Cancel invoice #{@invoice.invoice_number}?" } %>
     <% end %>
   </div>
@@ -80,10 +82,10 @@
       <div class="card-body p-4">
         <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-3">
           <div class="d-flex align-items-center gap-3">
-            <%= invoice_logo_svg(invoice_brand_name(@invoice), size: 48) %>
+            <%= invoice_logo_svg(@current_forum.name, size: 48) %>
             <div>
-              <div class="invoice-brand"><%= invoice_brand_name(@invoice) %></div>
-              <div class="text-muted small"><%= invoice_brand_subtitle(@invoice) %></div>
+              <div class="invoice-brand"><%= @current_forum.name %></div>
+              <div class="text-muted small">Membership Billing</div>
             </div>
           </div>
           <span class="text-uppercase text-muted small fw-bold" style="letter-spacing: 0.08em;">Invoice</span>
@@ -107,17 +109,12 @@
         <div class="row g-3 mb-4">
           <div class="col-12 col-sm-6">
             <div class="text-uppercase text-muted small fw-semibold mb-1">Billed To</div>
-            <div class="fw-semibold"><%= @invoice.billed_to_name %></div>
-            <% if @invoice.member_invoice? %>
-              <div class="text-muted small"><%= @invoice.forum.name %></div>
-            <% end %>
+            <div class="fw-semibold"><%= @invoice.user.display_name %></div>
           </div>
-          <% if @invoice.plan %>
-            <div class="col-12 col-sm-6">
-              <div class="text-uppercase text-muted small fw-semibold mb-1">Plan</div>
-              <div class="fw-semibold"><%= @invoice.plan.name %></div>
-            </div>
-          <% end %>
+          <div class="col-12 col-sm-6">
+            <div class="text-uppercase text-muted small fw-semibold mb-1">Chapter</div>
+            <div class="fw-semibold"><%= @invoice.user.chapter&.name || "&mdash;".html_safe %></div>
+          </div>
         </div>
 
         <table class="table invoice-items-table mb-4">
@@ -129,12 +126,7 @@
           </thead>
           <tbody>
             <tr>
-              <td>
-                <%= @invoice.description.presence || "#{@invoice.plan&.name || 'Subscription'} charges" %>
-                <% if @invoice.coupon %>
-                  <div class="text-muted small">Coupon applied: <%= @invoice.coupon.code %></div>
-                <% end %>
-              </td>
+              <td><%= @invoice.description.presence || "Membership charges" %></td>
               <td class="text-end">&#8377;<%= number_with_delimiter(@invoice.amount.to_i) %></td>
             </tr>
           </tbody>
@@ -161,19 +153,13 @@
           <div class="small fw-semibold"><%= invoice_amount_in_words(@invoice.amount) %></div>
         </div>
 
-        <p class="text-muted small mb-4">
-          <% if @invoice.member_invoice? %>
-            This invoice is view-only for <%= @invoice.billed_to_name %> &mdash; share the public link above so they can view it, and record any payment received above.
-          <% else %>
-            Thank you for being part of the Krama Consultancy network. Share the public link above with the forum admin so they can view and settle this invoice directly.
-          <% end %>
-        </p>
+        <p class="text-muted small mb-4">Share the public link above with <%= @invoice.user.display_name %> so they can view and settle this invoice directly.</p>
 
         <div class="d-flex justify-content-end">
           <div class="invoice-signature-block">
             <div class="invoice-signature-line"></div>
             <div class="text-uppercase text-muted" style="font-size: 0.65rem; font-weight: 700; letter-spacing: 0.04em;">Authorised Signatory</div>
-            <div class="small fw-semibold"><%= invoice_brand_name(@invoice) %></div>
+            <div class="small fw-semibold"><%= @current_forum.name %></div>
           </div>
         </div>
       </div>
@@ -181,11 +167,11 @@
   </div>
 
   <div class="col-12 col-lg-5">
-    <% unless @invoice.paid? || @invoice.cancelled? %>
+    <% if can?(:update, @invoice) && !@invoice.paid? && !@invoice.cancelled? %>
       <div class="card mb-4">
         <div class="card-header fw-semibold">Record Payment</div>
         <div class="card-body">
-          <%= form_with url: mark_paid_super_admin_invoice_path(@invoice), method: :patch, local: true do %>
+          <%= form_with url: mark_paid_forum_invoice_path(forum_slug: @current_forum.slug, id: @invoice), method: :patch, local: true do %>
             <p class="text-muted small mb-3">
               Balance due: <strong>&#8377;<%= number_with_delimiter(@invoice.balance_due.to_i) %></strong>
               <% if @invoice.amount_paid.positive? %>

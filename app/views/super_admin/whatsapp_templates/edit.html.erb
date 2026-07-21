@@ -1,15 +1,15 @@
-<% content_for :title, "WhatsApp Template" %>
+<% content_for :title, "Edit #{WhatsappTemplate::LABELS.fetch(@template.key)}" %>
 
 <div class="page-header">
-  <h1 class="page-title h4">WhatsApp Template</h1>
-  <p class="page-subtitle mb-0">Platform-wide message used when sharing billing invoices with forum admins.</p>
+  <h1 class="page-title h4"><%= WhatsappTemplate::LABELS.fetch(@template.key) %></h1>
+  <p class="page-subtitle mb-0">Platform-wide default. Any forum can still override this with its own wording.</p>
 </div>
 
 <div class="row justify-content-center">
-  <div class="col-12 col-lg-8">
+  <div class="col-12 col-lg-7">
     <div class="card">
       <div class="card-body p-4">
-        <%= form_with model: @template, url: super_admin_whatsapp_template_path, method: :patch, local: true do |f| %>
+        <%= form_with model: @template, url: super_admin_whatsapp_template_path(@template.key), method: :patch, local: true do |f| %>
           <div class="mb-3">
             <%= f.label :body, "Message", class: "form-label" %>
             <%= f.text_area :body, class: "form-control", rows: 10, required: true %>
@@ -20,7 +20,11 @@
               <code class="me-1">%{<%= var %>}</code>
             <% end %>
           </div>
-          <%= f.submit "Save", class: "btn btn-primary btn-lg" %>
+          <div class="d-flex flex-wrap gap-2">
+            <%= f.submit "Save", class: "btn btn-primary btn-lg" %>
+            <%= link_to "Cancel", super_admin_whatsapp_templates_path, class: "btn btn-outline-secondary btn-lg" %>
+            <%= button_to "Reset to Default", reset_super_admin_whatsapp_template_path(@template.key), method: :patch, class: "btn btn-outline-danger btn-lg", data: { turbo_confirm: "Reset this message to the default wording?" } %>
+          </div>
         <% end %>
       </div>
     </div>

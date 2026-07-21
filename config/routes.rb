@@ -55,7 +55,11 @@ Rails.application.routes.draw do
     end
     resources :payments, only: [ :index ]
     resource :billing, only: [ :edit, :update ], controller: "billing"
-    resource :whatsapp_template, only: [ :edit, :update ], controller: "whatsapp_templates"
+    resources :whatsapp_templates, controller: "whatsapp_templates", param: :key, only: [ :index, :edit, :update ] do
+      member do
+        patch :reset
+      end
+    end
     resources :users do
       member do
         patch :suspend
@@ -114,6 +118,12 @@ Rails.application.routes.draw do
     get "finance", to: "forums/finance#show"
     get "ledger", to: "forums/ledger#show"
     resources :expenses, controller: "forums/expenses", except: [ :show ]
+    resources :invoices, controller: "forums/invoices", only: [ :index, :new, :create, :show, :edit, :update, :destroy ] do
+      member do
+        patch :mark_paid
+        patch :void
+      end
+    end
     resources :documents, controller: "forums/documents", except: [ :show, :edit, :update ]
     resources :announcements, controller: "forums/announcements", only: [ :index, :new, :create, :destroy ]
     resources :whatsapp_templates, controller: "forums/whatsapp_templates", param: :key, only: [ :index, :edit, :update ] do

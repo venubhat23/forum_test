@@ -10,7 +10,12 @@
       Created by <%= @lead.created_by.display_name %> &middot; <%= @lead.created_at.strftime("%d %b %Y") %>
     </p>
   </div>
-  <span class="badge fs-6 <%= lead_stage_badge_class(@lead.stage) %>"><%= lead_stage_label(@lead.stage) %></span>
+  <div class="d-flex align-items-center gap-2">
+    <span class="badge fs-6 <%= lead_stage_badge_class(@lead.stage) %>"><%= lead_stage_label(@lead.stage) %></span>
+    <% if is_creator || can?(:manage, Lead) %>
+      <%= link_to "Edit", edit_forum_lead_path(forum_slug: @current_forum.slug, id: @lead.id), class: "btn btn-outline-secondary" %>
+    <% end %>
+  </div>
 </div>
 
 <div class="lead-stage-track mb-4">

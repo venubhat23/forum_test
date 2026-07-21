@@ -19,6 +19,7 @@ class WhatsappTemplate < ApplicationRecord
     darshan_thankyou_host
     darshan_thankyou_visitor
     fee_receipt_share
+    member_invoice_share
   ].freeze
 
   KEYS = (FORUM_KEYS + GLOBAL_KEYS).freeze
@@ -39,6 +40,7 @@ class WhatsappTemplate < ApplicationRecord
     "darshan_thankyou_host" => "Office Visit — Host Thanks Visitor",
     "darshan_thankyou_visitor" => "Office Visit — Visitor Thanks Host",
     "fee_receipt_share" => "Fee Receipt Share",
+    "member_invoice_share" => "Member Invoice Share",
     "invoice_share" => "Platform Invoice Share"
   }.freeze
 
@@ -58,6 +60,7 @@ class WhatsappTemplate < ApplicationRecord
     "darshan_thankyou_host" => %w[visitor_name scheduled_at],
     "darshan_thankyou_visitor" => %w[host_name scheduled_at],
     "fee_receipt_share" => %w[display_name invoice_number amount forum_name status_text],
+    "member_invoice_share" => %w[display_name invoice_number amount due_date forum_name invoice_url],
     "invoice_share" => %w[forum_name invoice_number amount due_date invoice_url]
   }.freeze
 
@@ -186,6 +189,16 @@ class WhatsappTemplate < ApplicationRecord
       Hi %{display_name}! Here is your membership fee invoice %{invoice_number} (%{amount}) from %{forum_name}. %{status_text}
     MSG
 
+    "member_invoice_share" => <<~MSG.strip,
+      Hi %{display_name}! 👋
+
+      You have a new invoice *%{invoice_number}* from %{forum_name} for %{amount}, due by *%{due_date}*.
+
+      View & pay: %{invoice_url}
+
+      Thank you! 🙏
+    MSG
+
     "invoice_share" => <<~MSG.strip
       Hi %{forum_name}! 👋
 
@@ -201,12 +214,17 @@ class WhatsappTemplate < ApplicationRecord
   validates :body, presence: true
   validates :key, uniqueness: { scope: :forum_id }
 
-  # Looks up the forum's (or, for global keys, the platform's) saved override
-  # and falls back to today's hardcoded wording when nothing has been customized.
+  # Looks up the forum's saved override first, then the platform-wide default
+  # set by a super admin, and falls back to today's hardcoded wording when
+  # nothing has been customized at either level. Global keys (e.g. invoice
+  # sharing, which isn't tied to any one forum) only ever use the platform-wide row.
   def self.resolve_body(forum, key)
     key = key.to_s
-    scope = GLOBAL_KEYS.include?(key) ? where(forum_id: nil) : where(forum: forum)
-    scope.find_by(key: key)&.body.presence || DEFAULTS.fetch(key)
+    return where(forum_id: nil, key: key).first&.body.presence || DEFAULTS.fetch(key) if GLOBAL_KEYS.include?(key)
+
+    where(forum: forum, key: key).first&.body.presence ||
+      where(forum_id: nil, key: key).first&.body.presence ||
+      DEFAULTS.fetch(key)
   end
 
   # Renders a template with named %{var} placeholders. Uses a forgiving gsub

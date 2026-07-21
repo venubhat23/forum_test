@@ -42,6 +42,7 @@ class Ability
       can :manage, Chapter, forum_id: user.forum_id
       can :manage, User, forum_id: user.forum_id
       can :manage, FeePayment, user: { forum_id: user.forum_id }
+      can :manage, Invoice, user: { forum_id: user.forum_id }
       can :manage, Attendance, user: { forum_id: user.forum_id }
       can :manage, Referral, giver: { forum_id: user.forum_id }
       can :manage, ThanksgivingSlip, given_by: { forum_id: user.forum_id }
@@ -65,6 +66,7 @@ class Ability
       can [ :read, :update ], Chapter, id: user.chapter_id
       can :manage, User, chapter_id: user.chapter_id
       can :manage, FeePayment, user: { chapter_id: user.chapter_id }
+      can :manage, Invoice, user: { chapter_id: user.chapter_id }
       can :manage, Attendance, user: { chapter_id: user.chapter_id }
       can :manage, Referral, giver: { chapter_id: user.chapter_id }
       can :manage, ThanksgivingSlip, given_by: { chapter_id: user.chapter_id }

@@ -3,13 +3,14 @@ module SuperAdmin
     before_action :set_invoice, only: [ :show, :edit, :update, :destroy, :mark_paid, :void ]
 
     def index
-      @total_invoices = Invoice.count
-      @paid_invoices = Invoice.where(status: :paid).count
-      @pending_invoices = Invoice.where(status: :pending).count
-      @partially_paid_invoices = Invoice.where(status: :partially_paid).count
-      @overdue_invoices = Invoice.where(status: :overdue).or(Invoice.where("due_date < ? AND status = ?", Date.current, Invoice.statuses[:pending])).count
+      base = Invoice.where(user_id: nil)
+      @total_invoices = base.count
+      @paid_invoices = base.where(status: :paid).count
+      @pending_invoices = base.where(status: :pending).count
+      @partially_paid_invoices = base.where(status: :partially_paid).count
+      @overdue_invoices = base.where(status: :overdue).or(base.where("due_date < ? AND status = ?", Date.current, Invoice.statuses[:pending])).count
 
-      @invoices = Invoice.includes(:forum).order(created_at: :desc)
+      @invoices = base.includes(:forum).order(created_at: :desc)
       @invoices = @invoices.where(forum_id: params[:forum_id]) if params[:forum_id].present?
       @invoices = @invoices.where(status: params[:status]) if params[:status].present?
       @invoices = @invoices.page(params[:page])
@@ -101,7 +102,7 @@ module SuperAdmin
     private
 
     def set_invoice
-      @invoice = Invoice.find(params[:id])
+      @invoice = Invoice.where(user_id: nil).find(params[:id])
       @invoice.regenerate_share_token if action_name == "show" && @invoice.share_token.blank?
     end
 

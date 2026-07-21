@@ -1,0 +1,130 @@
+<% content_for :title, "Invoices" %>
+
+<div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+  <div>
+    <h1 class="page-title h4">Invoices</h1>
+    <p class="page-subtitle mb-0">Billing records raised against members of <%= @current_forum.name %>.</p>
+  </div>
+  <% if can? :create, Invoice %>
+    <%= link_to new_forum_invoice_path(forum_slug: @current_forum.slug), class: "btn btn-primary" do %>
+      <i class="bi bi-plus-lg me-1"></i> Create Invoice
+    <% end %>
+  <% end %>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-6 col-lg">
+    <div class="mini-stat-card">
+      <div>
+        <div class="mini-stat-label">Total</div>
+        <div class="mini-stat-value text-primary"><%= @total_invoices %></div>
+      </div>
+      <div class="mini-stat-icon mini-stat-icon-primary"><i class="bi bi-file-earmark-text"></i></div>
+    </div>
+  </div>
+  <div class="col-6 col-lg">
+    <div class="mini-stat-card">
+      <div>
+        <div class="mini-stat-label">Paid</div>
+        <div class="mini-stat-value text-success"><%= @paid_invoices %></div>
+      </div>
+      <div class="mini-stat-icon mini-stat-icon-success"><i class="bi bi-check-circle"></i></div>
+    </div>
+  </div>
+  <div class="col-6 col-lg">
+    <div class="mini-stat-card">
+      <div>
+        <div class="mini-stat-label">Pending</div>
+        <div class="mini-stat-value text-warning"><%= @pending_invoices %></div>
+      </div>
+      <div class="mini-stat-icon mini-stat-icon-warning"><i class="bi bi-hourglass-split"></i></div>
+    </div>
+  </div>
+  <div class="col-6 col-lg">
+    <div class="mini-stat-card">
+      <div>
+        <div class="mini-stat-label">Partially Paid</div>
+        <div class="mini-stat-value text-warning"><%= @partially_paid_invoices %></div>
+      </div>
+      <div class="mini-stat-icon mini-stat-icon-warning"><i class="bi bi-pie-chart"></i></div>
+    </div>
+  </div>
+  <div class="col-6 col-lg">
+    <div class="mini-stat-card">
+      <div>
+        <div class="mini-stat-label">Overdue</div>
+        <div class="mini-stat-value text-danger"><%= @overdue_invoices %></div>
+      </div>
+      <div class="mini-stat-icon mini-stat-icon-danger"><i class="bi bi-exclamation-triangle"></i></div>
+    </div>
+  </div>
+</div>
+
+<%= form_with url: forum_invoices_path(forum_slug: @current_forum.slug), method: :get, local: true, class: "card mb-3" do %>
+  <div class="card-body d-flex flex-wrap gap-2">
+    <%= select_tag :status, options_for_select([ [ "All statuses", "" ] ] + Invoice.statuses.keys.map { |s| [ s.titleize, s ] }, params[:status]), class: "form-select", style: "max-width: 200px;" %>
+    <%= submit_tag "Filter", class: "btn btn-outline-secondary" %>
+    <%= link_to "Reset", forum_invoices_path(forum_slug: @current_forum.slug), class: "btn btn-link" %>
+  </div>
+<% end %>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th>Invoice #</th>
+          <th>Member</th>
+          <th>Amount</th>
+          <th>Status</th>
+          <th>Due</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @invoices.each do |invoice| %>
+          <tr>
+            <td>
+              <div class="d-flex align-items-center gap-2">
+                <span class="row-avatar"><i class="bi bi-file-earmark-text"></i></span>
+                <span class="fw-semibold"><%= link_to invoice.invoice_number, forum_invoice_path(forum_slug: @current_forum.slug, id: invoice) %></span>
+              </div>
+            </td>
+            <td><%= invoice.user.display_name %></td>
+            <td>&#8377;<%= number_with_delimiter(invoice.amount.to_i) %></td>
+            <td><span class="badge <%= invoice_status_badge_class(invoice) %>"><%= invoice.status.titleize %></span></td>
+            <td><%= invoice.due_date.strftime("%d %b %Y") %></td>
+            <td class="text-end">
+              <div class="d-flex gap-1 justify-content-end">
+                <%= link_to forum_invoice_path(forum_slug: @current_forum.slug, id: invoice), class: "icon-btn icon-btn-view", title: "View" do %>
+                  <i class="bi bi-eye"></i>
+                <% end %>
+                <% if (wa_link = whatsapp_member_invoice_share_link(invoice)) %>
+                  <%= link_to wa_link, class: "icon-btn icon-btn-whatsapp", title: "Share via WhatsApp", target: "_blank", rel: "noopener" do %>
+                    <i class="bi bi-whatsapp"></i>
+                  <% end %>
+                <% end %>
+                <% if can?(:update, invoice) && !invoice.locked_for_edits? %>
+                  <%= link_to edit_forum_invoice_path(forum_slug: @current_forum.slug, id: invoice), class: "icon-btn icon-btn-edit", title: "Edit" do %>
+                    <i class="bi bi-pencil"></i>
+                  <% end %>
+                <% end %>
+                <% if can?(:destroy, invoice) && !invoice.locked_for_edits? %>
+                  <%= button_to forum_invoice_path(forum_slug: @current_forum.slug, id: invoice), method: :delete, class: "icon-btn icon-btn-danger", title: "Delete",
+                        data: { turbo_confirm: "Delete invoice #{invoice.invoice_number}? This cannot be undone." } do %>
+                    <i class="bi bi-trash"></i>
+                  <% end %>
+                <% end %>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+        <% if @invoices.empty? %>
+          <tr><td colspan="6" class="text-center text-muted py-4">No invoices yet.</td></tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<%= paginate @invoices %>
