@@ -81,7 +81,7 @@ module Forums
     end
 
     def meeting_params
-      params.require(:one_to_one_meeting).permit(:requester_id, :requested_with_id, :scheduled_at, :notes, :follow_up_on)
+      params.require(:one_to_one_meeting).permit(:requester_id, :requested_with_id, :scheduled_at, :notes, :follow_up_on, :fee_amount)
     end
   end
 end

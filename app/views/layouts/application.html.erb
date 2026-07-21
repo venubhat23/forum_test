@@ -175,7 +175,7 @@
         applyDesktopState();
 
         // Assigning .onclick (rather than addEventListener) so re-running
-        // this initializer on every turbo:load overwrites the previous
+        // this initializer on every turbo:render overwrites the previous
         // handler instead of stacking duplicate ones.
         desktopToggle.onclick = function() {
           if (window.innerWidth < 992) return;
@@ -213,7 +213,7 @@
         };
       }
 
-      document.addEventListener('turbo:load', function() {
+      document.addEventListener('turbo:render', function() {
         initDesktopSidebarToggle();
         initMobileSidebarToggle();
       });
@@ -226,7 +226,7 @@
         localStorage.setItem('theme', next);
       }
 
-      document.addEventListener('turbo:load', function() {
+      document.addEventListener('turbo:render', function() {
         document.documentElement.setAttribute('data-theme', localStorage.getItem('theme') || 'light');
       });
 
@@ -238,7 +238,7 @@
         setTimeout(function() { toast.remove(); }, 300);
       }
 
-      document.addEventListener('turbo:load', function() {
+      document.addEventListener('turbo:render', function() {
         var toast = document.getElementById('toast-notification');
         if (toast) {
           setTimeout(function() { toast.style.transform = 'translateX(0)'; }, 100);
@@ -254,7 +254,7 @@
         setTimeout(function() { toast.remove(); }, 300);
       }
 
-      document.addEventListener('turbo:load', function() {
+      document.addEventListener('turbo:render', function() {
         var toasts = document.querySelectorAll('.toast-announcement');
         toasts.forEach(function(toast, index) {
           setTimeout(function() { toast.style.transform = 'translateX(0)'; }, 100 + index * 150);

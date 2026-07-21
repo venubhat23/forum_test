@@ -5,16 +5,23 @@
     <h1 class="page-title h4">Members</h1>
     <p class="page-subtitle mb-0"><%= @chapter.name %> &middot; <%= @current_forum.name %></p>
   </div>
-  <% if can? :create, User %>
-    <div class="d-flex flex-wrap gap-2">
+  <div class="d-flex flex-wrap gap-2">
+    <% if can? :destroy, User %>
+      <button type="button" class="btn btn-outline-danger" id="bulk-delete-members-btn" disabled data-bs-toggle="modal" data-bs-target="#bulk-delete-members-modal">
+        <i class="bi bi-trash3-fill me-1"></i>Delete Selected
+      </button>
+    <% end %>
+    <% if can? :create, User %>
       <%= link_to "Export CSV", "#{forum_chapter_members_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id)}.csv", class: "btn btn-outline-primary" %>
       <%= link_to "Import Excel", import_forum_chapter_members_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id), class: "btn btn-outline-primary" %>
       <%= link_to new_forum_chapter_member_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id), class: "btn btn-primary" do %>
         <i class="bi bi-plus-lg me-1"></i> Add Member
       <% end %>
-    </div>
-  <% end %>
+    <% end %>
+  </div>
 </div>
+
+<%= form_with url: bulk_destroy_forum_chapter_members_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id), method: :delete, local: true, id: "bulk-delete-members-form" do %><% end %>
 
 <% if @upcoming_event && can?(:update, User) %>
   <div class="card mb-4">
@@ -82,6 +89,7 @@
     <table class="table table-hover align-middle mb-0">
       <thead>
         <tr>
+          <th><input type="checkbox" class="form-check-input" id="select-all-members"></th>
           <th>Name</th>
           <th>Email</th>
           <th>Business</th>
@@ -95,6 +103,12 @@
           <% fee = @annual_fees_by_user[member.id] %>
           <% fee_paid_current = fee&.paid? && member.renews_on.present? && member.renews_on >= Date.current %>
           <tr>
+            <td>
+              <% if can? :destroy, member %>
+                <input type="checkbox" class="form-check-input member-select-checkbox" name="member_ids[]" value="<%= member.id %>"
+                       form="bulk-delete-members-form" data-member-name="<%= member.full_name %>">
+              <% end %>
+            </td>
             <td>
               <div class="d-flex align-items-center gap-2">
                 <span class="row-avatar"><%= member.full_name.first.upcase %></span>
@@ -153,12 +167,18 @@
                 <%= link_to forum_chapter_member_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: member.id), class: "icon-btn icon-btn-view", title: "View" do %>
                   <i class="bi bi-eye"></i>
                 <% end %>
+                <% if can? :destroy, member %>
+                  <%= button_to forum_chapter_member_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: member.id), method: :delete, class: "icon-btn icon-btn-danger", title: "Delete Permanently",
+                        data: { turbo_confirm: "Permanently delete #{member.full_name}? This will also permanently delete all their fee payments, attendance records, referrals, leads, event registrations, notifications, badges, support tickets, and other data. This cannot be undone." } do %>
+                    <i class="bi bi-trash3-fill"></i>
+                  <% end %>
+                <% end %>
               </div>
             </td>
           </tr>
         <% end %>
         <% if @members.empty? %>
-          <tr><td colspan="6" class="text-center text-muted py-4">No members yet. Add the first one to get started.</td></tr>
+          <tr><td colspan="7" class="text-center text-muted py-4">No members yet. Add the first one to get started.</td></tr>
         <% end %>
       </tbody>
     </table>
@@ -166,3 +186,67 @@
 </div>
 
 <%= paginate @members %>
+
+<% if can? :destroy, User %>
+  <div class="modal fade" id="bulk-delete-members-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title text-danger"><i class="bi bi-exclamation-triangle-fill me-2"></i>Permanently delete <span id="bulk-delete-members-count"></span> member(s)?</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>This will <strong>permanently delete</strong> the following members and <strong>all their data</strong> —
+          fee payments, attendance records, referrals, leads, event registrations, notifications, badges, support
+          tickets, and every other associated record. This cannot be undone.</p>
+          <ul id="bulk-delete-members-list" class="mb-3"></ul>
+          <p>Type <strong>DELETE</strong> to confirm:</p>
+          <input type="text" class="form-control" id="bulk-delete-members-confirm-input" autocomplete="off" oninput="checkBulkDeleteMembersInput()">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-danger" form="bulk-delete-members-form" id="bulk-delete-members-submit-btn" disabled>Delete Forever</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function checkBulkDeleteMembersInput() {
+      var input = document.getElementById('bulk-delete-members-confirm-input');
+      document.getElementById('bulk-delete-members-submit-btn').disabled = (input.value !== 'DELETE');
+    }
+
+    function updateBulkDeleteMembersButton() {
+      var checked = document.querySelectorAll('.member-select-checkbox:checked');
+      var bulkBtn = document.getElementById('bulk-delete-members-btn');
+      bulkBtn.disabled = checked.length === 0;
+
+      var list = document.getElementById('bulk-delete-members-list');
+      list.innerHTML = '';
+      checked.forEach(function(cb) {
+        var li = document.createElement('li');
+        li.textContent = cb.dataset.memberName;
+        list.appendChild(li);
+      });
+      document.getElementById('bulk-delete-members-count').textContent = checked.length;
+    }
+
+    document.addEventListener('turbo:load', function() {
+      document.querySelectorAll('.member-select-checkbox').forEach(function(cb) {
+        cb.addEventListener('change', updateBulkDeleteMembersButton);
+      });
+
+      var selectAll = document.getElementById('select-all-members');
+      if (selectAll) {
+        selectAll.addEventListener('change', function() {
+          document.querySelectorAll('.member-select-checkbox').forEach(function(cb) { cb.checked = selectAll.checked; });
+          updateBulkDeleteMembersButton();
+        });
+      }
+
+      var bulkInput = document.getElementById('bulk-delete-members-confirm-input');
+      if (bulkInput) bulkInput.value = '';
+    });
+  </script>
+<% end %>

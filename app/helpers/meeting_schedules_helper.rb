@@ -11,15 +11,9 @@ module MeetingSchedulesHelper
     venue_text = schedule.venue.present? ? "\n📍 Venue: #{schedule.venue}" : ""
     agenda_text = schedule.agenda.present? ? "\n📋 Agenda: #{schedule.agenda}" : ""
 
-    <<~MSG.strip
-      Hi #{user.display_name}! 👋
-
-      You're invited to join *#{schedule.title.presence || "#{schedule.day_name} Meetings"}* at #{forum.name}! 🎉
-
-      🗓️ #{when_text}
-      📅 #{range_text}#{venue_text}#{agenda_text}
-
-      Mark your calendar — we'd love to see you there every time! 😊
-    MSG
+    WhatsappTemplate.render(forum, :schedule_invite,
+      display_name: user.display_name, schedule_title: schedule.title.presence || "#{schedule.day_name} Meetings",
+      forum_name: forum.name, when_text: when_text, range_text: range_text,
+      venue_text: venue_text, agenda_text: agenda_text)
   end
 end

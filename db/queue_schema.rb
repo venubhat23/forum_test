@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_19_050000) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_21_033400) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -219,6 +219,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_19_050000) do
     t.decimal "fee_amount", precision: 10, scale: 2
     t.string "payment_upi_id"
     t.text "payment_bank_details"
+    t.string "speaker"
+    t.string "speaker_phone"
     t.index ["chapter_id"], name: "index_events_on_chapter_id"
     t.index ["created_by_id"], name: "index_events_on_created_by_id"
     t.index ["forum_id"], name: "index_events_on_forum_id"
@@ -412,6 +414,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_19_050000) do
     t.string "payment_upi_id"
     t.text "payment_bank_details"
     t.bigint "meeting_schedule_id"
+    t.string "speaker_phone"
     t.index ["chapter_id"], name: "index_meetings_on_chapter_id"
     t.index ["meeting_schedule_id"], name: "index_meetings_on_meeting_schedule_id"
   end
@@ -507,6 +510,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_19_050000) do
     t.date "follow_up_on"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.decimal "fee_amount", precision: 10, scale: 2
     t.index ["forum_id"], name: "index_one_to_one_meetings_on_forum_id"
     t.index ["requested_with_id"], name: "index_one_to_one_meetings_on_requested_with_id"
     t.index ["requester_id"], name: "index_one_to_one_meetings_on_requester_id"
@@ -884,6 +888,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_19_050000) do
     t.string "service_area"
     t.string "capacity"
     t.boolean "lifetime_member", default: false, null: false
+    t.integer "membership_year"
     t.index ["business_category_id"], name: "index_users_on_business_category_id"
     t.index ["chapter_id"], name: "index_users_on_chapter_id"
     t.index ["email"], name: "index_users_on_email", unique: true

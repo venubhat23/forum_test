@@ -15,8 +15,14 @@
       <%= f.text_field :venue, class: "form-control" %>
     </div>
     <div class="col-12 col-sm-6">
-      <%= f.label :speaker, class: "form-label" %>
+      <%= f.label :speaker, "Guest Speaker", class: "form-label" %>
       <%= f.text_field :speaker, class: "form-control" %>
+    </div>
+  </div>
+  <div class="row g-3 mb-3">
+    <div class="col-12 col-sm-6">
+      <%= f.label :speaker_phone, "Guest Speaker Phone", class: "form-label" %>
+      <%= f.telephone_field :speaker_phone, class: "form-control", placeholder: "For WhatsApp invite" %>
     </div>
   </div>
   <div class="mb-3">

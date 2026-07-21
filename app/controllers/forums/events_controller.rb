@@ -106,7 +106,7 @@ module Forums
     end
 
     def event_params
-      params.require(:event).permit(:title, :event_type, :starts_at, :venue, :registration_opens_at, :registration_closes_at,
+      params.require(:event).permit(:title, :event_type, :starts_at, :venue, :speaker, :speaker_phone, :registration_opens_at, :registration_closes_at,
         :fee_amount, :payment_upi_id, :payment_bank_details, :payment_qr, gallery: [])
     end
   end

@@ -22,14 +22,9 @@ module InvoicesHelper
   end
 
   def whatsapp_invoice_share_message(invoice)
-    <<~MSG.strip
-      Hi #{invoice.forum.name}! 👋
-
-      Here's your invoice *#{invoice.invoice_number}* for #{number_to_currency(invoice.amount, unit: '₹', format: '%u%n')}, due by *#{invoice.due_date.strftime('%d %b %Y')}*.
-
-      View & pay: #{public_invoice_url(invoice.share_token)}
-
-      Thank you! 🙏
-    MSG
+    WhatsappTemplate.render(nil, :invoice_share,
+      forum_name: invoice.forum.name, invoice_number: invoice.invoice_number,
+      amount: number_to_currency(invoice.amount, unit: "₹", format: "%u%n"),
+      due_date: invoice.due_date.strftime("%d %b %Y"), invoice_url: public_invoice_url(invoice.share_token))
   end
 end

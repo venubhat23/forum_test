@@ -19,6 +19,16 @@
   </div>
   <div class="row g-3 mb-3">
     <div class="col-12 col-sm-6">
+      <%= f.label :speaker, "Guest Speaker (optional)", class: "form-label" %>
+      <%= f.text_field :speaker, class: "form-control" %>
+    </div>
+    <div class="col-12 col-sm-6">
+      <%= f.label :speaker_phone, "Guest Speaker Phone", class: "form-label" %>
+      <%= f.telephone_field :speaker_phone, class: "form-control", placeholder: "For WhatsApp invite" %>
+    </div>
+  </div>
+  <div class="row g-3 mb-3">
+    <div class="col-12 col-sm-6">
       <%= f.label :registration_opens_at, "Registration Opens", class: "form-label" %>
       <%= f.datetime_field :registration_opens_at, class: "form-control" %>
     </div>

@@ -1,0 +1,28 @@
+<% content_for :title, "WhatsApp Template" %>
+
+<div class="page-header">
+  <h1 class="page-title h4">WhatsApp Template</h1>
+  <p class="page-subtitle mb-0">Platform-wide message used when sharing billing invoices with forum admins.</p>
+</div>
+
+<div class="row justify-content-center">
+  <div class="col-12 col-lg-8">
+    <div class="card">
+      <div class="card-body p-4">
+        <%= form_with model: @template, url: super_admin_whatsapp_template_path, method: :patch, local: true do |f| %>
+          <div class="mb-3">
+            <%= f.label :body, "Message", class: "form-label" %>
+            <%= f.text_area :body, class: "form-control", rows: 10, required: true %>
+          </div>
+          <div class="mb-4">
+            <p class="text-muted small mb-1">Available placeholders — include any of these anywhere in the text and they'll be filled in automatically:</p>
+            <% WhatsappTemplate::VARIABLES.fetch(@template.key, []).each do |var| %>
+              <code class="me-1">%{<%= var %>}</code>
+            <% end %>
+          </div>
+          <%= f.submit "Save", class: "btn btn-primary btn-lg" %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

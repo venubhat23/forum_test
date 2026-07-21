@@ -9,8 +9,8 @@ module Forums
 
     def members
       @members = @current_forum.users.member.order(:full_name)
-      respond_with_csv(@members, "members", [ "Name", "Email", "Phone", "Chapter", "Status", "Renews On", "Joined" ]) do |m|
-        [ m.full_name, m.email, m.phone, m.chapter&.name, m.membership_status, m.renews_on, m.created_at ]
+      respond_with_csv(@members, "members", [ "Name", "Email", "Phone", "Chapter", "Status", "Renews On", "Member Since" ]) do |m|
+        [ m.full_name, m.email, m.phone, m.chapter&.name, m.membership_status, m.renews_on, m.member_since ]
       end
     end
 

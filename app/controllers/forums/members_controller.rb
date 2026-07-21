@@ -4,7 +4,7 @@ require "roo"
 module Forums
   class MembersController < BaseController
     before_action :set_chapter, except: [ :import, :bulk_import, :all ]
-    before_action :set_member, only: [ :show, :edit, :update, :suspend, :activate, :reset_password, :force_logout, :renew, :print, :update_role ]
+    before_action :set_member, only: [ :show, :edit, :update, :destroy, :suspend, :activate, :reset_password, :force_logout, :renew, :print, :update_role ]
 
     def all
       authorize! :read, User
@@ -55,13 +55,15 @@ module Forums
 
     def new
       authorize! :create, User
-      @member = @chapter.members.new
+      @member = @chapter.members.new(membership_year: Date.current.year)
     end
 
     def create
       @member = @chapter.members.new(member_params)
       @member.forum = @current_forum
       @member.role = :member
+      @member.membership_year ||= Date.current.year
+      @member.renews_on = Date.new(@member.membership_year, 12, 31)
       authorize! :create, @member
 
       if @member.save
@@ -84,6 +86,34 @@ module Forums
         flash.now[:alert] = @member.errors.full_messages.to_sentence
         render :edit, status: :unprocessable_entity
       end
+    end
+
+    def destroy
+      authorize! :destroy, @member
+      name = @member.display_name
+      @member.purge!
+      redirect_to forum_chapter_members_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id), notice: "#{name} and all their data have been permanently deleted."
+    rescue ActiveRecord::InvalidForeignKey, ActiveRecord::RecordNotDestroyed => e
+      redirect_to forum_chapter_members_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id), alert: "Could not delete #{name}: #{e.message}"
+    end
+
+    def bulk_destroy
+      authorize! :destroy, User
+      deleted = []
+      failed = []
+      @chapter.members.where(id: params[:member_ids]).find_each do |member|
+        name = member.display_name
+        begin
+          member.purge!
+          deleted << name
+        rescue ActiveRecord::InvalidForeignKey, ActiveRecord::RecordNotDestroyed => e
+          failed << "#{name} (#{e.message})"
+        end
+      end
+
+      redirect_to forum_chapter_members_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id),
+        notice: (deleted.any? ? "Permanently deleted: #{deleted.join(', ')}." : nil),
+        alert: (failed.any? ? "Could not delete: #{failed.join('; ')}." : nil)
     end
 
     def suspend
@@ -208,20 +238,22 @@ module Forums
     def member_params
       params.require(:member).permit(:full_name, :email, :phone, :password, :password_confirmation,
         :business_name, :business_category, :speciality, :designation, :gst_number, :pan_number, :aadhaar_number,
-        :website, :address, :city, :service_area, :capacity, :experience_years, :date_of_birth, :business_category_id, :photo, kyc_documents: [])
+        :website, :address, :city, :service_area, :capacity, :experience_years, :date_of_birth, :business_category_id, :photo,
+        :membership_year, kyc_documents: [])
     end
 
     def member_update_params
       params.require(:member).permit(:full_name, :email, :phone,
         :business_name, :business_category, :speciality, :designation, :gst_number, :pan_number, :aadhaar_number,
-        :website, :address, :city, :service_area, :capacity, :experience_years, :date_of_birth, :business_category_id, :photo, kyc_documents: [])
+        :website, :address, :city, :service_area, :capacity, :experience_years, :date_of_birth, :business_category_id, :photo,
+        :membership_year, kyc_documents: [])
     end
 
     def members_csv(members)
       CSV.generate(headers: true) do |csv|
-        csv << [ "Full Name", "Email", "Phone", "Business Name", "Membership Status", "Renews On", "Joined" ]
+        csv << [ "Full Name", "Email", "Phone", "Business Name", "Membership Status", "Renews On", "Member Since" ]
         members.each do |m|
-          csv << [ m.full_name, m.email, m.phone, m.business_name, m.membership_status, m.renews_on, m.created_at ]
+          csv << [ m.full_name, m.email, m.phone, m.business_name, m.membership_status, m.renews_on, m.member_since ]
         end
       end
     end

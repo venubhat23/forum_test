@@ -4,6 +4,8 @@ class MembershipApplication < ApplicationRecord
   belongs_to :forum
   belongs_to :chapter, optional: true
   belongs_to :reviewed_by, class_name: "User", optional: true
+  belongs_to :user, optional: true
+  belongs_to :invited_by, class_name: "User", optional: true
 
   validates :name, presence: true
   validates :email, presence: true, format: { with: URI::MailTo::EMAIL_REGEXP }

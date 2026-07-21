@@ -4,11 +4,25 @@ class OneToOneMeeting < ApplicationRecord
   belongs_to :forum
   belongs_to :requester, class_name: "User"
   belongs_to :requested_with, class_name: "User"
+  has_many :fee_payments, as: :feeable, dependent: :destroy
 
   validates :scheduled_at, presence: true
+  validates :fee_amount, numericality: { greater_than: 0 }, allow_nil: true
   validate :requester_and_requested_with_differ
 
   after_create :notify_requested_with
+
+  def paid_count
+    fee_payments.paid.count
+  end
+
+  def pending_count
+    fee_payments.pending.count
+  end
+
+  def collected_amount
+    fee_payments.paid.sum(:amount)
+  end
 
   private
 

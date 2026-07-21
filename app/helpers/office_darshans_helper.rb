@@ -10,10 +10,12 @@ module OfficeDarshansHelper
   end
 
   def whatsapp_darshan_host_thankyou_message(darshan)
-    "Hi #{darshan.visitor.display_name}! 🙏\n\nThank you so much for visiting our office on #{darshan.scheduled_at.strftime('%d %b %Y')}. It was wonderful hosting you — looking forward to more collaboration! 🤝"
+    WhatsappTemplate.render(darshan.forum, :darshan_thankyou_host,
+      visitor_name: darshan.visitor.display_name, scheduled_at: darshan.scheduled_at.strftime("%d %b %Y"))
   end
 
   def whatsapp_darshan_visitor_thankyou_message(darshan)
-    "Hi #{darshan.host.display_name}! 🙏\n\nThank you for hosting me at your office on #{darshan.scheduled_at.strftime('%d %b %Y')}. Really enjoyed the visit and looking forward to working together! 🤝"
+    WhatsappTemplate.render(darshan.forum, :darshan_thankyou_visitor,
+      host_name: darshan.host.display_name, scheduled_at: darshan.scheduled_at.strftime("%d %b %Y"))
   end
 end

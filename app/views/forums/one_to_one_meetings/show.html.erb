@@ -16,8 +16,45 @@
 </div>
 
 <% if @meeting.notes.present? %>
-  <div class="card">
+  <div class="card mb-4">
     <div class="card-header fw-semibold">Notes</div>
     <div class="card-body"><%= simple_format(@meeting.notes) %></div>
+  </div>
+<% end %>
+
+<% if @meeting.fee_amount.present? %>
+  <div class="card mb-4">
+    <div class="card-header fw-semibold">Fee &amp; Payment Info</div>
+    <div class="card-body">
+      <p class="mb-3">Fee: <strong><%= number_to_currency(@meeting.fee_amount) %></strong></p>
+      <% fee = @meeting.fee_payments.order(:created_at).find_by(user_id: @meeting.requested_with_id) %>
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <span><%= @meeting.requested_with.display_name %></span>
+        <div class="d-flex align-items-center gap-2">
+          <% if fee&.paid? %>
+            <span class="badge badge-status-active"><i class="bi bi-check-circle-fill me-1"></i>Paid</span>
+          <% elsif fee&.partially_paid? %>
+            <span class="badge badge-status-partial"><i class="bi bi-exclamation-triangle-fill me-1"></i>Partially Paid</span>
+          <% elsif fee.nil? && @meeting.requested_with.annual_fee_paid? %>
+            <span class="badge badge-status-active" title="Annual membership fee is already paid — no meeting fee is collected"><i class="bi bi-shield-check me-1"></i>Waived · Annual Member</span>
+          <% else %>
+            <span class="badge badge-status-trial"><i class="bi bi-exclamation-circle-fill me-1"></i>Due</span>
+          <% end %>
+          <% if can?(:update, @meeting) %>
+            <% if fee && !fee.paid? %>
+              <%= button_to mark_paid_forum_chapter_fee_payment_path(forum_slug: @current_forum.slug, chapter_id: @meeting.requested_with.chapter_id, id: fee.id), method: :patch, class: "icon-btn icon-btn-success", title: "Mark Paid (full balance)" do %>
+                <i class="bi bi-check-lg"></i>
+              <% end %>
+            <% elsif fee.nil? && @meeting.requested_with.annual_fee_paid? %>
+              <%# annual dues already cover this member — no fee to record %>
+            <% elsif fee.nil? && @meeting.requested_with.chapter_id.present? %>
+              <%= link_to new_forum_chapter_fee_payment_path(forum_slug: @current_forum.slug, chapter_id: @meeting.requested_with.chapter_id, user_id: @meeting.requested_with.id, fee_type: "meeting", one_to_one_meeting_id: @meeting.id), class: "icon-btn icon-btn-view", title: "Record Fee" do %>
+                <i class="bi bi-cash-coin"></i>
+              <% end %>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    </div>
   </div>
 <% end %>

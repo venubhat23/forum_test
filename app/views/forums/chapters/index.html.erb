@@ -5,12 +5,21 @@
     <h1 class="page-title h4">Chapters</h1>
     <p class="page-subtitle mb-0">Chapters under <%= @current_forum.name %>.</p>
   </div>
-  <% if can? :create, Chapter %>
-    <%= link_to new_forum_chapter_path(forum_slug: @current_forum.slug), class: "btn btn-primary" do %>
-      <i class="bi bi-plus-lg me-1"></i> New Chapter
+  <div class="d-flex flex-wrap gap-2">
+    <% if can? :destroy, Chapter %>
+      <button type="button" class="btn btn-outline-danger" id="bulk-delete-chapters-btn" disabled data-bs-toggle="modal" data-bs-target="#bulk-delete-chapters-modal">
+        <i class="bi bi-trash3-fill me-1"></i>Delete Selected
+      </button>
     <% end %>
-  <% end %>
+    <% if can? :create, Chapter %>
+      <%= link_to new_forum_chapter_path(forum_slug: @current_forum.slug), class: "btn btn-primary" do %>
+        <i class="bi bi-plus-lg me-1"></i> New Chapter
+      <% end %>
+    <% end %>
+  </div>
 </div>
+
+<%= form_with url: bulk_destroy_permanently_forum_chapters_path(forum_slug: @current_forum.slug), method: :delete, local: true, id: "bulk-delete-chapters-form" do %><% end %>
 
 <div class="row g-3 mb-4">
   <div class="col-6 col-lg-4">
@@ -56,6 +65,7 @@
     <table class="table table-hover align-middle mb-0">
       <thead>
         <tr>
+          <th><input type="checkbox" class="form-check-input" id="select-all-chapters"></th>
           <th>Name</th>
           <th>Status</th>
           <th>Collected</th>
@@ -67,6 +77,12 @@
         <% @chapters.each do |chapter| %>
           <tr>
             <td>
+              <% if can? :destroy, chapter %>
+                <input type="checkbox" class="form-check-input chapter-select-checkbox" name="chapter_ids[]" value="<%= chapter.id %>"
+                       form="bulk-delete-chapters-form" data-chapter-name="<%= chapter.name %>">
+              <% end %>
+            </td>
+            <td>
               <div class="d-flex align-items-center gap-2">
                 <span class="row-avatar"><%= chapter.name.first.upcase %></span>
                 <span class="fw-semibold"><%= chapter.name %></span>
@@ -76,14 +92,22 @@
             <td><%= number_to_currency(chapter.collected_amount) %></td>
             <td><%= chapter.created_at.strftime("%d %b %Y") %></td>
             <td class="text-end">
-              <%= link_to forum_chapter_path(forum_slug: @current_forum.slug, id: chapter.id), class: "icon-btn icon-btn-view", title: "View" do %>
-                <i class="bi bi-eye"></i>
-              <% end %>
+              <div class="d-flex gap-1 justify-content-end">
+                <%= link_to forum_chapter_path(forum_slug: @current_forum.slug, id: chapter.id), class: "icon-btn icon-btn-view", title: "View" do %>
+                  <i class="bi bi-eye"></i>
+                <% end %>
+                <% if can? :destroy, chapter %>
+                  <%= button_to destroy_permanently_forum_chapter_path(forum_slug: @current_forum.slug, id: chapter.id), method: :delete, class: "icon-btn icon-btn-danger", title: "Delete Permanently",
+                        data: { turbo_confirm: "Permanently delete #{chapter.name}? This will also permanently delete all its members, guests, and committee members (and everything belonging to them), its meetings, meeting schedules, and presentations, and unlink its events, announcements, support tickets, applications, and referrals. This cannot be undone." } do %>
+                    <i class="bi bi-trash3-fill"></i>
+                  <% end %>
+                <% end %>
+              </div>
             </td>
           </tr>
         <% end %>
         <% if @chapters.empty? %>
-          <tr><td colspan="5" class="text-center text-muted py-4">No chapters yet.</td></tr>
+          <tr><td colspan="6" class="text-center text-muted py-4">No chapters yet.</td></tr>
         <% end %>
       </tbody>
     </table>
@@ -91,3 +115,67 @@
 </div>
 
 <%= paginate @chapters %>
+
+<% if can? :destroy, Chapter %>
+  <div class="modal fade" id="bulk-delete-chapters-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title text-danger"><i class="bi bi-exclamation-triangle-fill me-2"></i>Permanently delete <span id="bulk-delete-chapters-count"></span> chapter(s)?</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>This will <strong>permanently delete</strong> the following chapters and <strong>everything in them</strong> —
+          all members, guests, committee members, meetings, meeting schedules, presentations, fee payments, referrals,
+          and every other associated record. This cannot be undone.</p>
+          <ul id="bulk-delete-chapters-list" class="mb-3"></ul>
+          <p>Type <strong>DELETE</strong> to confirm:</p>
+          <input type="text" class="form-control" id="bulk-delete-chapters-confirm-input" autocomplete="off" oninput="checkBulkDeleteChaptersInput()">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-danger" form="bulk-delete-chapters-form" id="bulk-delete-chapters-submit-btn" disabled>Delete Forever</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function checkBulkDeleteChaptersInput() {
+      var input = document.getElementById('bulk-delete-chapters-confirm-input');
+      document.getElementById('bulk-delete-chapters-submit-btn').disabled = (input.value !== 'DELETE');
+    }
+
+    function updateBulkDeleteChaptersButton() {
+      var checked = document.querySelectorAll('.chapter-select-checkbox:checked');
+      var bulkBtn = document.getElementById('bulk-delete-chapters-btn');
+      bulkBtn.disabled = checked.length === 0;
+
+      var list = document.getElementById('bulk-delete-chapters-list');
+      list.innerHTML = '';
+      checked.forEach(function(cb) {
+        var li = document.createElement('li');
+        li.textContent = cb.dataset.chapterName;
+        list.appendChild(li);
+      });
+      document.getElementById('bulk-delete-chapters-count').textContent = checked.length;
+    }
+
+    document.addEventListener('turbo:load', function() {
+      document.querySelectorAll('.chapter-select-checkbox').forEach(function(cb) {
+        cb.addEventListener('change', updateBulkDeleteChaptersButton);
+      });
+
+      var selectAll = document.getElementById('select-all-chapters');
+      if (selectAll) {
+        selectAll.addEventListener('change', function() {
+          document.querySelectorAll('.chapter-select-checkbox').forEach(function(cb) { cb.checked = selectAll.checked; });
+          updateBulkDeleteChaptersButton();
+        });
+      }
+
+      var bulkInput = document.getElementById('bulk-delete-chapters-confirm-input');
+      if (bulkInput) bulkInput.value = '';
+    });
+  </script>
+<% end %>

@@ -39,7 +39,7 @@
             </div>
             <div class="col-12 col-sm-6">
               <%= f.label :business_category, class: "form-label" %>
-              <%= f.select :business_category, User::BUSINESS_CATEGORIES.keys, { include_blank: true }, class: "form-select" %>
+              <%= f.select :business_category, business_categories_map(@current_forum).keys, { include_blank: true }, class: "form-select" %>
             </div>
           </div>
 

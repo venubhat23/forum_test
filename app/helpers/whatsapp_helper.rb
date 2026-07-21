@@ -18,4 +18,21 @@ module WhatsappHelper
     digits = "91#{digits}" if digits.size == 10
     digits
   end
+
+  # Builds a wa.me click-to-chat link that opens WhatsApp with a pre-filled
+  # invite message for a guest speaker of a meeting/event, including venue.
+  def whatsapp_speaker_invite_link(name, phone, subject, when_time, venue, forum)
+    return nil if name.blank?
+
+    whatsapp_link(phone, whatsapp_speaker_invite_message(name, subject, when_time, venue, forum))
+  end
+
+  def whatsapp_speaker_invite_message(name, subject, when_time, venue, forum)
+    when_text = when_time.strftime("%A, %d %b %Y at %I:%M %p")
+    venue_text = venue.present? ? "\n📍 Venue: #{venue}" : ""
+
+    WhatsappTemplate.render(forum, :speaker_invite,
+      name: name, subject: subject, forum_name: forum.name,
+      when_text: when_text, venue_text: venue_text)
+  end
 end

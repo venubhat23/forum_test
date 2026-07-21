@@ -109,7 +109,7 @@
 </head>
 <body>
   <div class="toolbar">
-    <% if (wa_link = whatsapp_link(member.phone, "Hi #{member.display_name}! Here is your membership fee invoice #{@fee_payment.invoice_number} (#{number_to_currency(@fee_payment.amount)}) from #{@current_forum.name}. #{@fee_payment.paid? ? 'Payment received with thanks! 🙏' : 'Kindly complete the payment at your earliest convenience.'}")) %>
+    <% if (wa_link = whatsapp_receipt_share_link(member, @fee_payment, @current_forum)) %>
       <%= link_to wa_link, class: "btn btn-whatsapp", target: "_blank", rel: "noopener" do %>
         📱 Share on WhatsApp
       <% end %>

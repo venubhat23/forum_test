@@ -1,6 +1,6 @@
 module Forums
   class ChaptersController < BaseController
-    before_action :set_chapter, only: [ :show, :edit, :update, :destroy, :activate, :assign_admin ]
+    before_action :set_chapter, only: [ :show, :edit, :update, :destroy, :destroy_permanently, :activate, :assign_admin ]
 
     def index
       authorize! :read, Chapter
@@ -58,6 +58,34 @@ module Forums
       authorize! :destroy, @chapter
       @chapter.update!(status: :active)
       redirect_to forum_chapter_path(forum_slug: @current_forum.slug, id: @chapter.id), notice: "#{@chapter.name} was activated."
+    end
+
+    def destroy_permanently
+      authorize! :destroy, @chapter
+      name = @chapter.name
+      @chapter.purge!
+      redirect_to forum_chapters_path(forum_slug: @current_forum.slug), notice: "#{name} and all its members and data have been permanently deleted."
+    rescue ActiveRecord::InvalidForeignKey, ActiveRecord::RecordNotDestroyed => e
+      redirect_to forum_chapters_path(forum_slug: @current_forum.slug), alert: "Could not delete #{name}: #{e.message}"
+    end
+
+    def bulk_destroy_permanently
+      authorize! :destroy, Chapter
+      deleted = []
+      failed = []
+      @current_forum.chapters.where(id: params[:chapter_ids]).find_each do |chapter|
+        name = chapter.name
+        begin
+          chapter.purge!
+          deleted << name
+        rescue ActiveRecord::InvalidForeignKey, ActiveRecord::RecordNotDestroyed => e
+          failed << "#{name} (#{e.message})"
+        end
+      end
+
+      redirect_to forum_chapters_path(forum_slug: @current_forum.slug),
+        notice: (deleted.any? ? "Permanently deleted: #{deleted.join(', ')}." : nil),
+        alert: (failed.any? ? "Could not delete: #{failed.join('; ')}." : nil)
     end
 
     def assign_admin

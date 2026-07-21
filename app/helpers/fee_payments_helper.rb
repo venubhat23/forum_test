@@ -9,14 +9,22 @@ module FeePaymentsHelper
   def whatsapp_item_fee_reminder_message(person, fee, subject, forum)
     amount_text = fee ? " of #{number_to_currency(fee.balance_due)}" : ""
 
-    <<~MSG.strip
-      Hi #{person.display_name}! 👋
+    WhatsappTemplate.render(forum, :fee_reminder_item,
+      display_name: person.display_name, forum_name: forum.name,
+      amount_text: amount_text, subject: subject)
+  end
 
-      This is a friendly reminder from #{forum.name} that your fee#{amount_text} for *#{subject}* is still pending.
+  # Builds a wa.me click-to-chat link sharing a printable fee payment
+  # invoice/receipt with the paying member.
+  def whatsapp_receipt_share_link(member, fee_payment, forum)
+    whatsapp_link(member.phone, whatsapp_receipt_share_message(member, fee_payment, forum))
+  end
 
-      Kindly complete the payment at your earliest convenience.
+  def whatsapp_receipt_share_message(member, fee_payment, forum)
+    status_text = fee_payment.paid? ? "Payment received with thanks! 🙏" : "Kindly complete the payment at your earliest convenience."
 
-      Thank you! 🙏
-    MSG
+    WhatsappTemplate.render(forum, :fee_receipt_share,
+      display_name: member.display_name, invoice_number: fee_payment.invoice_number,
+      amount: number_to_currency(fee_payment.amount), forum_name: forum.name, status_text: status_text)
   end
 end

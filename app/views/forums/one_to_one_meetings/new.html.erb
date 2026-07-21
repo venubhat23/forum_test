@@ -23,6 +23,11 @@
             <%= f.label :scheduled_at, "Date & Time", class: "form-label" %>
             <%= f.datetime_field :scheduled_at, class: "form-control", required: true %>
           </div>
+          <div class="mb-3">
+            <%= f.label :fee_amount, "Meeting Fee (optional)", class: "form-label" %>
+            <%= f.number_field :fee_amount, step: "0.01", min: "0.01", class: "form-control" %>
+            <div class="form-text">Leave blank for no fee. Members with an active annual membership are never charged, regardless of this amount.</div>
+          </div>
           <div class="mb-4">
             <%= f.label :notes, class: "form-label" %>
             <%= f.text_area :notes, class: "form-control", rows: 3 %>

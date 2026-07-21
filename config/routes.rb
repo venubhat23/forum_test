@@ -55,6 +55,7 @@ Rails.application.routes.draw do
     end
     resources :payments, only: [ :index ]
     resource :billing, only: [ :edit, :update ], controller: "billing"
+    resource :whatsapp_template, only: [ :edit, :update ], controller: "whatsapp_templates"
     resources :users do
       member do
         patch :suspend
@@ -115,6 +116,11 @@ Rails.application.routes.draw do
     resources :expenses, controller: "forums/expenses", except: [ :show ]
     resources :documents, controller: "forums/documents", except: [ :show, :edit, :update ]
     resources :announcements, controller: "forums/announcements", only: [ :index, :new, :create, :destroy ]
+    resources :whatsapp_templates, controller: "forums/whatsapp_templates", param: :key, only: [ :index, :edit, :update ] do
+      member do
+        patch :reset
+      end
+    end
     resources :notifications, controller: "forums/notifications", only: [ :index ] do
       member do
         patch :mark_read
@@ -127,13 +133,18 @@ Rails.application.routes.draw do
       member do
         patch :activate
         patch :assign_admin
+        delete :destroy_permanently
+      end
+      collection do
+        delete :bulk_destroy_permanently
       end
 
-      resources :members, controller: "forums/members", only: [ :index, :new, :create, :show, :edit, :update ] do
+      resources :members, controller: "forums/members", only: [ :index, :new, :create, :show, :edit, :update, :destroy ] do
         collection do
           get :import
           post :bulk_import
           post :invite_to_event
+          delete :bulk_destroy
         end
         member do
           patch :suspend

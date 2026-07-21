@@ -113,7 +113,7 @@ module Forums
     end
 
     def meeting_params
-      params.require(:meeting).permit(:meeting_type, :scheduled_at, :venue, :speaker, :agenda, :minutes,
+      params.require(:meeting).permit(:meeting_type, :scheduled_at, :venue, :speaker, :speaker_phone, :agenda, :minutes,
         :fee_amount, :payment_upi_id, :payment_bank_details, :payment_qr, documents: [])
     end
   end

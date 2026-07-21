@@ -1,0 +1,32 @@
+<% content_for :title, "Edit #{WhatsappTemplate::LABELS.fetch(@template.key)}" %>
+
+<div class="page-header">
+  <h1 class="page-title h4"><%= WhatsappTemplate::LABELS.fetch(@template.key) %></h1>
+  <p class="page-subtitle mb-0"><%= @current_forum.name %></p>
+</div>
+
+<div class="row justify-content-center">
+  <div class="col-12 col-lg-7">
+    <div class="card">
+      <div class="card-body p-4">
+        <%= form_with model: @template, url: forum_whatsapp_template_path(forum_slug: @current_forum.slug, key: @template.key), method: :patch, local: true do |f| %>
+          <div class="mb-3">
+            <%= f.label :body, "Message", class: "form-label" %>
+            <%= f.text_area :body, class: "form-control", rows: 10, required: true %>
+          </div>
+          <div class="mb-4">
+            <p class="text-muted small mb-1">Available placeholders — include any of these anywhere in the text and they'll be filled in automatically:</p>
+            <% WhatsappTemplate::VARIABLES.fetch(@template.key, []).each do |var| %>
+              <code class="me-1">%{<%= var %>}</code>
+            <% end %>
+          </div>
+          <div class="d-flex flex-wrap gap-2">
+            <%= f.submit "Save", class: "btn btn-primary btn-lg" %>
+            <%= link_to "Cancel", forum_whatsapp_templates_path(forum_slug: @current_forum.slug), class: "btn btn-outline-secondary btn-lg" %>
+            <%= button_to "Reset to Default", reset_forum_whatsapp_template_path(forum_slug: @current_forum.slug, key: @template.key), method: :patch, class: "btn btn-outline-danger btn-lg", data: { turbo_confirm: "Reset this message to the default wording?" } %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

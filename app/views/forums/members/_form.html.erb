@@ -29,6 +29,13 @@
     <%= f.text_area :address, class: "form-control", rows: 2 %>
   </div>
 
+  <h2 class="h6 text-uppercase text-muted mb-3">Membership</h2>
+  <div class="mb-4">
+    <%= f.label :membership_year, "Membership Year", class: "form-label" %>
+    <%= f.select :membership_year, ((Date.current.year - 1)..(Date.current.year + 1)), { selected: member.membership_year || Date.current.year }, class: "form-select" %>
+    <div class="form-text">Membership runs Jan 1 &ndash; Dec 31 of the selected year.</div>
+  </div>
+
   <h2 class="h6 text-uppercase text-muted mb-3">Business Details</h2>
   <div class="mb-3">
     <%= f.label :designation, "Role", class: "form-label" %>
@@ -38,12 +45,13 @@
     <%= f.label :business_name, "Business Name", class: "form-label" %>
     <%= f.text_field :business_name, class: "form-control" %>
   </div>
+  <% categories_map = business_categories_map(@current_forum) %>
   <div class="row g-3 mb-3" data-controller="business-category"
-       data-business-category-categories-value="<%= User::BUSINESS_CATEGORIES.to_json %>"
+       data-business-category-categories-value="<%= categories_map.to_json %>"
        data-business-category-selected-value="<%= member.speciality %>">
     <div class="col-12 col-sm-6">
       <%= f.label :business_category, "Business Category", class: "form-label" %>
-      <%= f.select :business_category, User::BUSINESS_CATEGORIES.keys, {}, class: "form-select",
+      <%= f.select :business_category, categories_map.keys, {}, class: "form-select",
             data: { business_category_target: "category", action: "change->business-category#categoryChanged" } %>
     </div>
     <div class="col-12 col-sm-6">

@@ -22,6 +22,16 @@ class Chapter < ApplicationRecord
     FeePayment.joins(:user).where(users: { chapter_id: id }, status: :paid).sum(:amount)
   end
 
+  # Permanently deletes the chapter and every member/guest/committee-member
+  # in it (and everything belonging to them), plus the chapter's own
+  # dependent records (meetings, meeting_schedules, weekly_presentations).
+  def purge!
+    ActiveRecord::Base.transaction do
+      users.find_each(&:purge!)
+      destroy!
+    end
+  end
+
   private
 
   def within_forum_chapter_limit

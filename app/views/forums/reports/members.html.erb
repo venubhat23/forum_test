@@ -8,7 +8,7 @@
 <div class="card">
   <div class="table-responsive">
     <table class="table table-hover align-middle mb-0">
-      <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Chapter</th><th>Status</th><th>Renews On</th><th>Joined</th></tr></thead>
+      <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Chapter</th><th>Status</th><th>Renews On</th><th>Member Since</th></tr></thead>
       <tbody>
         <% @members.each do |m| %>
           <tr>
@@ -18,7 +18,7 @@
             <td><%= m.chapter&.name %></td>
             <td><%= m.membership_status.titleize %></td>
             <td><%= m.renews_on&.strftime("%d %b %Y") %></td>
-            <td><%= m.created_at.strftime("%d %b %Y") %></td>
+            <td><%= m.member_since.strftime("%d %b %Y") %></td>
           </tr>
         <% end %>
       </tbody>

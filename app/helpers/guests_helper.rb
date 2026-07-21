@@ -9,16 +9,8 @@ module GuestsHelper
     when_text = event.starts_at.strftime("%A, %d %b %Y at %I:%M %p")
     venue_text = event.venue.present? ? "\n📍 Venue: #{event.venue}" : ""
 
-    <<~MSG.strip
-      Hi #{guest.full_name}! 👋
-
-      You're warmly invited to *#{event.title}*, hosted by #{forum.name}! 🎉
-
-      🗓️ #{when_text}#{venue_text}
-
-      We'd love to have you join us — come connect, network, and grow with us!
-
-      See you there! 😊
-    MSG
+    WhatsappTemplate.render(forum, :event_invite,
+      full_name: guest.full_name, event_title: event.title, forum_name: forum.name,
+      when_text: when_text, venue_text: venue_text)
   end
 end

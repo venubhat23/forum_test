@@ -59,6 +59,7 @@ class Ability
       can :manage, Expense, forum_id: user.forum_id
       can :manage, Document, forum_id: user.forum_id
       can [ :read, :create, :destroy ], Announcement, forum_id: user.forum_id
+      can :manage, WhatsappTemplate, forum_id: user.forum_id
       can :access, :forum_reports
     when :chapter_admin
       can [ :read, :update ], Chapter, id: user.chapter_id
@@ -81,6 +82,7 @@ class Ability
       can :manage, Expense, forum_id: user.forum_id
       can :manage, Document, forum_id: user.forum_id
       can [ :read, :create, :destroy ], Announcement, forum_id: user.forum_id
+      can :manage, WhatsappTemplate, forum_id: user.forum_id
       can :access, :forum_reports
     when :committee_member
       can :read, Chapter, id: user.chapter_id

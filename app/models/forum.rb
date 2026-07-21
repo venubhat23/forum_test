@@ -35,6 +35,7 @@ class Forum < ApplicationRecord
   before_validation :generate_slug, on: :create
   before_validation :assign_default_plan, on: :create
   before_validation :assign_subscription_dates, on: :create
+  after_create :seed_default_business_categories
 
   def admin
     users.find_by(role: :forum_admin)
@@ -98,5 +99,9 @@ class Forum < ApplicationRecord
     self.started_at ||= Time.current
     self.trial_ends_at ||= started_at + plan.trial_days.days if trial? && plan && plan.trial_days.to_i.positive?
     self.renews_on ||= started_at.to_date + (plan&.annual? ? 1.year : 1.month)
+  end
+
+  def seed_default_business_categories
+    BusinessCategory.seed_defaults_for(self)
   end
 end

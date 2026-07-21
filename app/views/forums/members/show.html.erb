@@ -42,8 +42,8 @@
     <div class="stats-card">
       <div class="icon-bg gradient-green"><i class="bi bi-calendar3"></i></div>
       <div>
-        <div class="stats-value h6 mb-0"><%= @member.created_at.strftime("%d %b %Y") %></div>
-        <div class="stats-label">Joined</div>
+        <div class="stats-value h6 mb-0"><%= @member.member_since.strftime("%d %b %Y") %></div>
+        <div class="stats-label">Member Since</div>
       </div>
     </div>
   </div>
@@ -114,6 +114,37 @@
 <% end %>
 
 <% if can? :update, @member %>
+  <div class="card mb-4">
+    <div class="card-header fw-semibold">Login Credentials</div>
+    <div class="card-body">
+      <dl class="row mb-0">
+        <dt class="col-sm-3">Login URL</dt>
+        <dd class="col-sm-9">
+          <div class="d-flex align-items-center gap-2">
+            <code id="member-login-url"><%= forum_root_url(forum_slug: @current_forum.slug) %></code>
+            <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-1" onclick="navigator.clipboard.writeText(document.getElementById('member-login-url').innerText)" title="Copy URL"><i class="bi bi-clipboard small"></i></button>
+          </div>
+        </dd>
+        <dt class="col-sm-3">Username</dt>
+        <dd class="col-sm-9">
+          <div class="d-flex align-items-center gap-2">
+            <code id="member-username"><%= @member.email %></code>
+            <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-1" onclick="navigator.clipboard.writeText(document.getElementById('member-username').innerText)" title="Copy username"><i class="bi bi-clipboard small"></i></button>
+          </div>
+        </dd>
+        <dt class="col-sm-3">Password</dt>
+        <dd class="col-sm-9">
+          <div class="d-flex align-items-center gap-2">
+            <code id="member-password"><%= @member.original_password.presence || "Not available — use Reset Password below" %></code>
+            <% if @member.original_password.present? %>
+              <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-1" onclick="navigator.clipboard.writeText(document.getElementById('member-password').innerText)" title="Copy password"><i class="bi bi-clipboard small"></i></button>
+            <% end %>
+          </div>
+        </dd>
+      </dl>
+    </div>
+  </div>
+
   <div class="card mb-4">
     <div class="card-header fw-semibold">Account Actions</div>
     <div class="card-body d-flex flex-wrap gap-2">
