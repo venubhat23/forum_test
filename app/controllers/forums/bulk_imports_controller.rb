@@ -21,12 +21,15 @@ module Forums
       @results = []
       @imported = false
 
+      chapters_by_name = {}
+
       ActiveRecord::Base.transaction do
         (2..spreadsheet.last_row).each do |i|
           row = Hash[header.zip(spreadsheet.row(i))]
           row_errors = []
 
-          chapter = @current_forum.chapters.find_or_initialize_by(name: row["chapter_name"].to_s.strip)
+          chapter_name = row["chapter_name"].to_s.strip
+          chapter = chapters_by_name[chapter_name] ||= @current_forum.chapters.find_or_initialize_by(name: chapter_name)
           row_errors.concat(chapter.errors.full_messages) unless chapter.persisted? || chapter.save
 
           if row_errors.empty?

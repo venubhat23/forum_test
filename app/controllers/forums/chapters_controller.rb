@@ -12,6 +12,9 @@ module Forums
       @chapters = @chapters.where("name ILIKE ?", "%#{params[:q]}%") if params[:q].present?
       @chapters = @chapters.where(status: params[:status]) if params[:status].present?
       @chapters = @chapters.page(params[:page])
+      @chapter_collected_amounts = Hash.new(0).merge(
+        FeePayment.joins(:user).where(users: { chapter_id: @chapters.map(&:id) }, status: :paid).group("users.chapter_id").sum(:amount)
+      )
     end
 
     def show

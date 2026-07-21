@@ -9,7 +9,7 @@ module Forums
       @outstanding = FeePayment.where(user_id: user_ids, status: :pending).sum(:amount)
       @expenses_total = @current_forum.expenses.sum(:amount)
       @net = @income - @expenses_total
-      @recent_payments = FeePayment.where(user_id: user_ids, status: :paid).order(paid_on: :desc).limit(10)
+      @recent_payments = FeePayment.includes(:user).where(user_id: user_ids, status: :paid).order(paid_on: :desc).limit(10)
       @recent_expenses = @current_forum.expenses.order(incurred_on: :desc).limit(10)
 
       respond_to do |format|

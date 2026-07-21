@@ -89,7 +89,7 @@
               </div>
             </td>
             <td><span class="badge <%= chapter.active? ? 'badge-status-active' : 'badge-status-suspended' %>"><%= chapter.status.titleize %></span></td>
-            <td><%= number_to_currency(chapter.collected_amount) %></td>
+            <td><%= number_to_currency(@chapter_collected_amounts[chapter.id]) %></td>
             <td><%= chapter.created_at.strftime("%d %b %Y") %></td>
             <td class="text-end">
               <div class="d-flex gap-1 justify-content-end">

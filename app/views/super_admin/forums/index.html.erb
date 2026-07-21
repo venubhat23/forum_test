@@ -101,8 +101,8 @@
               <span class="badge badge-plan-none">No plan</span>
             <% end %></td>
             <td><span class="badge badge-status-<%= forum.status %>"><%= forum.status.titleize %></span></td>
-            <td><%= forum.chapters.count %></td>
-            <td><%= number_to_currency(forum.collected_amount) %></td>
+            <td><%= forum.chapters.size %></td>
+            <td><%= number_to_currency(@collected_amounts[forum.id]) %></td>
             <td><%= forum.created_at.strftime("%d %b %Y") %></td>
             <td class="text-end">
               <div class="d-flex gap-1 justify-content-end">

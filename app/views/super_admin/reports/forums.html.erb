@@ -16,7 +16,7 @@
             <td><code><%= f.slug %></code></td>
             <td><%= f.plan.name %></td>
             <td><%= f.status.titleize %></td>
-            <td><%= f.chapters.count %></td>
+            <td><%= f.chapters.size %></td>
             <td><%= f.created_at.strftime("%d %b %Y") %></td>
           </tr>
         <% end %>

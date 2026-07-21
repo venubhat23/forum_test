@@ -12,6 +12,9 @@ module Forums
       @events = @events.where("title ILIKE ?", "%#{params[:q]}%") if params[:q].present?
       @events = @events.where(event_type: params[:event_type]) if params[:event_type].present?
       @events = @events.page(params[:page])
+      @event_collected_amounts = Hash.new(0).merge(
+        FeePayment.where(feeable: @events, status: :paid).group(:feeable_id).sum(:amount)
+      )
     end
 
     def show
