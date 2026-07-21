@@ -1,7 +1,7 @@
 module Forums
   class MeetingsController < BaseController
     before_action :set_chapter
-    before_action :set_meeting, only: [ :show, :edit, :update, :destroy, :remind, :attendance, :record_attendance ]
+    before_action :set_meeting, only: [ :show, :edit, :update, :destroy, :remind, :attendance, :record_attendance, :check_in ]
 
     def index
       authorize! :read, Meeting
@@ -96,6 +96,25 @@ module Forums
 
       redirect_to forum_chapter_meeting_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: @meeting.id),
         notice: "Attendance recorded for #{attendable_people.count} people."
+    end
+
+    # Self check-in: a member/guest marks themselves present for their own
+    # chapter's meeting, but only on the meeting day itself.
+    def check_in
+      authorize! :create, Attendance
+      raise CanCan::AccessDenied, "You can only check in to your own chapter's meeting." unless @meeting.chapter_id == current_user.chapter_id
+
+      unless @meeting.scheduled_at.to_date == Date.current
+        return redirect_to forum_my_attendance_path(forum_slug: @current_forum.slug), alert: "You can only mark attendance on the day of the meeting."
+      end
+
+      record = @meeting.attendances.find_or_initialize_by(user_id: current_user.id)
+      record.event_type = :meeting
+      record.occurred_on = Date.current
+      record.present = true
+      record.save!
+
+      redirect_to forum_my_attendance_path(forum_slug: @current_forum.slug), notice: "Attendance marked for today's meeting."
     end
 
     private

@@ -15,7 +15,7 @@
             <td class="fw-semibold"><%= m.chapter.name %></td>
             <td><%= m.meeting_type.titleize %></td>
             <td><%= m.scheduled_at.strftime("%d %b %Y %H:%M") %></td>
-            <td><%= m.attendance_percentage %>%</td>
+            <td><%= @meeting_attendance[m.id] %>%</td>
           </tr>
         <% end %>
       </tbody>

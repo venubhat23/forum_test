@@ -13,6 +13,9 @@ module SuperAdmin
       @forums = @forums.where("name ILIKE ?", "%#{params[:q]}%") if params[:q].present?
       @forums = @forums.where(status: params[:status]) if params[:status].present?
       @forums = @forums.order(created_at: :desc).page(params[:page])
+      @collected_amounts = Hash.new(0).merge(
+        FeePayment.joins(:user).where(users: { forum_id: @forums.map(&:id) }, status: :paid).group("users.forum_id").sum(:amount)
+      )
     end
 
     def show
@@ -89,7 +92,11 @@ module SuperAdmin
     end
 
     def bulk_destroy_permanently
-      forums = Forum.where(id: params[:forum_ids])
+      forums = Forum.where(id: params[:forum_ids]).includes(
+        :chapters, :users, :business_categories, :one_to_one_meetings, :office_darshans,
+        :events, :membership_applications, :membership_plans, :expenses, :documents,
+        :leads, :referrals, :invoices
+      )
       deleted = []
       failed = []
 

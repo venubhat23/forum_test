@@ -15,7 +15,7 @@
             <td class="fw-semibold"><%= e.title %></td>
             <td><%= e.event_type.titleize %></td>
             <td><%= e.starts_at.strftime("%d %b %Y %H:%M") %></td>
-            <td><%= e.event_registrations.count %></td>
+            <td><%= e.event_registrations.size %></td>
           </tr>
         <% end %>
       </tbody>

@@ -5,7 +5,7 @@ module Forums
 
     def index
       authorize! :read, MeetingSchedule
-      @schedules = @chapter.meeting_schedules.order(created_at: :desc)
+      @schedules = @chapter.meeting_schedules.includes(:meetings).order(created_at: :desc)
     end
 
     def new
@@ -31,7 +31,12 @@ module Forums
 
     def show
       authorize! :read, @schedule
-      @occurrences = @schedule.meetings.order(:scheduled_at)
+      @occurrences = @schedule.meetings.includes(:chapter).order(:scheduled_at)
+      @attendance_by_meeting = Meeting.attendance_percentages(@occurrences, @chapter)
+      @paid_counts_by_meeting = Hash.new(0).merge(
+        FeePayment.where(feeable: @occurrences, status: :paid).group(:feeable_id).count
+      )
+      @chapter_members_count = @chapter.members.count
     end
 
     def destroy

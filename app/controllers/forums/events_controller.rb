@@ -1,6 +1,6 @@
 module Forums
   class EventsController < BaseController
-    before_action :set_event, only: [ :show, :edit, :update, :destroy, :remind, :attendance, :record_attendance ]
+    before_action :set_event, only: [ :show, :edit, :update, :destroy, :remind, :attendance, :record_attendance, :check_in ]
 
     def index
       authorize! :read, Event
@@ -97,6 +97,21 @@ module Forums
 
       redirect_to forum_event_path(forum_slug: @current_forum.slug, id: @event.id),
         notice: "Attendance recorded for #{@event.event_registrations.count} registrant(s)."
+    end
+
+    # Self check-in: a registrant marks themselves attended, but only on the
+    # day the event starts.
+    def check_in
+      registration = @event.event_registrations.find_by(user_id: current_user.id)
+      raise CanCan::AccessDenied, "You are not registered for this event." unless registration
+      authorize! :update, registration
+
+      unless @event.starts_at.to_date == Date.current
+        return redirect_to forum_my_attendance_path(forum_slug: @current_forum.slug), alert: "You can only mark attendance on the day of the event."
+      end
+
+      registration.update!(attended: true, attended_at: Time.current)
+      redirect_to forum_my_attendance_path(forum_slug: @current_forum.slug), notice: "Attendance marked for #{@event.title}."
     end
 
     private

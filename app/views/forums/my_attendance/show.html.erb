@@ -1,0 +1,90 @@
+<% content_for :title, "My Attendance" %>
+
+<div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+  <div>
+    <h1 class="page-title h4">My Attendance</h1>
+    <p class="page-subtitle mb-0">Mark yourself present for today's weekly meeting or events.</p>
+  </div>
+</div>
+
+<div class="card mb-4">
+  <div class="card-header fw-semibold">Today's Weekly Meeting</div>
+  <div class="card-body">
+    <% if @todays_meeting.nil? %>
+      <p class="text-muted mb-0">No meeting scheduled today for your chapter.</p>
+    <% else %>
+      <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+        <div>
+          <div class="fw-semibold"><%= @todays_meeting.meeting_type.titleize %> Meeting</div>
+          <div class="text-muted small">
+            <%= @todays_meeting.scheduled_at.strftime("%d %b %Y %H:%M") %>
+            <% if @todays_meeting.venue.present? %> &middot; <%= @todays_meeting.venue %><% end %>
+          </div>
+        </div>
+        <% if @todays_meeting_attendance&.present? %>
+          <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>You're marked present</span>
+        <% else %>
+          <%= button_to "Mark My Attendance", check_in_forum_chapter_meeting_path(forum_slug: @current_forum.slug, chapter_id: @todays_meeting.chapter_id, id: @todays_meeting.id), method: :post, class: "btn btn-primary" %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<div class="card mb-4">
+  <div class="card-header fw-semibold">Today's Events</div>
+  <div class="card-body">
+    <% if @todays_registrations.empty? %>
+      <p class="text-muted mb-0">No events today you're registered for.</p>
+    <% else %>
+      <ul class="list-group list-group-flush">
+        <% @todays_registrations.each do |registration| %>
+          <li class="list-group-item d-flex flex-wrap justify-content-between align-items-center gap-2 px-0">
+            <div>
+              <div class="fw-semibold"><%= registration.event.title %></div>
+              <div class="text-muted small"><%= registration.event.starts_at.strftime("%d %b %Y %H:%M") %></div>
+            </div>
+            <% if registration.attended? %>
+              <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>You're marked present</span>
+            <% else %>
+              <%= button_to "Mark My Attendance", check_in_forum_event_path(forum_slug: @current_forum.slug, id: registration.event_id), method: :post, class: "btn btn-primary" %>
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
+    <% end %>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header fw-semibold">Recent Attendance History</div>
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Type</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @recent_attendances.each do |attendance| %>
+          <tr>
+            <td><%= attendance.occurred_on.strftime("%d %b %Y") %></td>
+            <td><%= attendance.event_type.titleize %></td>
+            <td>
+              <% if attendance.present? %>
+                <span class="badge bg-success">Present</span>
+              <% else %>
+                <span class="badge bg-danger">Absent</span>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+        <% if @recent_attendances.empty? %>
+          <tr><td colspan="3" class="text-center text-muted py-4">No attendance recorded yet.</td></tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

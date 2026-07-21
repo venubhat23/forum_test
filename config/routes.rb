@@ -174,6 +174,7 @@ Rails.application.routes.draw do
           post :remind
           get :attendance
           post :record_attendance
+          post :check_in
         end
       end
       resources :meeting_schedules, controller: "forums/meeting_schedules", only: [ :index, :new, :create, :show, :destroy ]
@@ -226,9 +227,11 @@ Rails.application.routes.draw do
         post :remind
         get :attendance
         post :record_attendance
+        post :check_in
       end
       resources :registrations, controller: "forums/event_registrations", only: [ :index, :create, :destroy ]
     end
+    get "my_attendance", to: "forums/my_attendance#show"
     get "calendar", to: "forums/calendar#show"
     get "scorecard", to: "forums/scorecard#show"
     get "analytics", to: "forums/analytics#show"

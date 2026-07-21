@@ -17,9 +17,9 @@ module Forums
     def set_pending_fee_reminders
       seen_ids = session[:seen_fee_reminder_ids] ||= []
 
-      events = @current_forum.events.where("starts_at >= ?", Time.current).where.not(fee_amount: nil)
+      events = @current_forum.events.includes(:fee_payments).where("starts_at >= ?", Time.current).where.not(fee_amount: nil)
       items = events.map do |event|
-        fee = event.fee_payments.find_by(user_id: current_user.id)
+        fee = event.fee_payments.detect { |f| f.user_id == current_user.id }
         {
           key: "event-#{event.id}",
           title: event.title,
@@ -31,9 +31,9 @@ module Forums
       end
 
       if current_user.chapter_id.present?
-        meetings = Meeting.where(chapter_id: current_user.chapter_id).where("scheduled_at >= ?", Time.current).where.not(fee_amount: nil)
+        meetings = Meeting.includes(:fee_payments).where(chapter_id: current_user.chapter_id).where("scheduled_at >= ?", Time.current).where.not(fee_amount: nil)
         items += meetings.map do |meeting|
-          fee = meeting.fee_payments.find_by(user_id: current_user.id)
+          fee = meeting.fee_payments.detect { |f| f.user_id == current_user.id }
           {
             key: "meeting-#{meeting.id}",
             title: "#{meeting.meeting_type.titleize} Meeting",

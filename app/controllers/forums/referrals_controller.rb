@@ -14,7 +14,7 @@ module Forums
       @converted_referrals = base.where(status: :converted).count
       @monthly_stats = base.group_by_month(:created_at, last: 6).count
 
-      @referrals = base.order(created_at: :desc)
+      @referrals = base.includes(:giver, :receiver, :thanksgiving_slips).order(created_at: :desc)
       @referrals = @referrals.where("prospect_name ILIKE ?", "%#{params[:q]}%") if params[:q].present?
       @referrals = @referrals.where(status: params[:status]) if params[:status].present?
       @referrals = @referrals.page(params[:page])

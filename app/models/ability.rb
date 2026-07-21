@@ -115,7 +115,7 @@ class Ability
       can [ :read, :create ], ThanksgivingSlip, given_by_id: user.id
       can [ :read, :create ], Lead, created_by_id: user.id
       can [ :read, :update ], Lead, forum_id: user.forum_id
-      can :read, Attendance, user_id: user.id
+      can [ :read, :create ], Attendance, user_id: user.id
       can :read, FeePayment, user_id: user.id
       can :read, Meeting, chapter_id: user.chapter_id
       can :read, MeetingSchedule, chapter_id: user.chapter_id
@@ -125,7 +125,7 @@ class Ability
       can [ :read, :create, :complete, :thank ], OfficeDarshan, host_id: user.id
       can [ :read, :update, :complete, :thank ], OfficeDarshan, visitor_id: user.id
       can :read, Event, forum_id: user.forum_id
-      can [ :read, :create, :destroy ], EventRegistration, user_id: user.id
+      can [ :read, :create, :update, :destroy ], EventRegistration, user_id: user.id
       can :read, MembershipPlan, forum_id: user.forum_id
       can :read, Document, forum_id: user.forum_id
     when :guest

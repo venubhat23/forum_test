@@ -1,5 +1,84 @@
 <div class="modern-sidebar" id="sidebar" data-controller="sidebar">
   <nav class="sidebar-nav">
+  <% if current_user.member? %>
+    <div class="nav-section">
+      <div class="nav-section-title">Main</div>
+      <ul class="nav-menu">
+        <li class="nav-item">
+          <%= link_to forum_dashboard_path(forum_slug: @current_forum.slug), class: "nav-link-modern #{'active' if current_page?(forum_dashboard_path(forum_slug: @current_forum.slug))}", data: { tooltip: "Dashboard" } do %>
+            <div class="nav-icon-modern"><div class="icon-bg gradient-blue"><i class="bi bi-speedometer2"></i></div></div>
+            <span class="nav-text">Dashboard</span>
+          <% end %>
+        </li>
+        <li class="nav-item">
+          <%= link_to forum_calendar_path(forum_slug: @current_forum.slug), class: "nav-link-modern #{'active' if current_page?(forum_calendar_path(forum_slug: @current_forum.slug))}", data: { tooltip: "Calendar" } do %>
+            <div class="nav-icon-modern"><div class="icon-bg gradient-blue"><i class="bi bi-calendar3"></i></div></div>
+            <span class="nav-text">Calendar</span>
+          <% end %>
+        </li>
+        <li class="nav-item">
+          <%= link_to forum_my_attendance_path(forum_slug: @current_forum.slug), class: "nav-link-modern #{'active' if current_page?(forum_my_attendance_path(forum_slug: @current_forum.slug))}", data: { tooltip: "My Attendance" } do %>
+            <div class="nav-icon-modern"><div class="icon-bg gradient-teal"><i class="bi bi-clipboard2-check"></i></div></div>
+            <span class="nav-text">My Attendance</span>
+          <% end %>
+        </li>
+        <li class="nav-item">
+          <%= link_to forum_events_path(forum_slug: @current_forum.slug), class: "nav-link-modern #{'active' if request.path.start_with?(forum_events_path(forum_slug: @current_forum.slug))}", data: { tooltip: "Events" } do %>
+            <div class="nav-icon-modern"><div class="icon-bg gradient-green"><i class="bi bi-calendar-event"></i></div></div>
+            <span class="nav-text">Events</span>
+          <% end %>
+        </li>
+      </ul>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Engagement</div>
+      <ul class="nav-menu">
+        <li class="nav-item">
+          <%= link_to forum_leads_path(forum_slug: @current_forum.slug), class: "nav-link-modern #{'active' if request.path.start_with?(forum_leads_path(forum_slug: @current_forum.slug))}", data: { tooltip: "Leads" } do %>
+            <div class="nav-icon-modern"><div class="icon-bg gradient-orange"><i class="bi bi-lightbulb"></i></div></div>
+            <span class="nav-text">Leads</span>
+          <% end %>
+        </li>
+        <li class="nav-item">
+          <%= link_to forum_one_to_one_meetings_path(forum_slug: @current_forum.slug), class: "nav-link-modern #{'active' if request.path.start_with?(forum_one_to_one_meetings_path(forum_slug: @current_forum.slug))}", data: { tooltip: "One-to-One" } do %>
+            <div class="nav-icon-modern"><div class="icon-bg gradient-purple"><i class="bi bi-people"></i></div></div>
+            <span class="nav-text">One-to-One Meetings</span>
+          <% end %>
+        </li>
+        <li class="nav-item">
+          <%= link_to forum_office_darshans_path(forum_slug: @current_forum.slug), class: "nav-link-modern #{'active' if request.path.start_with?(forum_office_darshans_path(forum_slug: @current_forum.slug))}", data: { tooltip: "Office Darshan" } do %>
+            <div class="nav-icon-modern"><div class="icon-bg gradient-indigo"><i class="bi bi-building-check"></i></div></div>
+            <span class="nav-text">Office Darshan</span>
+          <% end %>
+        </li>
+      </ul>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Account</div>
+      <ul class="nav-menu">
+        <li class="nav-item">
+          <%= link_to edit_forum_profile_path(forum_slug: @current_forum.slug), class: "nav-link-modern #{'active' if request.path.start_with?('/f/' + @current_forum.slug + '/profile')}", data: { tooltip: "My Profile" } do %>
+            <div class="nav-icon-modern"><div class="icon-bg gradient-indigo"><i class="bi bi-person-circle"></i></div></div>
+            <span class="nav-text">My Profile</span>
+          <% end %>
+        </li>
+        <li class="nav-item">
+          <%= link_to forum_support_tickets_path(forum_slug: @current_forum.slug), class: "nav-link-modern #{'active' if request.path.start_with?(forum_support_tickets_path(forum_slug: @current_forum.slug))}", data: { tooltip: "Support" } do %>
+            <div class="nav-icon-modern"><div class="icon-bg gradient-green"><i class="bi bi-headset"></i></div></div>
+            <span class="nav-text">Support</span>
+          <% end %>
+        </li>
+        <li class="nav-item">
+          <%= link_to forum_help_path(forum_slug: @current_forum.slug), class: "nav-link-modern #{'active' if current_page?(forum_help_path(forum_slug: @current_forum.slug))}", data: { tooltip: "Help" } do %>
+            <div class="nav-icon-modern"><div class="icon-bg gradient-purple"><i class="bi bi-question-circle"></i></div></div>
+            <span class="nav-text">Help &amp; FAQ</span>
+          <% end %>
+        </li>
+      </ul>
+    </div>
+  <% else %>
     <div class="nav-section">
       <div class="nav-section-title">Main</div>
       <ul class="nav-menu">
@@ -225,6 +304,7 @@
         </li>
       </ul>
     </div>
+  <% end %>
   </nav>
 
   <div class="sidebar-footer">

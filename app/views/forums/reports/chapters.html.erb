@@ -14,9 +14,9 @@
           <tr>
             <td class="fw-semibold"><%= c.name %></td>
             <td><%= c.status.titleize %></td>
-            <td><%= c.members.count %></td>
-            <td><%= c.guests.count %></td>
-            <td><%= c.committee_members.count %></td>
+            <td><%= @chapter_role_counts[[ c.id, "member" ]] %></td>
+            <td><%= @chapter_role_counts[[ c.id, "guest" ]] %></td>
+            <td><%= @chapter_role_counts[[ c.id, "committee_member" ]] %></td>
             <td><%= c.created_at.strftime("%d %b %Y") %></td>
           </tr>
         <% end %>

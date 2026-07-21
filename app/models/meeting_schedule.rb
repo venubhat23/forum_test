@@ -11,7 +11,7 @@ class MeetingSchedule < ApplicationRecord
   # scheduled_at — silently orphaning future occurrences instead of destroying them.
   has_many :meetings
   has_many :meeting_schedule_attendees, dependent: :destroy
-  has_many :attendees, through: :meeting_schedule_attendees, source: :user
+  has_many :attendees, through: :meeting_schedule_attendees, source: :user, validate: false, autosave: false
 
   validates :day_of_week, inclusion: { in: 0..6 }
   validates :start_time, :end_time, :start_date, :end_date, presence: true

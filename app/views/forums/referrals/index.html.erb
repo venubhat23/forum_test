@@ -98,7 +98,7 @@
             <td><%= referral.receiver.display_name %></td>
             <td><span class="badge bg-secondary"><%= referral.referral_type.titleize %></span></td>
             <td><span class="badge bg-secondary"><%= referral.status.titleize %></span></td>
-            <td><%= referral.thanksgiving_slips.count %></td>
+            <td><%= referral.thanksgiving_slips.size %></td>
             <td><%= referral.created_at.strftime("%d %b %Y") %></td>
             <td class="text-end">
               <%= link_to forum_chapter_referral_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: referral.id), class: "icon-btn icon-btn-view", title: "View" do %>
