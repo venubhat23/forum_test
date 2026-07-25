@@ -115,7 +115,9 @@
                 <div>
                   <span class="fw-semibold d-block">
                     <%= member.full_name %>
-                    <% if fee_paid_current %>
+                    <% if member.lifetime_member? %>
+                      <i class="bi bi-gem ms-1" style="color:#7c3aed;" title="Lifetime member"></i>
+                    <% elsif fee_paid_current %>
                       <i class="bi bi-patch-check-fill text-success ms-1" title="Annual membership fee paid"></i>
                     <% end %>
                   </span>
@@ -138,21 +140,27 @@
               <% end %>
             </td>
             <td>
-              <% if fee_paid_current %>
-                <span class="badge badge-status-active"><i class="bi bi-check-circle-fill me-1"></i>Paid</span>
+              <% if member.lifetime_member? %>
+                <span class="badge badge-status-lifetime"><i class="bi bi-gem me-1"></i>Lifetime Member</span>
+              <% elsif fee_paid_current %>
+                <span class="badge badge-status-active"><i class="bi bi-check-circle-fill me-1"></i>Annual Member &middot; Fully Paid</span>
+                <div class="text-muted small mt-1">Renews <%= member.renews_on.strftime('%d %b %Y') %></div>
               <% elsif fee&.partially_paid? %>
                 <span class="badge badge-status-partial"><i class="bi bi-exclamation-triangle-fill me-1"></i>Partially Paid</span>
                 <div class="text-muted small mt-1">Balance: <%= number_to_currency(fee.balance_due) %></div>
+                <div class="text-muted small">
+                  <%= member.renews_on ? "Renews #{member.renews_on.strftime('%d %b %Y')}" : "Renewal not set" %>
+                </div>
               <% else %>
                 <span class="badge badge-status-trial"><i class="bi bi-exclamation-circle-fill me-1"></i>Due</span>
+                <div class="text-muted small mt-1">
+                  <%= member.renews_on ? "Renews #{member.renews_on.strftime('%d %b %Y')}" : "Renewal not set" %>
+                </div>
               <% end %>
-              <div class="text-muted small mt-1">
-                <%= member.renews_on ? "Renews #{member.renews_on.strftime('%d %b %Y')}" : "Renewal not set" %>
-              </div>
             </td>
             <td class="text-end">
               <div class="d-flex gap-1 justify-content-end">
-                <% if !fee_paid_current && can?(:create, FeePayment) %>
+                <% if !member.lifetime_member? && !fee_paid_current && can?(:create, FeePayment) %>
                   <% if (wa_link = whatsapp_fee_reminder_link(member, fee, @current_forum)) %>
                     <%= link_to wa_link, class: "icon-btn icon-btn-whatsapp", title: "Remind to pay via WhatsApp", target: "_blank", rel: "noopener" do %>
                       <i class="bi bi-whatsapp"></i>

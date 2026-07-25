@@ -36,15 +36,44 @@
     <div class="form-text">Membership runs Jan 1 &ndash; Dec 31 of the selected year.</div>
   </div>
   <% if member.new_record? %>
-    <div class="form-check mb-2">
-      <%= check_box_tag "member[annual_membership_paid]", "1", false, class: "form-check-input", id: "annual-membership-paid" %>
-      <%= label_tag "annual-membership-paid", "Annual Member (fee already paid)", class: "form-check-label" %>
-      <div class="form-text">Check this if the member already paid their annual membership fee outside the system. Their fee will be marked as paid and they won't be prompted to pay it again.</div>
-    </div>
-    <div class="mb-4" style="max-width: 220px;">
-      <%= label_tag "member-annual-membership-fee-amount", "Membership Fee Amount", class: "form-label" %>
-      <%= number_field_tag "member[annual_membership_fee_amount]", @chapter.annual_membership_fee, step: "0.01", min: "0.01", class: "form-control", id: "member-annual-membership-fee-amount" %>
-      <div class="form-text">Loaded from the chapter's annual membership fee — adjust if this member paid a different amount.</div>
+    <% full_fee = @chapter.annual_membership_fee %>
+    <% lifetime_fee = @chapter.lifetime_membership_fee %>
+    <h2 class="h6 text-uppercase text-muted mb-2">Membership Fee</h2>
+    <div class="mb-4" data-controller="member-fee-status">
+      <div class="form-check mb-2">
+        <%= radio_button_tag "member[fee_status]", "unpaid", true, class: "form-check-input", id: "fee-status-unpaid",
+              data: { member_fee_status_target: "radio", action: "change->member-fee-status#toggle" } %>
+        <%= label_tag "fee-status-unpaid", "Not paid yet", class: "form-check-label" %>
+        <div class="form-text">Dues will be collected later from the member's profile page.</div>
+      </div>
+
+      <div class="form-check mb-2">
+        <%= radio_button_tag "member[fee_status]", "full", false, class: "form-check-input", id: "fee-status-full",
+              disabled: full_fee.blank?, data: { member_fee_status_target: "radio", action: "change->member-fee-status#toggle" } %>
+        <% full_label = full_fee.present? ? "Fully Paid — #{number_to_currency(full_fee)}" : "Fully Paid (set the chapter's annual fee to enable)" %>
+        <%= label_tag "fee-status-full", full_label, class: "form-check-label" %>
+      </div>
+
+      <div class="form-check mb-2">
+        <%= radio_button_tag "member[fee_status]", "partial", false, class: "form-check-input", id: "fee-status-partial",
+              disabled: full_fee.blank?, data: { member_fee_status_target: "radio", action: "change->member-fee-status#toggle" } %>
+        <%= label_tag "fee-status-partial", "Partially Paid", class: "form-check-label" %>
+      </div>
+      <div class="mb-3 ms-4 d-none" style="max-width: 260px;" data-member-fee-status-target="partialWrap">
+        <%= label_tag "member-partial-amount-paid", "Amount Paid Now", class: "form-label" %>
+        <%= number_field_tag "member[partial_amount_paid]", nil, step: "0.01", min: "0.01", max: full_fee,
+              class: "form-control", id: "member-partial-amount-paid", data: { member_fee_status_target: "partialField" } %>
+        <% if full_fee.present? %>
+          <div class="form-text">Total fee is <%= number_to_currency(full_fee) %> — the remaining balance is marked pending.</div>
+        <% end %>
+      </div>
+
+      <div class="form-check mb-2">
+        <%= radio_button_tag "member[fee_status]", "lifetime", false, class: "form-check-input", id: "fee-status-lifetime",
+              disabled: lifetime_fee.blank?, data: { member_fee_status_target: "radio", action: "change->member-fee-status#toggle" } %>
+        <% lifetime_label = lifetime_fee.present? ? "Lifetime Member — #{number_to_currency(lifetime_fee)}" : "Lifetime Member (set the chapter's lifetime fee to enable)" %>
+        <%= label_tag "fee-status-lifetime", lifetime_label, class: "form-check-label" %>
+      </div>
     </div>
   <% end %>
 

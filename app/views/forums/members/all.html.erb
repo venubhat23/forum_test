@@ -90,18 +90,27 @@
               <% end %>
             </td>
             <td>
-              <% if fee_paid_current %>
-                <span class="badge badge-status-active"><i class="bi bi-check-circle-fill me-1"></i>Paid</span>
+              <% if member.lifetime_member? %>
+                <span class="badge badge-status-lifetime"><i class="bi bi-gem me-1"></i>Lifetime Member</span>
+              <% elsif fee_paid_current %>
+                <span class="badge badge-status-active"><i class="bi bi-check-circle-fill me-1"></i>Annual Member &middot; Fully Paid</span>
+                <div class="text-muted small mt-1">Renews <%= member.renews_on.strftime('%d %b %Y') %></div>
               <% elsif fee&.partially_paid? %>
                 <span class="badge badge-status-partial"><i class="bi bi-exclamation-triangle-fill me-1"></i>Partially Paid</span>
                 <div class="text-muted small mt-1">Pending: <%= number_to_currency(fee.balance_due) %></div>
+                <% if member.renews_on %>
+                  <div class="text-muted small">Renews <%= member.renews_on.strftime('%d %b %Y') %></div>
+                <% end %>
               <% else %>
                 <span class="badge badge-status-trial"><i class="bi bi-exclamation-circle-fill me-1"></i>Not Paid</span>
+                <% if member.renews_on %>
+                  <div class="text-muted small mt-1">Renews <%= member.renews_on.strftime('%d %b %Y') %></div>
+                <% end %>
               <% end %>
             </td>
             <td class="text-end">
               <div class="d-flex gap-1 justify-content-end align-items-center">
-                <% if !fee_paid_current && can?(:create, FeePayment) && member.chapter_id.present? %>
+                <% if !member.lifetime_member? && !fee_paid_current && can?(:create, FeePayment) && member.chapter_id.present? %>
                   <% if fee %>
                     <%= button_to "Full Pay", mark_paid_forum_chapter_fee_payment_path(forum_slug: @current_forum.slug, chapter_id: member.chapter_id, id: fee.id), method: :patch, class: "btn btn-sm btn-success", title: "Mark full balance as paid", data: { turbo_confirm: "Mark #{number_to_currency(fee.balance_due)} as fully paid for #{member.display_name}?" } %>
                     <button type="button" class="btn btn-sm btn-outline-success" title="Record a partial payment" data-bs-toggle="modal" data-bs-target="#record-payment-<%= fee.id %>">

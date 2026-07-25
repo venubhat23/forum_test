@@ -24,6 +24,7 @@
   <div class="card-body">
     <p class="mb-1"><strong>Status:</strong> <span class="badge <%= @chapter.active? ? 'badge-status-active' : 'badge-status-suspended' %>"><%= @chapter.status.titleize %></span></p>
     <p class="mb-1"><strong>Annual Membership Fee:</strong> <%= @chapter.annual_membership_fee.present? ? number_to_currency(@chapter.annual_membership_fee) : "Not set" %></p>
+    <p class="mb-1"><strong>Lifetime Membership Fee:</strong> <%= @chapter.lifetime_membership_fee.present? ? number_to_currency(@chapter.lifetime_membership_fee) : "Not set" %></p>
     <p class="mb-0"><strong>Created:</strong> <%= @chapter.created_at.strftime("%d %b %Y") %></p>
   </div>
 </div>

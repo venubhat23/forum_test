@@ -68,7 +68,8 @@ module Forums
 
       if @member.save
         notice = "#{@member.display_name} was added as a member."
-        notice += " #{mark_annual_fee_paid!(@member)}" if annual_membership_paid_checked?
+        fee_note = record_membership_fee!(@member)
+        notice += " #{fee_note}" if fee_note.present?
         redirect_to forum_chapter_members_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id), notice: notice
       else
         flash.now[:alert] = @member.errors.full_messages.to_sentence
@@ -237,22 +238,60 @@ module Forums
       @member = @chapter.members.find(params[:id])
     end
 
-    def annual_membership_paid_checked?
-      params.dig(:member, :annual_membership_paid) == "1"
+    # Records the membership fee chosen on the "Add Member" form, so the
+    # "Collect Membership Fee" prompt on the member's profile only shows up
+    # for members whose dues are still outstanding.
+    def record_membership_fee!(member)
+      case params.dig(:member, :fee_status)
+      when "full" then mark_annual_fee_full_paid!(member)
+      when "partial" then mark_annual_fee_partial_paid!(member)
+      when "lifetime" then mark_annual_fee_lifetime_paid!(member)
+      end
     end
 
-    # Auto-records and pays the member's annual membership fee, so the "Collect
-    # Membership Fee" prompt on their profile never shows for a member whose
-    # dues were already settled outside the system. Defaults to the chapter's
-    # annual membership fee, but the form allows overriding it per member.
-    def mark_annual_fee_paid!(member)
-      amount = params.dig(:member, :annual_membership_fee_amount).presence&.to_d || @chapter.annual_membership_fee
+    def mark_annual_fee_full_paid!(member)
+      amount = @chapter.annual_membership_fee
+      return "Chapter's annual membership fee isn't set — could not record the fee." if amount.blank?
+
       fee_payment = member.fee_payments.new(fee_type: :annual_membership, amount: amount, duration_years: 1)
       if fee_payment.save
         fee_payment.mark_paid!
         "Annual membership fee marked as paid."
       else
-        "Could not auto-mark the annual fee as paid (#{fee_payment.errors.full_messages.to_sentence}) — set the chapter's annual membership fee and collect it from the member's page."
+        "Could not record the annual fee (#{fee_payment.errors.full_messages.to_sentence})."
+      end
+    end
+
+    # Records the amount actually received against the full chapter fee,
+    # leaving the rest as a pending balance (member shows up as "Partially Paid").
+    def mark_annual_fee_partial_paid!(member)
+      amount = @chapter.annual_membership_fee
+      return "Chapter's annual membership fee isn't set — could not record the fee." if amount.blank?
+
+      paid_amount = params.dig(:member, :partial_amount_paid).presence&.to_d
+      return "Enter how much was paid to record a partial payment." unless paid_amount&.positive?
+
+      fee_payment = member.fee_payments.new(fee_type: :annual_membership, amount: amount, duration_years: 1)
+      if fee_payment.save
+        fee_payment.record_payment!(received_amount: paid_amount)
+        "#{helpers.number_to_currency(paid_amount)} recorded — #{helpers.number_to_currency(fee_payment.balance_due)} left pending."
+      else
+        "Could not record the annual fee (#{fee_payment.errors.full_messages.to_sentence})."
+      end
+    end
+
+    # Paying the chapter's lifetime fee flips the member to lifetime_member
+    # with no renewal date (see FeePayment#extend_membership_renewal).
+    def mark_annual_fee_lifetime_paid!(member)
+      amount = @chapter.lifetime_membership_fee
+      return "Chapter's lifetime membership fee isn't set — could not record the fee." if amount.blank?
+
+      fee_payment = member.fee_payments.new(fee_type: :annual_membership, amount: amount, lifetime: true)
+      if fee_payment.save
+        fee_payment.mark_paid!
+        "Lifetime membership fee marked as paid."
+      else
+        "Could not record the lifetime fee (#{fee_payment.errors.full_messages.to_sentence})."
       end
     end
 
