@@ -243,9 +243,11 @@ module Forums
 
     # Auto-records and pays the member's annual membership fee, so the "Collect
     # Membership Fee" prompt on their profile never shows for a member whose
-    # dues were already settled outside the system.
+    # dues were already settled outside the system. Defaults to the chapter's
+    # annual membership fee, but the form allows overriding it per member.
     def mark_annual_fee_paid!(member)
-      fee_payment = member.fee_payments.new(fee_type: :annual_membership, amount: @chapter.annual_membership_fee, duration_years: 1)
+      amount = params.dig(:member, :annual_membership_fee_amount).presence&.to_d || @chapter.annual_membership_fee
+      fee_payment = member.fee_payments.new(fee_type: :annual_membership, amount: amount, duration_years: 1)
       if fee_payment.save
         fee_payment.mark_paid!
         "Annual membership fee marked as paid."

@@ -36,10 +36,15 @@
     <div class="form-text">Membership runs Jan 1 &ndash; Dec 31 of the selected year.</div>
   </div>
   <% if member.new_record? %>
-    <div class="form-check mb-4">
+    <div class="form-check mb-2">
       <%= check_box_tag "member[annual_membership_paid]", "1", false, class: "form-check-input", id: "annual-membership-paid" %>
       <%= label_tag "annual-membership-paid", "Annual Member (fee already paid)", class: "form-check-label" %>
       <div class="form-text">Check this if the member already paid their annual membership fee outside the system. Their fee will be marked as paid and they won't be prompted to pay it again.</div>
+    </div>
+    <div class="mb-4" style="max-width: 220px;">
+      <%= label_tag "member-annual-membership-fee-amount", "Membership Fee Amount", class: "form-label" %>
+      <%= number_field_tag "member[annual_membership_fee_amount]", @chapter.annual_membership_fee, step: "0.01", min: "0.01", class: "form-control", id: "member-annual-membership-fee-amount" %>
+      <div class="form-text">Loaded from the chapter's annual membership fee — adjust if this member paid a different amount.</div>
     </div>
   <% end %>
 
