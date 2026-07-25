@@ -12,7 +12,7 @@
         <div class="modal-body">
           <div class="mb-3">
             <%= f.label :amount, "Membership Fee Amount", class: "form-label" %>
-            <%= f.number_field :amount, step: "0.01", min: "0.01", class: "form-control", required: true %>
+            <%= f.number_field :amount, value: member.chapter.annual_membership_fee, step: "0.01", min: "0.01", class: "form-control", required: true %>
           </div>
           <div class="mb-3" data-lifetime-toggle-target="durationWrap">
             <label class="form-label">Membership Duration</label>

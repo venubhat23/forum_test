@@ -43,6 +43,7 @@ module SuperAdmin
     end
 
     def show
+      @setting = PlatformSetting.instance
     end
 
     def edit

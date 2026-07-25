@@ -9,4 +9,8 @@ class PlatformSetting < ApplicationRecord
   def self.instance
     first_or_create!(site_name: "Krama Consultancy", support_email: "support@kramaconsultancy.com")
   end
+
+  def bank_details_present?
+    bank_name.present? || bank_account_number.present?
+  end
 end

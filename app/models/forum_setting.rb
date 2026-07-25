@@ -7,4 +7,8 @@ class ForumSetting < ApplicationRecord
   def self.for(forum)
     find_or_create_by!(forum: forum)
   end
+
+  def bank_details_present?
+    bank_name.present? || bank_account_number.present?
+  end
 end

@@ -12,12 +12,12 @@
           <% if current_user.forum_admin? || current_user.chapter_admin? %>
             <div class="mb-3">
               <%= f.label :host_id, "Host", class: "form-label" %>
-              <%= f.collection_select :host_id, @current_forum.users.where(role: [ :member, :committee_member ]).order(:full_name), :id, :display_name, {}, class: "form-select", required: true %>
+              <%= f.collection_select :host_id, @current_forum.users.where(role: [ :member, :committee_member ]).order(:full_name), :id, :display_name, {}, class: "form-select", required: true, data: { controller: "searchable-select", placeholder: "Search host by name..." } %>
             </div>
           <% end %>
           <div class="mb-3">
             <%= f.label :visitor_id, "Invite Member", class: "form-label" %>
-            <%= f.collection_select :visitor_id, @current_forum.users.where(role: [ :member, :committee_member ]).order(:full_name), :id, :display_name, { include_blank: true }, class: "form-select", required: true %>
+            <%= f.collection_select :visitor_id, @current_forum.users.where(role: [ :member, :committee_member ]).order(:full_name), :id, :display_name, { include_blank: true }, class: "form-select", required: true, data: { controller: "searchable-select", placeholder: "Search member by name..." } %>
           </div>
           <div class="mb-3">
             <%= f.label :scheduled_at, "Proposed Date & Time", class: "form-label" %>

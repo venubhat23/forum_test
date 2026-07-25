@@ -180,7 +180,7 @@ module SuperAdmin
     end
 
     def forum_update_params
-      params.require(:forum).permit(:name)
+      params.require(:forum).permit(:name, :gst_number, :address, :office)
     end
 
     # Fully, permanently removes a forum and every associated record.

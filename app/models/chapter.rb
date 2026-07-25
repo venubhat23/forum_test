@@ -16,6 +16,7 @@ class Chapter < ApplicationRecord
   has_many :referrals, dependent: :nullify
 
   validates :name, presence: true, uniqueness: { scope: :forum_id }
+  validates :annual_membership_fee, numericality: { greater_than: 0 }, allow_nil: true
   validate :within_forum_chapter_limit, on: :create
 
   def collected_amount

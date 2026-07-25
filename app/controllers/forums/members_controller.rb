@@ -67,7 +67,9 @@ module Forums
       authorize! :create, @member
 
       if @member.save
-        redirect_to forum_chapter_members_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id), notice: "#{@member.display_name} was added as a member."
+        notice = "#{@member.display_name} was added as a member."
+        notice += " #{mark_annual_fee_paid!(@member)}" if annual_membership_paid_checked?
+        redirect_to forum_chapter_members_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id), notice: notice
       else
         flash.now[:alert] = @member.errors.full_messages.to_sentence
         render :new, status: :unprocessable_entity
@@ -233,6 +235,23 @@ module Forums
 
     def set_member
       @member = @chapter.members.find(params[:id])
+    end
+
+    def annual_membership_paid_checked?
+      params.dig(:member, :annual_membership_paid) == "1"
+    end
+
+    # Auto-records and pays the member's annual membership fee, so the "Collect
+    # Membership Fee" prompt on their profile never shows for a member whose
+    # dues were already settled outside the system.
+    def mark_annual_fee_paid!(member)
+      fee_payment = member.fee_payments.new(fee_type: :annual_membership, amount: @chapter.annual_membership_fee, duration_years: 1)
+      if fee_payment.save
+        fee_payment.mark_paid!
+        "Annual membership fee marked as paid."
+      else
+        "Could not auto-mark the annual fee as paid (#{fee_payment.errors.full_messages.to_sentence}) — set the chapter's annual membership fee and collect it from the member's page."
+      end
     end
 
     def member_params

@@ -124,6 +124,23 @@
     .signature-label { font-size: 10px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); }
     .signature-name { font-size: 12px; font-weight: 700; color: var(--ink); margin-top: 2px; }
 
+    .computer-generated-block { width: 220px; text-align: center; padding: 10px 14px; border-radius: 10px; background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.22); }
+    .computer-generated-block .check { color: #059669; font-size: 18px; margin-bottom: 2px; }
+    .computer-generated-block .signature-label { color: #059669; }
+    .computer-generated-block .cg-note { font-size: 10px; color: var(--muted); margin-top: 3px; }
+
+    .extras-grid { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 24px; }
+    .info-box { flex: 1 1 260px; background: var(--panel); border-radius: 10px; padding: 14px 16px; }
+    .info-box .label { margin-bottom: 6px; }
+    .info-box .row-line { font-size: 13px; margin-bottom: 2px; }
+    .info-box-upi { display: flex; align-items: center; gap: 14px; background: rgba(139,92,246,0.06); }
+    .qr-frame { background: white; border-radius: 8px; padding: 6px; border: 1px solid var(--line); line-height: 0; flex-shrink: 0; }
+    .qr-frame svg { display: block; }
+
+    .terms-box { background: var(--panel); border-radius: 10px; padding: 14px 16px; font-size: 12px; color: var(--muted); white-space: pre-line; margin-bottom: 24px; }
+
+    .billed-to-extra { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
     .footer-note { text-align: center; font-size: 11px; color: var(--muted); margin-top: 28px; padding-top: 16px; border-top: 1px solid var(--line); }
 
     @media print {
@@ -139,6 +156,7 @@
       .meta-strip div { border-right: none; border-bottom: 1px solid var(--line); }
       .meta-strip div:last-child { border-bottom: none; }
       .signature-row { justify-content: flex-start; }
+      .info-box-upi { flex-direction: column; text-align: center; }
     }
   </style>
 </head>
@@ -186,6 +204,10 @@
             <div class="sub-value"><%= @invoice.forum.name %></div>
             <% if @invoice.user&.email.present? %><div class="sub-value"><%= @invoice.user.email %></div><% end %>
             <% if @invoice.user&.phone.present? %><div class="sub-value"><%= @invoice.user.phone %></div><% end %>
+          <% else %>
+            <div class="billed-to-extra">GST: <%= @invoice.forum.gst_number.presence || "Not provided" %></div>
+            <div class="billed-to-extra">Office: <%= @invoice.forum.office.presence || "Not provided" %></div>
+            <div class="billed-to-extra">Address: <%= @invoice.forum.address.presence || "Not provided" %></div>
           <% end %>
         </div>
         <% if @invoice.plan %>
@@ -255,11 +277,44 @@
         <% end %>
       </div>
 
+      <% if @setting.bank_details_present? || @setting.upi_id.present? %>
+        <div class="extras-grid">
+          <% if @setting.bank_details_present? %>
+            <div class="info-box">
+              <div class="label">Banking Details</div>
+              <% if @setting.bank_account_holder.present? %><div class="row-line">Account Holder: <strong><%= @setting.bank_account_holder %></strong></div><% end %>
+              <% if @setting.bank_name.present? %><div class="row-line">Bank: <strong><%= @setting.bank_name %></strong></div><% end %>
+              <% if @setting.bank_account_number.present? %><div class="row-line">A/C No: <strong><%= @setting.bank_account_number %></strong></div><% end %>
+              <% if @setting.bank_ifsc.present? %><div class="row-line">IFSC: <strong><%= @setting.bank_ifsc %></strong></div><% end %>
+              <% if @setting.bank_branch.present? %><div class="row-line">Branch: <strong><%= @setting.bank_branch %></strong></div><% end %>
+            </div>
+          <% end %>
+          <% if @setting.upi_id.present? %>
+            <div class="info-box info-box-upi">
+              <div class="qr-frame">
+                <%= upi_qr_code_svg(@setting.upi_id, payee_name: @setting.bank_account_holder.presence || invoice_brand_name(@invoice), amount: @invoice.balance_due, invoice_number: @invoice.invoice_number, size: 3) %>
+              </div>
+              <div>
+                <div class="label">Pay via UPI</div>
+                <div class="row-line"><strong><%= @setting.upi_id %></strong></div>
+                <div class="row-line">Scan to pay &#8377;<%= number_with_delimiter(@invoice.balance_due.to_i) %></div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+
+      <% if @setting.terms_and_conditions.present? %>
+        <div class="label" style="margin-bottom: 6px;">Terms &amp; Conditions</div>
+        <div class="terms-box"><%= @setting.terms_and_conditions %></div>
+      <% end %>
+
       <div class="signature-row">
-        <div class="signature-block">
-          <div class="signature-line"></div>
+        <div class="computer-generated-block">
+          <div class="check">&#9989;</div>
           <div class="signature-label">Authorised Signatory</div>
           <div class="signature-name"><%= invoice_brand_name(@invoice) %></div>
+          <div class="cg-note">Computer generated &mdash; no signature required</div>
         </div>
       </div>
 

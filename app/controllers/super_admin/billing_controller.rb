@@ -19,7 +19,8 @@ module SuperAdmin
     private
 
     def setting_params
-      params.require(:platform_setting).permit(:site_name, :support_email, :currency, :invoice_prefix, :tax_percent, :default_plan_id)
+      params.require(:platform_setting).permit(:site_name, :support_email, :currency, :invoice_prefix, :tax_percent, :default_plan_id,
+        :terms_and_conditions, :bank_name, :bank_account_holder, :bank_account_number, :bank_ifsc, :bank_branch, :upi_id)
     end
   end
 end

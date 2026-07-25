@@ -5,6 +5,7 @@ class PublicInvoicesController < ApplicationController
 
   def show
     @invoice = Invoice.includes(:forum, :plan, :user, payments: :recorded_by).find_by!(share_token: params[:token])
+    @setting = @invoice.member_invoice? ? ForumSetting.for(@invoice.forum) : PlatformSetting.instance
   end
 
   private

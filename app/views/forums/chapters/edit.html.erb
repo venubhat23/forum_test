@@ -13,6 +13,10 @@
             <%= f.label :name, "Chapter Name", class: "form-label" %>
             <%= f.text_field :name, class: "form-control form-control-lg", required: true %>
           </div>
+          <div class="mb-4">
+            <%= f.label :annual_membership_fee, "Annual Membership Fee", class: "form-label" %>
+            <%= f.number_field :annual_membership_fee, step: "0.01", min: "0.01", class: "form-control form-control-lg", placeholder: "Leave blank if not fixed" %>
+          </div>
           <div class="d-flex flex-wrap gap-2">
             <%= f.submit "Save Changes", class: "btn btn-primary btn-lg" %>
             <%= link_to "Cancel", forum_chapter_path(forum_slug: @current_forum.slug, id: @chapter.id), class: "btn btn-outline-secondary btn-lg" %>

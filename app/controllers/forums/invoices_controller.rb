@@ -49,6 +49,7 @@ module Forums
     def show
       authorize! :read, @invoice
       @invoice.regenerate_share_token if @invoice.share_token.blank?
+      @setting = ForumSetting.for(@current_forum)
     end
 
     def edit

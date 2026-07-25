@@ -23,7 +23,8 @@ module Forums
     end
 
     def setting_params
-      params.require(:forum_setting).permit(:theme_color, :invoice_prefix, :attendance_rules, :meeting_rules, :membership_rules, :logo)
+      params.require(:forum_setting).permit(:theme_color, :invoice_prefix, :attendance_rules, :meeting_rules, :membership_rules, :logo,
+        :terms_and_conditions, :bank_name, :bank_account_holder, :bank_account_number, :bank_ifsc, :bank_branch, :upi_id)
     end
   end
 end

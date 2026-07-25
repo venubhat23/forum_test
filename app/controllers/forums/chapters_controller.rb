@@ -105,7 +105,7 @@ module Forums
     end
 
     def chapter_params
-      params.require(:chapter).permit(:name)
+      params.require(:chapter).permit(:name, :annual_membership_fee)
     end
   end
 end

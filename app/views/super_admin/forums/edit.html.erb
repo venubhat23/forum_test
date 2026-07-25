@@ -15,6 +15,25 @@
             <%= f.text_field :name, class: "form-control form-control-lg", required: true %>
           </div>
 
+          <hr class="my-4">
+          <h2 class="h6 mb-3">Billing Details</h2>
+          <p class="text-muted small mb-3">Used on invoices raised to this forum &mdash; shown as "Not provided" if left blank.</p>
+
+          <div class="mb-3">
+            <%= f.label :gst_number, "GST Number", class: "form-label" %>
+            <%= f.text_field :gst_number, class: "form-control", placeholder: "e.g. 27AAAAA0000A1Z5" %>
+          </div>
+
+          <div class="mb-3">
+            <%= f.label :office, "Office", class: "form-label" %>
+            <%= f.text_field :office, class: "form-control", placeholder: "e.g. Registered Office / HQ" %>
+          </div>
+
+          <div class="mb-4">
+            <%= f.label :address, class: "form-label" %>
+            <%= f.text_area :address, class: "form-control", rows: 3 %>
+          </div>
+
           <div class="d-flex flex-wrap gap-2">
             <%= f.submit "Save Changes", class: "btn btn-primary btn-lg" %>
             <%= link_to "Cancel", super_admin_forum_path(@forum), class: "btn btn-outline-secondary btn-lg" %>

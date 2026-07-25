@@ -61,6 +61,9 @@ gem "aws-sdk-s3", require: false
 # Excel import for bulk member upload
 gem "roo"
 
+# QR code generation for UPI payment links on invoices
+gem "rqrcode"
+
 group :development, :test do
   # Load environment variables from .env [https://github.com/bkeepers/dotenv]
   gem "dotenv-rails"

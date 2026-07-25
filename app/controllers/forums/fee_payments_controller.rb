@@ -26,7 +26,8 @@ module Forums
         redirect_to forum_chapter_fee_payments_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id),
           alert: "#{user.display_name}'s annual membership fee is already paid — no meeting/event fee is collected." and return
       end
-      @fee_payment = FeePayment.new(user_id: params[:user_id], fee_type: params[:fee_type], feeable: feeable, amount: feeable&.fee_amount)
+      default_amount = feeable&.fee_amount || (params[:fee_type] == "annual_membership" ? @chapter.annual_membership_fee : nil)
+      @fee_payment = FeePayment.new(user_id: params[:user_id], fee_type: params[:fee_type], feeable: feeable, amount: default_amount)
       @people = billable_people
     end
 

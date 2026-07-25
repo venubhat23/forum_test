@@ -1,16 +1,30 @@
 module Forums
   class DashboardController < BaseController
     def show
-      @chapters_count = @current_forum.chapters.count
-      @members_count = @current_forum.users.member.count
-      @guests_count = @current_forum.users.guest.count
-      @renewing_this_month = @current_forum.users.member.where(renews_on: Date.current.beginning_of_month..Date.current.end_of_month).count
-      @recent_chapters = @current_forum.chapters.order(created_at: :desc).limit(5)
       load_lead_stats
+
+      if @lead_stats_scope == :forum
+        @chapters_count = @current_forum.chapters.count
+        @members_count = @current_forum.users.member.count
+        @guests_count = @current_forum.users.guest.count
+        @renewing_this_month = @current_forum.users.member.where(renews_on: Date.current.beginning_of_month..Date.current.end_of_month).count
+        @recent_chapters = @current_forum.chapters.order(created_at: :desc).limit(5)
+      else
+        load_personal_stats
+      end
+
       load_attendance_stats
     end
 
     private
+
+    def load_personal_stats
+      this_month = Date.current.beginning_of_month..Date.current.end_of_month
+      @referrals_given_count = current_user.referrals_given.count
+      @attendance_this_month_count = current_user.attendances.where(occurred_on: this_month, present: true).count
+      @one_to_ones_count = current_user.one_to_one_meetings_as_requester.count + current_user.one_to_one_meetings_as_requested.count
+      @events_registered_count = current_user.event_registrations.count
+    end
 
     def load_attendance_stats
       return unless can?(:manage, Attendance)

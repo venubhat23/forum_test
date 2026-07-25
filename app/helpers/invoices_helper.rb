@@ -74,6 +74,26 @@ module InvoicesHelper
     SVG
   end
 
+  # Builds a upi:// deep link for the given UPI ID and renders it as an inline
+  # SVG QR code — crisp in print/PDF with no image asset or external service.
+  def upi_qr_code_svg(upi_id, payee_name:, amount: nil, invoice_number: nil, size: 4)
+    return nil if upi_id.blank?
+
+    params = { pa: upi_id, pn: payee_name, cu: "INR" }
+    params[:am] = format("%.2f", amount) if amount.present? && amount.positive?
+    params[:tn] = "Invoice #{invoice_number}" if invoice_number.present?
+    uri = "upi://pay?#{params.map { |k, v| "#{k}=#{ERB::Util.url_encode(v.to_s)}" }.join('&')}"
+
+    RQRCode::QRCode.new(uri).as_svg(
+      offset: 0,
+      color: "1e293b",
+      shape_rendering: "crispEdges",
+      module_size: size,
+      standalone: true,
+      use_path: true
+    ).html_safe
+  end
+
   ONES = %w[Zero One Two Three Four Five Six Seven Eight Nine Ten
             Eleven Twelve Thirteen Fourteen Fifteen Sixteen Seventeen Eighteen Nineteen].freeze
   TENS = %w[Zero Ten Twenty Thirty Forty Fifty Sixty Seventy Eighty Ninety].freeze

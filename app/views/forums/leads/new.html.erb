@@ -21,17 +21,22 @@
           <p class="text-muted small mb-2">Pick the one person this lead should go to.</p>
 
           <div class="lead-tag-picker mb-4" data-controller="lead-tagging">
+            <div class="mb-2">
+              <input type="search" class="form-control form-control-sm" placeholder="Search by name, email, or number"
+                     data-lead-tagging-target="search" data-action="input->lead-tagging#filter">
+            </div>
             <div class="d-flex flex-wrap gap-2 mb-2">
               <button type="button" class="btn btn-sm btn-outline-secondary" data-action="lead-tagging#clearAll">Clear</button>
             </div>
             <div class="lead-tag-list">
               <% @taggable_members.group_by(&:chapter).each do |chapter, members| %>
-                <div class="lead-tag-group">
+                <div class="lead-tag-group" data-lead-tagging-target="group">
                   <div class="lead-tag-group-header">
                     <span><%= chapter&.name || "No Chapter" %></span>
                   </div>
                   <% members.each do |member| %>
-                    <label class="lead-tag-option">
+                    <label class="lead-tag-option" data-lead-tagging-target="option"
+                           data-search-text="<%= [member.display_name, member.email, member.phone].join(" ").downcase %>">
                       <input type="radio" name="lead[tagged_user_ids][]" value="<%= member.id %>" data-lead-tagging-target="checkbox" data-chapter-id="<%= chapter&.id %>">
                       <span><%= member.display_name %></span>
                     </label>
@@ -41,6 +46,7 @@
               <% if @taggable_members.empty? %>
                 <p class="text-muted small mb-0">No other members to tag yet.</p>
               <% end %>
+              <p class="text-muted small mb-0 d-none" data-lead-tagging-target="noResults">No members match your search.</p>
             </div>
           </div>
 

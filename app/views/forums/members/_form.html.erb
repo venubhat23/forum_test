@@ -35,6 +35,13 @@
     <%= f.select :membership_year, ((Date.current.year - 1)..(Date.current.year + 1)), { selected: member.membership_year || Date.current.year }, class: "form-select" %>
     <div class="form-text">Membership runs Jan 1 &ndash; Dec 31 of the selected year.</div>
   </div>
+  <% if member.new_record? %>
+    <div class="form-check mb-4">
+      <%= check_box_tag "member[annual_membership_paid]", "1", false, class: "form-check-input", id: "annual-membership-paid" %>
+      <%= label_tag "annual-membership-paid", "Annual Member (fee already paid)", class: "form-check-label" %>
+      <div class="form-text">Check this if the member already paid their annual membership fee outside the system. Their fee will be marked as paid and they won't be prompted to pay it again.</div>
+    </div>
+  <% end %>
 
   <h2 class="h6 text-uppercase text-muted mb-3">Business Details</h2>
   <div class="mb-3">
