@@ -17,10 +17,16 @@
     <% members_by_chapter.each do |chapter, chapter_members| %>
       <optgroup label="<%= chapter&.name || "No Chapter" %>">
         <% chapter_members.each do |member| %>
-          <option value="<%= member.id %>" data-chapter-id="<%= chapter&.id %>"><%= member.display_name %></option>
+          <% is_annual_member = member.respond_to?(:annual_fee_paid?) && member.annual_fee_paid? %>
+          <%= content_tag :option, member.display_name + (is_annual_member ? " — Annual Member (fee waived)" : ""),
+                value: member.id, data: { chapter_id: chapter&.id },
+                style: (is_annual_member ? "color:#198754;font-weight:600" : nil) %>
         <% end %>
       </optgroup>
     <% end %>
   </select>
-  <div class="form-text">Hold Ctrl/Cmd to select individual members, or use the buttons above for bulk selection.</div>
+  <div class="form-text">
+    Hold Ctrl/Cmd to select individual members, or use the buttons above for bulk selection.
+    <span class="text-success fw-semibold">Annual Members</span> have already paid their dues — they won't be asked to pay this event's fee.
+  </div>
 </div>
