@@ -1,0 +1,20 @@
+<div class="toast-notification toast-announcement toast-fee-reminder toast-info" style="top: calc(var(--header-height) + 10px + <%= index * 110 %>px);" data-announcement-toast>
+  <div class="toast-notification-content">
+    <div class="d-flex align-items-start">
+      <i class="bi bi-calendar-check me-2"></i>
+      <div>
+        <div class="fw-semibold"><%= item[:title] %></div>
+        <div class="small mb-1"><%= item[:when_text] %></div>
+        <% if item[:fee_amount].present? %>
+          <div class="small mb-2">Fee: <strong><%= number_to_currency(item[:fee_amount]) %></strong></div>
+        <% end %>
+        <div class="small mb-2 fw-semibold">Are you coming?</div>
+        <div class="d-flex gap-2">
+          <%= button_to "Yes", item[:rsvp_path], method: :patch, params: { rsvp_status: "coming" }, class: "btn btn-sm btn-success" %>
+          <%= button_to "No", item[:rsvp_path], method: :patch, params: { rsvp_status: "not_coming" }, class: "btn btn-sm btn-outline-secondary" %>
+        </div>
+      </div>
+    </div>
+    <button type="button" class="btn-close ms-3" onclick="closeAnnouncementToast(this)"></button>
+  </div>
+</div>

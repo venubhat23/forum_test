@@ -13,20 +13,28 @@
     <button type="button" class="btn btn-sm btn-outline-danger" data-action="member-picker#clearAll">Clear</button>
   </div>
 
-  <select name="<%= field_name %>" multiple class="form-select" size="8" data-member-picker-target="select">
+  <div class="border rounded p-3" style="max-height: 320px; overflow-y: auto;">
     <% members_by_chapter.each do |chapter, chapter_members| %>
-      <optgroup label="<%= chapter&.name || "No Chapter" %>">
-        <% chapter_members.each do |member| %>
-          <% is_annual_member = member.respond_to?(:annual_fee_paid?) && member.annual_fee_paid? %>
-          <%= content_tag :option, member.display_name + (is_annual_member ? " — Annual Member (fee waived)" : ""),
-                value: member.id, data: { chapter_id: chapter&.id },
-                style: (is_annual_member ? "color:#198754;font-weight:600" : nil) %>
-        <% end %>
-      </optgroup>
+      <div class="fw-semibold small text-uppercase text-muted mb-2 mt-2">
+        <%= chapter&.name || "No Chapter" %>
+      </div>
+      <% chapter_members.each do |member| %>
+        <% is_annual_member = member.respond_to?(:annual_fee_paid?) && member.annual_fee_paid? %>
+        <div class="form-check mb-1">
+          <%= check_box_tag field_name, member.id, false, class: "form-check-input",
+                id: "member-picker-#{member.id}", data: { chapter_id: chapter&.id, member_picker_target: "checkbox" } %>
+          <%= label_tag "member-picker-#{member.id}", class: "form-check-label #{"text-success fw-semibold" if is_annual_member}" do %>
+            <%= member.display_name %><%= " — Annual Member (fee waived)" if is_annual_member %>
+          <% end %>
+        </div>
+      <% end %>
     <% end %>
-  </select>
+    <% if members_by_chapter.empty? %>
+      <div class="text-muted small py-2">No members available.</div>
+    <% end %>
+  </div>
   <div class="form-text">
-    Hold Ctrl/Cmd to select individual members, or use the buttons above for bulk selection.
+    Check members individually, or use the buttons above for bulk selection.
     <span class="text-success fw-semibold">Annual Members</span> have already paid their dues — they won't be asked to pay this event's fee.
   </div>
 </div>

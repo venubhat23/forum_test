@@ -2,6 +2,11 @@ class Lead < ApplicationRecord
   STAGE_ORDER = %w[requested accepted consulting doing_business converted].freeze
   MANUALLY_ADVANCEABLE_STAGES = %w[consulting doing_business].freeze
 
+  # Stages that can be set directly from the edit form. "converted" is
+  # excluded because it must carry a thanksgiving amount, which only the
+  # dedicated give_thanksgiving flow collects.
+  EDITABLE_STAGES = %w[requested accepted consulting doing_business declined].freeze
+
   enum :stage, { requested: 0, accepted: 1, consulting: 2, doing_business: 3, converted: 4, declined: 5 }
 
   belongs_to :forum

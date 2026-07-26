@@ -80,6 +80,18 @@
       <% end %>
     <% end %>
 
+    <% if current_area == :forum && @pending_engagement_invites.present? %>
+      <% @pending_engagement_invites.each.with_index do |item, index| %>
+        <%= render "forums/shared/engagement_invite_toast", item: item, index: @active_announcements.size + @pending_fee_reminders.size + index %>
+      <% end %>
+    <% end %>
+
+    <% if current_area == :forum && @pending_event_rsvps.present? %>
+      <% @pending_event_rsvps.each.with_index do |item, index| %>
+        <%= render "forums/shared/event_rsvp_toast", item: item, index: @active_announcements.size + @pending_fee_reminders.size + @pending_engagement_invites.size + index %>
+      <% end %>
+    <% end %>
+
     <% if user_signed_in? %>
       <header class="app-header">
         <div class="container-fluid h-100">

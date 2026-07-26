@@ -1,3 +1,16 @@
+<% if f.object.persisted? && Lead::EDITABLE_STAGES.include?(f.object.stage) %>
+  <h2 class="h6 text-uppercase text-muted mb-3">Stage</h2>
+  <div class="mb-4">
+    <%= f.label :stage, class: "form-label" %>
+    <%= f.select :stage, Lead::EDITABLE_STAGES.map { |stage| [ lead_stage_label(stage), stage ] }, {}, class: "form-select" %>
+    <div class="form-text">To mark a lead Converted, use the Give Thanksgiving Slip action instead — it records the amount along with the stage change.</div>
+  </div>
+<% elsif f.object.persisted? %>
+  <div class="alert alert-secondary py-2 px-3 small mb-4">
+    Stage: <strong><%= lead_stage_label(f.object.stage) %></strong> — this lead has already converted, so its stage can't be changed here.
+  </div>
+<% end %>
+
 <h2 class="h6 text-uppercase text-muted mb-3">Prospect Details</h2>
 <div class="mb-3">
   <%= f.label :prospect_name, "Prospect Name", class: "form-label" %>

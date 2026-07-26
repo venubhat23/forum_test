@@ -32,6 +32,26 @@ module CalendarHelper
         meta: "Membership renewal",
         path: forum_chapter_member_path(forum_slug: @current_forum.slug, chapter_id: record.chapter_id, id: record.id)
       }
+    when :one_to_one
+      other = record.requester_id == current_user.id ? record.requested_with : record.requester
+      {
+        css_class: "one_to_one",
+        icon: "bi-person-lines-fill",
+        title: "1:1 with #{other.display_name}",
+        time: record.scheduled_at.strftime("%I:%M %p"),
+        meta: record.venue.presence || record.status.titleize,
+        path: forum_one_to_one_meeting_path(forum_slug: @current_forum.slug, id: record.id)
+      }
+    when :darshan
+      hosting = record.host_id == current_user.id
+      {
+        css_class: "darshan",
+        icon: "bi-building",
+        title: hosting ? "Office Darshan (hosting)" : "Office Darshan with #{record.host.display_name}",
+        time: record.scheduled_at.strftime("%I:%M %p"),
+        meta: record.venue.presence,
+        path: forum_office_darshan_path(forum_slug: @current_forum.slug, id: record.id)
+      }
     end
   end
 end

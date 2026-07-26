@@ -1,0 +1,14 @@
+<div class="toast-notification toast-announcement toast-fee-reminder toast-info" style="top: calc(var(--header-height) + 10px + <%= index * 110 %>px);" data-announcement-toast>
+  <div class="toast-notification-content">
+    <div class="d-flex align-items-start">
+      <i class="bi <%= item[:icon] %> me-2"></i>
+      <div>
+        <div class="fw-semibold"><%= item[:title] %></div>
+        <div class="small mb-1"><%= item[:subtitle] %></div>
+        <div class="small mb-2"><%= item[:when_text] %></div>
+        <%= link_to "View Details", item[:path], class: "btn btn-sm btn-primary" %>
+      </div>
+    </div>
+    <button type="button" class="btn-close ms-3" onclick="closeAnnouncementToast(this)"></button>
+  </div>
+</div>

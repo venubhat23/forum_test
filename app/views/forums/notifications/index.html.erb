@@ -4,9 +4,15 @@
   <div>
     <h1 class="page-title h4">Notifications</h1>
   </div>
-  <% if current_user.notifications.unread.any? %>
-    <%= button_to "Mark All Read", mark_all_read_forum_notifications_path(forum_slug: @current_forum.slug), method: :patch, class: "btn btn-outline-secondary" %>
-  <% end %>
+  <div class="d-flex flex-wrap gap-2">
+    <% if current_user.notifications.unread.any? %>
+      <%= button_to "Mark All Read", mark_all_read_forum_notifications_path(forum_slug: @current_forum.slug), method: :patch, class: "btn btn-outline-secondary" %>
+    <% end %>
+    <% if current_user.notifications.where.not(read_at: nil).any? %>
+      <%= button_to "Clear Read", clear_read_forum_notifications_path(forum_slug: @current_forum.slug), method: :delete, class: "btn btn-outline-danger",
+            data: { turbo_confirm: "Permanently delete all read notifications?" } %>
+    <% end %>
+  </div>
 </div>
 
 <div class="card">

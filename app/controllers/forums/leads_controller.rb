@@ -68,7 +68,7 @@ module Forums
       authorize! :update, @lead
       require_creator!
 
-      if @lead.update(lead_params)
+      if @lead.update(update_lead_params)
         redirect_to forum_lead_path(forum_slug: @current_forum.slug, id: @lead.id), notice: "Lead updated."
       else
         flash.now[:alert] = @lead.errors.full_messages.to_sentence
@@ -143,6 +143,15 @@ module Forums
 
     def lead_params
       params.require(:lead).permit(:prospect_name, :prospect_phone, :prospect_email, :business_name, :business_category, :requirement, :notes)
+    end
+
+    # Stage is only settable on update (not create), and only to one of the
+    # stages that don't require data collected elsewhere — see Lead::EDITABLE_STAGES.
+    def update_lead_params
+      permitted = lead_params
+      stage = params.dig(:lead, :stage)
+      permitted[:stage] = stage if Lead::EDITABLE_STAGES.include?(stage)
+      permitted
     end
 
     def thanksgiving_params

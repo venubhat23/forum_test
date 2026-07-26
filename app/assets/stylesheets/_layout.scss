@@ -1129,9 +1129,11 @@ nav.pagination span.page.gap {
   flex-shrink: 0;
 }
 
-.gcal-dot-meeting { background: #3b82f6; }
-.gcal-dot-event   { background: #8b5cf6; }
-.gcal-dot-renewal { background: #f59e0b; }
+.gcal-dot-meeting   { background: #3b82f6; }
+.gcal-dot-event     { background: #8b5cf6; }
+.gcal-dot-renewal   { background: #f59e0b; }
+.gcal-dot-one_to_one { background: #14b8a6; }
+.gcal-dot-darshan   { background: #ec4899; }
 
 .gcal-grid-wrap {
   background: #ffffff;
@@ -1241,9 +1243,11 @@ nav.pagination span.page.gap {
   box-shadow: 0 2px 6px rgba(15, 23, 42, 0.12);
 }
 
-.gcal-chip-meeting { background: rgba(59, 130, 246, 0.12); color: #1d4ed8; border-left-color: #3b82f6; }
-.gcal-chip-event   { background: rgba(139, 92, 246, 0.14); color: #6d28d9; border-left-color: #8b5cf6; }
-.gcal-chip-renewal { background: rgba(245, 158, 11, 0.14); color: #b45309; border-left-color: #f59e0b; }
+.gcal-chip-meeting   { background: rgba(59, 130, 246, 0.12); color: #1d4ed8; border-left-color: #3b82f6; }
+.gcal-chip-event     { background: rgba(139, 92, 246, 0.14); color: #6d28d9; border-left-color: #8b5cf6; }
+.gcal-chip-renewal   { background: rgba(245, 158, 11, 0.14); color: #b45309; border-left-color: #f59e0b; }
+.gcal-chip-one_to_one { background: rgba(20, 184, 166, 0.14); color: #0f766e; border-left-color: #14b8a6; }
+.gcal-chip-darshan   { background: rgba(236, 72, 153, 0.14); color: #be185d; border-left-color: #ec4899; }
 
 .gcal-more {
   font-size: 0.68rem;

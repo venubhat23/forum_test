@@ -137,6 +137,7 @@ Rails.application.routes.draw do
       end
       collection do
         patch :mark_all_read
+        delete :clear_read
       end
     end
     resources :chapters, controller: "forums/chapters", only: [ :index, :new, :create, :show, :edit, :update, :destroy ] do
@@ -249,7 +250,11 @@ Rails.application.routes.draw do
         post :record_attendance
         post :check_in
       end
-      resources :registrations, controller: "forums/event_registrations", only: [ :index, :create, :destroy ]
+      resources :registrations, controller: "forums/event_registrations", only: [ :index, :create, :destroy ] do
+        member do
+          patch :rsvp
+        end
+      end
     end
     get "my_attendance", to: "forums/my_attendance#show"
     get "calendar", to: "forums/calendar#show"

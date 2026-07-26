@@ -2,11 +2,11 @@ import { Controller } from "@hotwired/stimulus"
 
 // Connects to data-controller="member-picker"
 export default class extends Controller {
-  static targets = ["select", "chapterFilter"]
+  static targets = ["checkbox", "chapterFilter"]
 
   selectAll(event) {
     event.preventDefault()
-    Array.from(this.selectTarget.options).forEach((opt) => { opt.selected = true })
+    this.checkboxTargets.forEach((checkbox) => { checkbox.checked = true })
   }
 
   selectChapter(event) {
@@ -14,13 +14,13 @@ export default class extends Controller {
     const chapterId = this.chapterFilterTarget.value
     if (!chapterId) return
 
-    Array.from(this.selectTarget.options).forEach((opt) => {
-      if (opt.dataset.chapterId === chapterId) opt.selected = true
+    this.checkboxTargets.forEach((checkbox) => {
+      if (checkbox.dataset.chapterId === chapterId) checkbox.checked = true
     })
   }
 
   clearAll(event) {
     event.preventDefault()
-    Array.from(this.selectTarget.options).forEach((opt) => { opt.selected = false })
+    this.checkboxTargets.forEach((checkbox) => { checkbox.checked = false })
   }
 }

@@ -106,14 +106,6 @@
             <span class="nav-text">Calendar</span>
           <% end %>
         </li>
-        <% if can? :create, Chapter %>
-          <li class="nav-item">
-            <%= link_to new_forum_bulk_import_path(forum_slug: @current_forum.slug), class: "nav-link-modern #{'active' if request.path.start_with?(new_forum_bulk_import_path(forum_slug: @current_forum.slug))}", data: { tooltip: "Bulk Import" } do %>
-              <div class="nav-icon-modern"><div class="icon-bg gradient-cyan"><i class="bi bi-file-earmark-arrow-up"></i></div></div>
-              <span class="nav-text">Bulk Import</span>
-            <% end %>
-          </li>
-        <% end %>
       </ul>
     </div>
 
@@ -176,24 +168,6 @@
             <span class="nav-text">One-to-One Meetings</span>
           <% end %>
         </li>
-        <% if can? :read, MeetingSchedule %>
-          <%
-            meeting_schedules_target =
-              if current_user.chapter_id.present?
-                forum_chapter_meeting_schedules_path(forum_slug: @current_forum.slug, chapter_id: current_user.chapter_id)
-              elsif @current_forum.chapters.count == 1
-                forum_chapter_meeting_schedules_path(forum_slug: @current_forum.slug, chapter_id: @current_forum.chapters.first.id)
-              else
-                forum_chapters_path(forum_slug: @current_forum.slug)
-              end
-          %>
-          <li class="nav-item">
-            <%= link_to meeting_schedules_target, class: "nav-link-modern #{'active' if request.path.include?('/meeting_schedules')}", data: { tooltip: "Scheduled Meetings" } do %>
-              <div class="nav-icon-modern"><div class="icon-bg gradient-orange"><i class="bi bi-calendar-week"></i></div></div>
-              <span class="nav-text">Scheduled Meetings</span>
-            <% end %>
-          </li>
-        <% end %>
         <li class="nav-item">
           <%= link_to forum_office_darshans_path(forum_slug: @current_forum.slug), class: "nav-link-modern #{'active' if request.path.start_with?(forum_office_darshans_path(forum_slug: @current_forum.slug))}", data: { tooltip: "Office Darshan" } do %>
             <div class="nav-icon-modern"><div class="icon-bg gradient-indigo"><i class="bi bi-building-check"></i></div></div>

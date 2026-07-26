@@ -146,16 +146,24 @@
                 <span class="badge badge-status-active"><i class="bi bi-check-circle-fill me-1"></i>Annual Member &middot; Fully Paid</span>
                 <div class="text-muted small mt-1">Renews <%= member.renews_on.strftime('%d %b %Y') %></div>
               <% elsif fee&.partially_paid? %>
-                <span class="badge badge-status-partial"><i class="bi bi-exclamation-triangle-fill me-1"></i>Partially Paid</span>
-                <div class="text-muted small mt-1">Balance: <%= number_to_currency(fee.balance_due) %></div>
-                <div class="text-muted small">
-                  <%= renewal_status_text(member) %>
-                </div>
+                <span class="badge badge-status-partial"><i class="bi bi-exclamation-triangle-fill me-1"></i>Partially Paid<%= " (Lifetime)" if fee.lifetime? %></span>
+                <div class="text-muted small mt-1">Paid <%= number_to_currency(fee.paid_amount) %> of <%= number_to_currency(fee.amount) %></div>
+                <div class="text-muted small">Pending: <%= number_to_currency(fee.balance_due) %></div>
+                <% if member.renews_on %>
+                  <div class="text-muted small"><%= renewal_status_text(member) %></div>
+                <% end %>
               <% else %>
                 <span class="badge badge-status-trial"><i class="bi bi-exclamation-circle-fill me-1"></i>Due</span>
-                <div class="text-muted small mt-1">
-                  <%= renewal_status_text(member) %>
-                </div>
+                <% if fee %>
+                  <div class="text-muted small mt-1">Amount due: <%= number_to_currency(fee.balance_due) %></div>
+                <% elsif @chapter.annual_membership_fee.present? %>
+                  <div class="text-muted small mt-1">Amount due: <%= number_to_currency(@chapter.annual_membership_fee) %></div>
+                <% end %>
+                <% if member.renews_on %>
+                  <div class="text-muted small mt-1">
+                    <%= renewal_status_text(member) %>
+                  </div>
+                <% end %>
               <% end %>
             </td>
             <td class="text-end">
@@ -167,13 +175,14 @@
                     <% end %>
                   <% end %>
                   <% if fee && !fee.paid? %>
-                    <button type="button" class="icon-btn icon-btn-success" title="Record Payment (full or partial)" data-bs-toggle="modal" data-bs-target="#record-payment-<%= fee.id %>">
-                      <i class="bi bi-cash-coin"></i>
+                    <%= button_to "Full Pay", mark_paid_forum_chapter_fee_payment_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: fee.id), method: :patch, class: "btn btn-sm btn-success", title: "Mark full balance as paid", data: { turbo_confirm: "Mark #{number_to_currency(fee.balance_due)} as fully paid for #{member.display_name}?" } %>
+                    <button type="button" class="btn btn-sm btn-outline-success" title="Record a partial payment" data-bs-toggle="modal" data-bs-target="#record-payment-<%= fee.id %>">
+                      Partial
                     </button>
                     <%= render "forums/fee_payments/record_payment_modal", fee: fee, user: member %>
                   <% else %>
-                    <%= link_to new_forum_chapter_fee_payment_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, user_id: member.id, fee_type: "annual_membership"), class: "icon-btn icon-btn-view", title: "Record Annual Fee" do %>
-                      <i class="bi bi-cash-coin"></i>
+                    <%= link_to new_forum_chapter_fee_payment_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, user_id: member.id, fee_type: "annual_membership"), class: "btn btn-sm btn-primary", title: "Collect Annual Fee" do %>
+                      Pay
                     <% end %>
                   <% end %>
                 <% end %>

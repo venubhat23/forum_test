@@ -107,7 +107,7 @@ class Ability
       can [ :read, :update ], OfficeDarshanAttendance, user_id: user.id
       can :read, OfficeDarshanAttendance, office_darshan: { host_id: user.id }
       can :read, Event, forum_id: user.forum_id
-      can [ :read, :create, :destroy ], EventRegistration, user_id: user.id
+      can [ :read, :create, :update, :destroy ], EventRegistration, user_id: user.id
       can :read, MembershipPlan, forum_id: user.forum_id
       can :read, Document, forum_id: user.forum_id
     when :member
@@ -142,7 +142,7 @@ class Ability
       can :read, Meeting, chapter_id: user.chapter_id
       can :read, MeetingSchedule, chapter_id: user.chapter_id
       can :read, Event, forum_id: user.forum_id
-      can [ :read, :create, :destroy ], EventRegistration, user_id: user.id
+      can [ :read, :create, :update, :destroy ], EventRegistration, user_id: user.id
       can :read, MembershipPlan, forum_id: user.forum_id
       can :read, Document, forum_id: user.forum_id
     end

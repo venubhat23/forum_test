@@ -21,7 +21,7 @@ module Forums
         alert = added.size < users.size ? "Some members were already registered." : nil
         redirect_to forum_event_path(forum_slug: @current_forum.slug, id: @event.id), notice: notice, alert: alert
       else
-        @registration = @event.event_registrations.new(user: current_user)
+        @registration = @event.event_registrations.new(user: current_user, rsvp_status: :coming)
         authorize! :create, @registration
 
         if @registration.save
@@ -37,6 +37,15 @@ module Forums
       authorize! :destroy, @registration
       @registration.destroy
       redirect_to forum_event_path(forum_slug: @current_forum.slug, id: @event.id), notice: "Registration cancelled."
+    end
+
+    def rsvp
+      @registration = @event.event_registrations.find(params[:id])
+      authorize! :update, @registration
+      status = params[:rsvp_status] == "not_coming" ? :not_coming : :coming
+      @registration.update!(rsvp_status: status)
+      notice = status == :coming ? "Thanks — you're marked as coming!" : "Got it — you're marked as not coming."
+      redirect_back fallback_location: forum_event_path(forum_slug: @current_forum.slug, id: @event.id), notice: notice
     end
 
     private
