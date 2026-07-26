@@ -201,9 +201,16 @@
               <span class="badge <%= fee.paid? ? 'badge-status-active' : (fee.partially_paid? ? 'badge-status-partial' : 'badge-status-trial') %>"><%= fee.status.titleize %></span>
             </td>
             <td class="text-end">
-              <%= link_to print_forum_chapter_fee_payment_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: fee.id), class: "icon-btn icon-btn-view", title: "Invoice", target: "_blank" do %>
-                <i class="bi bi-receipt"></i>
-              <% end %>
+              <div class="d-flex gap-1 justify-content-end">
+                <% if fee.fee_payment_transactions.any? %>
+                  <button type="button" class="icon-btn" title="Payment history" data-bs-toggle="modal" data-bs-target="#payment-history-<%= fee.id %>">
+                    <i class="bi bi-clock-history"></i>
+                  </button>
+                <% end %>
+                <%= link_to print_forum_chapter_fee_payment_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: fee.id), class: "icon-btn icon-btn-view", title: "Invoice", target: "_blank" do %>
+                  <i class="bi bi-receipt"></i>
+                <% end %>
+              </div>
             </td>
           </tr>
         <% end %>
@@ -214,3 +221,48 @@
     </table>
   </div>
 </div>
+
+<% @fee_payments.each do |fee| %>
+  <% next unless fee.fee_payment_transactions.any? %>
+  <div class="modal fade" id="payment-history-<%= fee.id %>" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title mb-0">Payment History &middot; <%= fee.fee_type.titleize %></h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <table class="table table-sm mb-0">
+            <thead>
+              <tr><th>Date &amp; Time</th><th>Method</th><th class="text-end">Amount</th></tr>
+            </thead>
+            <tbody>
+              <% fee.fee_payment_transactions.order(:created_at).each do |txn| %>
+                <tr>
+                  <td><%= txn.created_at.strftime("%d %b %Y, %I:%M %p") %></td>
+                  <td><%= txn.payment_method&.titleize || "—" %></td>
+                  <td class="text-end"><%= number_to_currency(txn.amount) %></td>
+                </tr>
+              <% end %>
+            </tbody>
+            <tfoot>
+              <tr class="fw-semibold border-top">
+                <td colspan="2">Total Paid</td>
+                <td class="text-end"><%= number_to_currency(fee.paid_amount) %></td>
+              </tr>
+              <% if fee.balance_due.positive? %>
+                <tr class="text-muted">
+                  <td colspan="2">Balance Due</td>
+                  <td class="text-end"><%= number_to_currency(fee.balance_due) %></td>
+                </tr>
+              <% end %>
+            </tfoot>
+          </table>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>
