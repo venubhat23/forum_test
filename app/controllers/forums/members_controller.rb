@@ -246,6 +246,7 @@ module Forums
       when "full" then mark_annual_fee_full_paid!(member)
       when "partial" then mark_annual_fee_partial_paid!(member)
       when "lifetime" then mark_annual_fee_lifetime_paid!(member)
+      when "monthly" then mark_monthly_fee_paid!(member)
       end
     end
 
@@ -292,6 +293,21 @@ module Forums
         "Lifetime membership fee marked as paid."
       else
         "Could not record the lifetime fee (#{fee_payment.errors.full_messages.to_sentence})."
+      end
+    end
+
+    # Paying the chapter's monthly fee renews the member for one month (see
+    # FeePayment#extend_membership_renewal).
+    def mark_monthly_fee_paid!(member)
+      amount = @chapter.monthly_membership_fee
+      return "Chapter's monthly membership fee isn't set — could not record the fee." if amount.blank?
+
+      fee_payment = member.fee_payments.new(fee_type: :monthly_membership, amount: amount)
+      if fee_payment.save
+        fee_payment.mark_paid!
+        "Monthly membership fee marked as paid."
+      else
+        "Could not record the monthly fee (#{fee_payment.errors.full_messages.to_sentence})."
       end
     end
 

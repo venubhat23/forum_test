@@ -1,10 +1,10 @@
 class FeePayment < ApplicationRecord
-  enum :fee_type, { annual_membership: 0, meeting: 1, training: 2, event: 3 }
+  enum :fee_type, { annual_membership: 0, meeting: 1, training: 2, event: 3, monthly_membership: 4 }
   enum :status, { pending: 0, paid: 1, partially_paid: 2 }, default: :pending
   enum :payment_method, { cash: 0, bank_transfer: 1, upi: 2, cheque: 3, other: 4 }
 
   ALLOWED_FEE_TYPES = {
-    "member" => %w[annual_membership meeting training event],
+    "member" => %w[annual_membership monthly_membership meeting training event],
     "guest" => %w[meeting event]
   }.freeze
 
@@ -18,7 +18,7 @@ class FeePayment < ApplicationRecord
   validate :fee_type_allowed_for_role
 
   before_validation :assign_invoice_number, on: :create
-  after_save :extend_membership_renewal, if: -> { annual_membership? && paid? && saved_change_to_status? }
+  after_save :extend_membership_renewal, if: -> { (annual_membership? || monthly_membership?) && paid? && saved_change_to_status? }
 
   def paid_amount
     fee_payment_transactions.sum(:amount)
@@ -59,10 +59,13 @@ class FeePayment < ApplicationRecord
 
   # Paying the annual membership fee renews the member. Defaults to one year,
   # but a longer multi-year term or a lifetime membership can be recorded on
-  # the fee itself (see the "convert guest to member" flow).
+  # the fee itself (see the "convert guest to member" flow). A monthly fee
+  # renews the member for one month instead.
   def extend_membership_renewal
     if lifetime?
       user.update!(renews_on: nil, lifetime_member: true, membership_status: :active)
+    elsif monthly_membership?
+      user.update!(renews_on: 1.month.from_now.to_date, lifetime_member: false, membership_status: :active)
     else
       years = duration_years.to_i.positive? ? duration_years.to_i : 1
       user.update!(renews_on: years.years.from_now.to_date, lifetime_member: false, membership_status: :active)

@@ -14,8 +14,12 @@
             <%= f.text_field :name, class: "form-control form-control-lg", required: true %>
           </div>
           <div class="mb-4">
-            <%= f.label :annual_membership_fee, "Annual Membership Fee", class: "form-label" %>
+            <%= f.label :annual_membership_fee, "Yearly Membership Fee", class: "form-label" %>
             <%= f.number_field :annual_membership_fee, step: "0.01", min: "0.01", class: "form-control form-control-lg", placeholder: "Leave blank if not fixed" %>
+          </div>
+          <div class="mb-4">
+            <%= f.label :monthly_membership_fee, "Monthly Membership Fee", class: "form-label" %>
+            <%= f.number_field :monthly_membership_fee, step: "0.01", min: "0.01", class: "form-control form-control-lg", placeholder: "Leave blank if not offered" %>
           </div>
           <div class="mb-4">
             <%= f.label :lifetime_membership_fee, "Lifetime Membership Fee", class: "form-label" %>

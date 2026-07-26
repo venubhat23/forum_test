@@ -17,6 +17,7 @@ class Chapter < ApplicationRecord
 
   validates :name, presence: true, uniqueness: { scope: :forum_id }
   validates :annual_membership_fee, numericality: { greater_than: 0 }, allow_nil: true
+  validates :monthly_membership_fee, numericality: { greater_than: 0 }, allow_nil: true
   validates :lifetime_membership_fee, numericality: { greater_than: 0 }, allow_nil: true
   validate :within_forum_chapter_limit, on: :create
 
