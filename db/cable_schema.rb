@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_21_033400) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_26_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -151,6 +151,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_21_033400) do
     t.integer "status", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.decimal "annual_membership_fee", precision: 10, scale: 2
+    t.decimal "lifetime_membership_fee", precision: 10, scale: 2
+    t.decimal "monthly_membership_fee", precision: 10, scale: 2
     t.index ["forum_id", "name"], name: "index_chapters_on_forum_id_and_name", unique: true
     t.index ["forum_id"], name: "index_chapters_on_forum_id"
   end
@@ -297,6 +300,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_21_033400) do
     t.text "membership_rules"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.text "terms_and_conditions"
+    t.string "bank_name"
+    t.string "bank_account_holder"
+    t.string "bank_account_number"
+    t.string "bank_ifsc"
+    t.string "bank_branch"
+    t.string "upi_id"
     t.index ["forum_id"], name: "index_forum_settings_on_forum_id", unique: true
   end
 
@@ -312,6 +322,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_21_033400) do
     t.date "renews_on"
     t.bigint "business_plan_id"
     t.datetime "suspended_at"
+    t.string "gst_number"
+    t.text "address"
+    t.string "office"
     t.index ["business_plan_id"], name: "index_forums_on_business_plan_id"
     t.index ["plan_id"], name: "index_forums_on_plan_id"
     t.index ["slug"], name: "index_forums_on_slug", unique: true
@@ -331,11 +344,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_21_033400) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "share_token"
+    t.bigint "user_id"
     t.index ["coupon_id"], name: "index_invoices_on_coupon_id"
     t.index ["forum_id"], name: "index_invoices_on_forum_id"
     t.index ["invoice_number"], name: "index_invoices_on_invoice_number", unique: true
     t.index ["plan_id"], name: "index_invoices_on_plan_id"
     t.index ["share_token"], name: "index_invoices_on_share_token", unique: true
+    t.index ["user_id"], name: "index_invoices_on_user_id"
   end
 
   create_table "lead_taggings", force: :cascade do |t|
@@ -566,6 +581,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_21_033400) do
     t.bigint "default_plan_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.text "terms_and_conditions"
+    t.string "bank_name"
+    t.string "bank_account_holder"
+    t.string "bank_account_number"
+    t.string "bank_ifsc"
+    t.string "bank_branch"
+    t.string "upi_id"
     t.index ["default_plan_id"], name: "index_platform_settings_on_default_plan_id"
   end
 
@@ -916,6 +938,17 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_21_033400) do
     t.index ["member_id"], name: "index_weekly_presentations_on_member_id"
   end
 
+  create_table "whatsapp_templates", force: :cascade do |t|
+    t.bigint "forum_id"
+    t.string "key", null: false
+    t.text "body", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["forum_id", "key"], name: "index_whatsapp_templates_on_forum_id_and_key", unique: true, where: "(forum_id IS NOT NULL)"
+    t.index ["forum_id"], name: "index_whatsapp_templates_on_forum_id"
+    t.index ["key"], name: "index_whatsapp_templates_on_key_when_global", unique: true, where: "(forum_id IS NULL)"
+  end
+
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "announcements", "chapters"
@@ -949,6 +982,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_21_033400) do
   add_foreign_key "invoices", "coupons"
   add_foreign_key "invoices", "forums"
   add_foreign_key "invoices", "plans"
+  add_foreign_key "invoices", "users"
   add_foreign_key "lead_taggings", "leads"
   add_foreign_key "lead_taggings", "users"
   add_foreign_key "leads", "forums"
@@ -1006,4 +1040,5 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_21_033400) do
   add_foreign_key "weekly_presentations", "chapters"
   add_foreign_key "weekly_presentations", "meetings"
   add_foreign_key "weekly_presentations", "users", column: "member_id"
+  add_foreign_key "whatsapp_templates", "forums"
 end

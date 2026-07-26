@@ -34,7 +34,7 @@
       <div class="icon-bg gradient-blue"><i class="bi bi-arrow-repeat"></i></div>
       <div>
         <div class="stats-value h6 mb-0"><%= @member.renews_on&.strftime("%d %b %Y") || "&mdash;".html_safe %></div>
-        <div class="stats-label">Membership Renews</div>
+        <div class="stats-label"><%= @member.membership_expired? ? "Membership Expired" : "Membership Renews" %></div>
       </div>
     </div>
   </div>

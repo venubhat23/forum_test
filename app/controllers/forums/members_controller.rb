@@ -150,7 +150,8 @@ module Forums
 
     def renew
       authorize! :update, @member
-      @member.update!(renews_on: 1.year.from_now.to_date, membership_status: :active)
+      next_year = [ @member.membership_year.to_i, Date.current.year - 1 ].max + 1
+      @member.update!(membership_year: next_year, renews_on: Date.new(next_year, 12, 31), membership_status: :active)
       redirect_to forum_chapter_member_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: @member.id), notice: "Membership renewed until #{@member.renews_on.strftime('%d %b %Y')}."
     end
 

@@ -89,6 +89,12 @@ class User < ApplicationRecord
     membership_active? && (lifetime_member? || (renews_on.present? && renews_on >= Date.current))
   end
 
+  # Lifetime members never expire; everyone else (annual or monthly) is
+  # expired once their renews_on date has passed.
+  def membership_expired?
+    !lifetime_member? && renews_on.present? && renews_on < Date.current
+  end
+
   def suspended?
     suspended_at.present?
   end

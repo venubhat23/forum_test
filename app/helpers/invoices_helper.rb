@@ -55,10 +55,14 @@ module InvoicesHelper
   # Neither Krama Consultancy nor individual forums have an uploaded logo file
   # to put on an invoice document, so invoices carry this inline SVG monogram
   # instead of an <img> — crisp in print/PDF with no asset dependency.
-  def invoice_logo_svg(name, size: 64)
+  # `inverted: true` swaps to a white disc with gradient-filled initials, for
+  # use on top of a solid/gradient header instead of a plain background.
+  def invoice_logo_svg(name, size: 64, inverted: false)
     initials = name.to_s.split(/\s+/).reject(&:blank?).first(2).map { |w| w[0].upcase }.join
     initials = "?" if initials.blank?
     gradient_id = "invoiceLogoGradient#{size}#{initials.hash.abs}"
+    circle_fill = inverted ? "#ffffff" : "url(##{gradient_id})"
+    text_fill = inverted ? "url(##{gradient_id})" : "#ffffff"
 
     <<~SVG.html_safe
       <svg class="invoice-logo-mark" width="#{size}" height="#{size}" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="#{ERB::Util.html_escape(name)}">
@@ -68,8 +72,8 @@ module InvoicesHelper
             <stop offset="100%" stop-color="#8b5cf6"/>
           </linearGradient>
         </defs>
-        <circle cx="32" cy="32" r="31" fill="url(##{gradient_id})"/>
-        <text x="32" y="41" text-anchor="middle" font-family="Arial, sans-serif" font-size="#{initials.length > 1 ? 22 : 26}" font-weight="700" fill="#ffffff">#{ERB::Util.html_escape(initials)}</text>
+        <circle cx="32" cy="32" r="31" fill="#{circle_fill}"/>
+        <text x="32" y="41" text-anchor="middle" font-family="Arial, sans-serif" font-size="#{initials.length > 1 ? 22 : 26}" font-weight="700" fill="#{text_fill}">#{ERB::Util.html_escape(initials)}</text>
       </svg>
     SVG
   end

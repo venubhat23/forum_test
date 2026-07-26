@@ -149,12 +149,12 @@
                 <span class="badge badge-status-partial"><i class="bi bi-exclamation-triangle-fill me-1"></i>Partially Paid</span>
                 <div class="text-muted small mt-1">Balance: <%= number_to_currency(fee.balance_due) %></div>
                 <div class="text-muted small">
-                  <%= member.renews_on ? "Renews #{member.renews_on.strftime('%d %b %Y')}" : "Renewal not set" %>
+                  <%= renewal_status_text(member) %>
                 </div>
               <% else %>
                 <span class="badge badge-status-trial"><i class="bi bi-exclamation-circle-fill me-1"></i>Due</span>
                 <div class="text-muted small mt-1">
-                  <%= member.renews_on ? "Renews #{member.renews_on.strftime('%d %b %Y')}" : "Renewal not set" %>
+                  <%= renewal_status_text(member) %>
                 </div>
               <% end %>
             </td>

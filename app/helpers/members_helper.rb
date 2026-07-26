@@ -1,4 +1,14 @@
 module MembersHelper
+  # Renewal date chip text for a member row: "Renews ..." while current,
+  # flips to "Expired ..." once the date has passed (lifetime members never
+  # reach here since callers check lifetime_member? first).
+  def renewal_status_text(member)
+    return "Renewal not set" if member.renews_on.blank?
+
+    date_text = member.renews_on.strftime("%d %b %Y")
+    member.membership_expired? ? "Expired #{date_text}" : "Renews #{date_text}"
+  end
+
   # Builds a wa.me click-to-chat link that opens WhatsApp with a pre-filled
   # annual membership fee reminder for the given member.
   def whatsapp_fee_reminder_link(member, fee, forum)
