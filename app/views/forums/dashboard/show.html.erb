@@ -93,7 +93,7 @@
     <%= link_to "View Leads", forum_leads_path(forum_slug: @current_forum.slug), class: "btn btn-sm btn-outline-primary" %>
   </div>
   <div class="row g-3 mb-4">
-    <div class="col-6 col-lg-3">
+    <div class="col-6 col-lg">
       <div class="mini-stat-card">
         <div>
           <div class="mini-stat-label"><%= @lead_stats_scope == :forum ? "Total Leads" : "Created by You" %></div>
@@ -102,7 +102,7 @@
         <div class="mini-stat-icon mini-stat-icon-primary"><i class="bi bi-lightbulb"></i></div>
       </div>
     </div>
-    <div class="col-6 col-lg-3">
+    <div class="col-6 col-lg">
       <div class="mini-stat-card">
         <div>
           <div class="mini-stat-label"><%= @lead_stats_scope == :forum ? "Requested" : "Requests for You" %></div>
@@ -111,7 +111,7 @@
         <div class="mini-stat-icon mini-stat-icon-warning"><i class="bi bi-hourglass-split"></i></div>
       </div>
     </div>
-    <div class="col-6 col-lg-3">
+    <div class="col-6 col-lg">
       <div class="mini-stat-card">
         <div>
           <div class="mini-stat-label">Converted</div>
@@ -120,13 +120,22 @@
         <div class="mini-stat-icon mini-stat-icon-success"><i class="bi bi-trophy"></i></div>
       </div>
     </div>
-    <div class="col-6 col-lg-3">
+    <div class="col-6 col-lg">
       <div class="mini-stat-card">
         <div>
-          <div class="mini-stat-label">Thanksgiving Slips</div>
-          <div class="mini-stat-value text-info"><%= @thanksgiving_slips_count %></div>
+          <div class="mini-stat-label">Thanksgiving Slips Received</div>
+          <div class="mini-stat-value text-info"><%= @thanksgiving_slips_received_count %></div>
         </div>
         <div class="mini-stat-icon mini-stat-icon-info"><i class="bi bi-gift"></i></div>
+      </div>
+    </div>
+    <div class="col-6 col-lg">
+      <div class="mini-stat-card">
+        <div>
+          <div class="mini-stat-label">Thanksgiving Slips Created</div>
+          <div class="mini-stat-value text-info"><%= @thanksgiving_slips_given_count %></div>
+        </div>
+        <div class="mini-stat-icon mini-stat-icon-info"><i class="bi bi-gift-fill"></i></div>
       </div>
     </div>
   </div>

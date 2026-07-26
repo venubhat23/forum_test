@@ -24,13 +24,17 @@
             <%= f.datetime_field :scheduled_at, class: "form-control", required: true %>
           </div>
           <div class="mb-3">
+            <%= f.label :venue, "Venue", class: "form-label" %>
+            <%= f.text_field :venue, class: "form-control", placeholder: "e.g. Office, Café, Video call link" %>
+          </div>
+          <div class="mb-3">
             <%= f.label :fee_amount, "Meeting Fee (optional)", class: "form-label" %>
             <%= f.number_field :fee_amount, step: "0.01", min: "0.01", class: "form-control" %>
             <div class="form-text">Leave blank for no fee. Members with an active annual membership are never charged, regardless of this amount.</div>
           </div>
           <div class="mb-4">
-            <%= f.label :notes, class: "form-label" %>
-            <%= f.text_area :notes, class: "form-control", rows: 3 %>
+            <%= f.label :agenda, "Agenda", class: "form-label" %>
+            <%= f.text_area :agenda, class: "form-control", rows: 3, placeholder: "What would you like to discuss?" %>
           </div>
           <div class="d-flex flex-wrap gap-2">
             <%= f.submit "Request Meeting", class: "btn btn-primary btn-lg" %>

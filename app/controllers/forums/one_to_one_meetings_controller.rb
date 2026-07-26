@@ -1,6 +1,8 @@
 module Forums
   class OneToOneMeetingsController < BaseController
-    before_action :set_meeting, only: [ :show, :edit, :update, :destroy, :accept, :reject, :complete ]
+    include OneToOneMeetingsHelper
+
+    before_action :set_meeting, only: [ :show, :edit, :update, :destroy, :accept, :reject, :complete, :add_note, :thank ]
 
     def index
       authorize! :read, OneToOneMeeting
@@ -69,9 +71,36 @@ module Forums
     end
 
     def complete
-      authorize! :update, @meeting
+      authorize! :complete, @meeting
       @meeting.update!(status: :completed)
       redirect_to forum_one_to_one_meeting_path(forum_slug: @current_forum.slug, id: @meeting.id), notice: "Meeting marked completed."
+    end
+
+    def add_note
+      authorize! :complete, @meeting
+      if @meeting.update(note_params)
+        redirect_to forum_one_to_one_meeting_path(forum_slug: @current_forum.slug, id: @meeting.id), notice: "Meeting notes saved."
+      else
+        redirect_to forum_one_to_one_meeting_path(forum_slug: @current_forum.slug, id: @meeting.id), alert: @meeting.errors.full_messages.to_sentence
+      end
+    end
+
+    def thank
+      authorize! :thank, @meeting
+      unless @meeting.completed?
+        return redirect_to forum_one_to_one_meeting_path(forum_slug: @current_forum.slug, id: @meeting.id), alert: "Mark the meeting completed before sending a thank-you."
+      end
+      if @meeting.notes.blank?
+        return redirect_to forum_one_to_one_meeting_path(forum_slug: @current_forum.slug, id: @meeting.id), alert: "Add your meeting notes before sending a thank-you."
+      end
+
+      link = whatsapp_one_to_one_thankyou_link(@meeting, current_user)
+      if link.blank?
+        redirect_to forum_one_to_one_meeting_path(forum_slug: @current_forum.slug, id: @meeting.id), alert: "No phone number on file to send a thank-you."
+      else
+        @meeting.update!(thanked_at: Time.current)
+        redirect_to link, allow_other_host: true
+      end
     end
 
     private
@@ -81,7 +110,11 @@ module Forums
     end
 
     def meeting_params
-      params.require(:one_to_one_meeting).permit(:requester_id, :requested_with_id, :scheduled_at, :notes, :follow_up_on, :fee_amount)
+      params.require(:one_to_one_meeting).permit(:requester_id, :requested_with_id, :scheduled_at, :venue, :agenda, :notes, :follow_up_on, :fee_amount)
+    end
+
+    def note_params
+      params.require(:one_to_one_meeting).permit(:notes)
     end
   end
 end

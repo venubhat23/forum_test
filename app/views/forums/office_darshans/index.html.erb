@@ -65,7 +65,8 @@
       <thead>
         <tr>
           <th>Host</th>
-          <th>Visitor</th>
+          <th>Invited</th>
+          <th>Coming / Total</th>
           <th>Scheduled</th>
           <th>Status</th>
           <th></th>
@@ -80,7 +81,16 @@
                 <span class="fw-semibold"><%= d.host.display_name %></span>
               </div>
             </td>
-            <td><%= d.visitor.display_name %></td>
+            <td>
+              <% if d.scope_chapter? %>
+                <span class="badge bg-primary-subtle text-primary-emphasis"><i class="bi bi-diagram-3 me-1"></i><%= d.chapter&.name || "Chapter" %></span>
+              <% elsif d.scope_forum_wide? %>
+                <span class="badge bg-primary-subtle text-primary-emphasis"><i class="bi bi-building me-1"></i>Entire Forum</span>
+              <% else %>
+                <%= d.visitor&.display_name %>
+              <% end %>
+            </td>
+            <td><%= d.attendances.any? ? "#{d.coming_count} / #{d.attendances.size}" : "—" %></td>
             <td><%= d.scheduled_at.strftime("%d %b %Y %H:%M") %></td>
             <td><span class="badge bg-secondary"><%= d.status.titleize %></span></td>
             <td class="text-end">
@@ -98,7 +108,7 @@
           </tr>
         <% end %>
         <% if @darshans.empty? %>
-          <tr><td colspan="5" class="text-center text-muted py-4">No office darshan visits yet.</td></tr>
+          <tr><td colspan="6" class="text-center text-muted py-4">No office darshan visits yet.</td></tr>
         <% end %>
       </tbody>
     </table>

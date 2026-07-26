@@ -16,3 +16,6 @@ production:
   award_badges:
     class: AwardBadgesJob
     schedule: "0 2 1 * *"
+  office_darshan_reminders:
+    class: OfficeDarshanReminderJob
+    schedule: every day at 8am

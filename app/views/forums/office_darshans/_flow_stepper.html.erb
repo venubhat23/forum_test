@@ -1,0 +1,13 @@
+<%# locals: darshan %>
+<% steps = [ [ "Invited", "bi-send" ], [ "RSVP", "bi-people" ], [ "Scheduled", "bi-calendar-check" ], [ "Completed", "bi-trophy" ] ] %>
+<% current_step = { "invited" => 2, "scheduled" => 3, "completed" => 5, "cancelled" => 0, "accepted" => 2, "declined" => 2 }.fetch(darshan.status, 1) %>
+<div class="lead-stage-track mb-4">
+  <% steps.each_with_index do |(name, icon), index| %>
+    <% position = index + 1 %>
+    <% state = position < current_step ? "done" : (position == current_step ? "active" : "upcoming") %>
+    <div class="lead-stage-step <%= "lead-stage-step-#{state}" %>">
+      <div class="lead-stage-dot"><i class="bi <%= state == "done" ? "bi-check-lg" : icon %>"></i></div>
+      <div class="lead-stage-name"><%= name %></div>
+    </div>
+  <% end %>
+</div>

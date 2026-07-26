@@ -1,0 +1,436 @@
+<%# Shared invoice document look, rendered identically from the public share
+    link, the super admin invoice page, and the forum admin invoice page.
+    Every rule is scoped under .invoice-doc (and prefixed) so it can safely sit
+    inside a Bootstrap admin page without leaking onto .card/.table/.btn there. %>
+<style>
+  .invoice-doc, .invoice-doc *, .invoice-doc *::before, .invoice-doc *::after { box-sizing: border-box; }
+  .invoice-doc {
+    --brand-1: #3b82f6; --brand-2: #8b5cf6; --brand-deep: #4c1d95;
+    --ink: #1e293b; --muted: #64748b; --line: #e2e8f0; --panel: #f8fafc;
+    --success: #059669; --success-bg: rgba(5,150,105,0.08); --success-line: rgba(5,150,105,0.22);
+    --warning: #d97706; --warning-bg: rgba(217,119,6,0.08);
+    --danger: #dc2626; --danger-bg: rgba(220,38,38,0.06); --danger-line: rgba(220,38,38,0.18);
+    max-width: 820px; margin: 0 auto; background: white; border-radius: 18px; overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 20px 48px rgba(30,27,75,0.12);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+
+  /* Header */
+  .invoice-doc .invoice-header { background: linear-gradient(135deg, var(--brand-deep), #4338ca, var(--brand-1)); color: white; padding: 28px 32px; position: relative; overflow: hidden; }
+  .invoice-doc .invoice-header::after {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background: radial-gradient(circle at 85% 10%, rgba(255,255,255,0.16), transparent 55%);
+  }
+  .invoice-doc .invoice-header-top { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; position: relative; z-index: 1; }
+  .invoice-doc .invoice-header-brand { display: flex; align-items: center; gap: 14px; }
+  .invoice-doc .invoice-logo-mark { flex-shrink: 0; }
+  .invoice-doc .invoice-brand { font-size: 22px; font-weight: 800; background: none; -webkit-background-clip: initial; background-clip: initial; color: white; }
+  .invoice-doc .invoice-brand-sub { color: rgba(255,255,255,0.8); font-size: 13px; margin-top: 2px; }
+  .invoice-doc .invoice-header-right { text-align: right; }
+  .invoice-doc .invoice-pill {
+    display: inline-block; padding: 4px 14px; border-radius: 999px; background: rgba(255,255,255,0.18);
+    font-size: 11px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px;
+  }
+  .invoice-doc .invoice-number { font-size: 20px; font-weight: 800; letter-spacing: 0.02em; }
+  .invoice-doc .invoice-header-status {
+    display: inline-block; margin-top: 10px; padding: 6px 16px; border-radius: 999px; background: rgba(255,255,255,0.92);
+    font-size: 11px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase;
+  }
+  .invoice-doc .invoice-header-status.status-paid { color: var(--success); }
+  .invoice-doc .invoice-header-status.status-pending, .invoice-doc .invoice-header-status.status-draft { color: var(--brand-2); }
+  .invoice-doc .invoice-header-status.status-overdue { color: var(--danger); }
+  .invoice-doc .invoice-header-status.status-cancelled { color: var(--muted); }
+  .invoice-doc .invoice-header-status.status-partially_paid { color: var(--warning); }
+
+  .invoice-doc .invoice-body { padding: 28px 32px 36px; }
+
+  /* Stat cards */
+  .invoice-doc .invoice-stat-cards { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 24px; }
+  .invoice-doc .invoice-stat-card { flex: 1 1 180px; display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-radius: 12px; border: 1px solid var(--line); background: var(--panel); }
+  .invoice-doc .invoice-stat-card.is-total { background: rgba(139,92,246,0.06); border-color: rgba(139,92,246,0.18); }
+  .invoice-doc .invoice-stat-card.is-paid { background: var(--success-bg); border-color: var(--success-line); }
+  .invoice-doc .invoice-stat-card.is-balance { background: var(--warning-bg); border-color: rgba(217,119,6,0.2); }
+  .invoice-doc .invoice-stat-icon { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 17px; flex-shrink: 0; color: white; }
+  .invoice-doc .invoice-stat-card.is-total .invoice-stat-icon { background: linear-gradient(135deg, var(--brand-deep), var(--brand-1)); }
+  .invoice-doc .invoice-stat-card.is-paid .invoice-stat-icon { background: var(--success); }
+  .invoice-doc .invoice-stat-card.is-balance .invoice-stat-icon { background: var(--warning); }
+  .invoice-doc .invoice-stat-label { text-transform: uppercase; font-size: 10px; font-weight: 700; letter-spacing: 0.05em; color: var(--muted); }
+  .invoice-doc .invoice-stat-value { font-size: 19px; font-weight: 800; margin-top: 1px; }
+
+  /* Panels */
+  .invoice-doc .invoice-panel { border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; background: white; }
+  .invoice-doc .invoice-panel-title { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink); margin-bottom: 12px; }
+  .invoice-doc .invoice-panel-icon { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; background: rgba(139,92,246,0.12); flex-shrink: 0; }
+
+  .invoice-doc .invoice-two-col { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 16px; align-items: stretch; }
+  .invoice-doc .invoice-two-col > * { flex: 1 1 260px; }
+  .invoice-doc .invoice-stack-col { display: flex; flex-direction: column; gap: 16px; }
+  .invoice-doc .invoice-stack-col .invoice-panel { flex: 1; }
+
+  .invoice-doc .invoice-billed-name { font-size: 16px; font-weight: 800; margin-bottom: 4px; }
+  .invoice-doc .invoice-billed-line { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  .invoice-doc .invoice-detail-row { display: flex; justify-content: space-between; gap: 12px; padding: 6px 0; font-size: 13px; border-bottom: 1px dashed var(--line); }
+  .invoice-doc .invoice-detail-row:last-child { border-bottom: none; }
+  .invoice-doc .invoice-detail-label { color: var(--muted); display: flex; align-items: center; gap: 6px; }
+  .invoice-doc .invoice-detail-value { font-weight: 700; text-align: right; }
+  .invoice-doc .invoice-detail-value.is-overdue { color: var(--danger); }
+
+  /* Items table */
+  .invoice-doc .invoice-items-table { width: 100%; border-collapse: collapse; margin-bottom: 4px; }
+  .invoice-doc .invoice-items-table thead th {
+    text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: white;
+    background: linear-gradient(135deg, var(--brand-deep), var(--brand-1)); padding: 11px 14px; font-weight: 700; border: none;
+  }
+  .invoice-doc .invoice-items-table thead th:first-child { border-radius: 8px 0 0 8px; }
+  .invoice-doc .invoice-items-table thead th:last-child { border-radius: 0 8px 8px 0; }
+  .invoice-doc .invoice-items-table thead th.num, .invoice-doc .invoice-items-table tbody td.amount, .invoice-doc .invoice-items-table tfoot td.amount { text-align: right; }
+  .invoice-doc .invoice-items-table tbody td { padding: 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  .invoice-doc .invoice-items-table tbody tr:last-child td { border-bottom: none; }
+  .invoice-doc .invoice-item-desc { font-weight: 700; }
+  .invoice-doc .invoice-item-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .invoice-doc .invoice-items-table tfoot td { padding: 6px 14px; border: none; }
+  .invoice-doc .invoice-items-table tfoot td:first-child { text-align: right; color: var(--muted); font-size: 13px; }
+  .invoice-doc .invoice-items-table .invoice-total-row td { font-weight: 800; font-size: 18px; padding-top: 12px; color: var(--brand-deep); background: none; }
+  .invoice-doc .invoice-items-table .invoice-total-row td:first-child { color: var(--ink); font-size: 13px; }
+  .invoice-doc .invoice-items-table .invoice-paid-row td { color: var(--success); font-size: 13px; }
+  .invoice-doc .invoice-items-table .invoice-balance-row td { font-weight: 800; padding-top: 6px; border-top: 1px solid var(--line); }
+
+  .invoice-doc .invoice-amount-words { display: flex; align-items: center; gap: 10px; }
+  .invoice-doc .invoice-amount-words-value { font-weight: 700; font-size: 13px; }
+
+  /* Scan & pay */
+  .invoice-doc .invoice-qr-panel { display: flex; align-items: center; gap: 16px; background: rgba(139,92,246,0.05); border-color: rgba(139,92,246,0.18); }
+  .invoice-doc .invoice-qr-frame { background: white; border-radius: 10px; padding: 8px; border: 1px solid var(--line); line-height: 0; flex-shrink: 0; }
+  .invoice-doc .invoice-qr-frame svg { display: block; }
+  .invoice-doc .invoice-upi-id { font-weight: 800; color: var(--brand-deep); font-size: 14px; }
+  .invoice-doc .invoice-upi-note { font-size: 12px; color: var(--muted); margin: 4px 0 10px; }
+  .invoice-doc .invoice-upi-amount-pill { display: inline-block; padding: 5px 12px; border-radius: 999px; background: rgba(139,92,246,0.12); color: var(--brand-deep); font-size: 12px; font-weight: 700; }
+  .invoice-doc .invoice-pay-app-badges { display: flex; gap: 6px; margin-top: 12px; flex-wrap: wrap; }
+  .invoice-doc .invoice-pay-app-badge { font-size: 10px; font-weight: 700; padding: 4px 8px; border-radius: 6px; background: white; border: 1px solid var(--line); color: var(--muted); }
+
+  /* Timeline */
+  .invoice-doc .invoice-timeline { display: flex; align-items: flex-start; justify-content: space-between; padding-top: 4px; }
+  .invoice-doc .invoice-timeline-step { flex: 1; text-align: center; position: relative; }
+  .invoice-doc .invoice-timeline-dot { width: 14px; height: 14px; border-radius: 50%; margin: 0 auto 8px; border: 3px solid var(--line); background: white; }
+  .invoice-doc .invoice-timeline-step.is-done .invoice-timeline-dot { background: var(--brand-2); border-color: var(--brand-2); }
+  .invoice-doc .invoice-timeline-step.is-current .invoice-timeline-dot { background: var(--warning); border-color: var(--warning); }
+  .invoice-doc .invoice-timeline-step.is-paid .invoice-timeline-dot { background: var(--success); border-color: var(--success); }
+  .invoice-doc .invoice-timeline-step.is-muted .invoice-timeline-dot { background: var(--panel); border-color: var(--line); }
+  .invoice-doc .invoice-timeline-line { position: absolute; top: 6px; left: -50%; width: 100%; height: 2px; background: var(--line); z-index: -1; }
+  .invoice-doc .invoice-timeline-line.is-filled { background: var(--brand-2); }
+  .invoice-doc .invoice-timeline-step:first-child .invoice-timeline-line { display: none; }
+  .invoice-doc .invoice-timeline-label { font-size: 11px; font-weight: 700; color: var(--ink); }
+  .invoice-doc .invoice-timeline-date { font-size: 11px; color: var(--muted); margin-top: 1px; }
+
+  /* Status alert */
+  .invoice-doc .invoice-status-alert { border-radius: 12px; padding: 16px 18px; display: flex; flex-direction: column; justify-content: center; height: 100%; }
+  .invoice-doc .invoice-status-alert.is-pending { background: var(--danger-bg); border: 1px solid var(--danger-line); }
+  .invoice-doc .invoice-status-alert.is-paid { background: var(--success-bg); border: 1px solid var(--success-line); }
+  .invoice-doc .invoice-status-alert.is-cancelled { background: var(--panel); border: 1px solid var(--line); }
+  .invoice-doc .invoice-status-alert-title { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 14px; margin-bottom: 4px; }
+  .invoice-doc .invoice-status-alert.is-pending .invoice-status-alert-title { color: var(--danger); }
+  .invoice-doc .invoice-status-alert.is-paid .invoice-status-alert-title { color: var(--success); }
+  .invoice-doc .invoice-status-alert.is-cancelled .invoice-status-alert-title { color: var(--muted); }
+  .invoice-doc .invoice-status-alert-body { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+  .invoice-doc .invoice-status-alert-amount-label { font-size: 10px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); }
+  .invoice-doc .invoice-status-alert-amount { font-size: 22px; font-weight: 800; }
+  .invoice-doc .invoice-status-alert.is-pending .invoice-status-alert-amount { color: var(--danger); }
+  .invoice-doc .invoice-status-alert.is-paid .invoice-status-alert-amount { color: var(--success); }
+
+  /* Payment history */
+  .invoice-doc .invoice-payments-title { font-size: 13px; font-weight: 800; margin: 0 0 8px; color: var(--ink); }
+  .invoice-doc .invoice-payments-table { width: 100%; border-collapse: collapse; }
+  .invoice-doc .invoice-payments-table td, .invoice-doc .invoice-payments-table th { font-size: 13px; padding: 8px 4px; text-align: left; border-bottom: 1px solid var(--line); }
+  .invoice-doc .invoice-payments-table th { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; }
+  .invoice-doc .invoice-payments-table td.amount, .invoice-doc .invoice-payments-table th.num { text-align: right; }
+
+  /* Terms */
+  .invoice-doc .invoice-terms-list { list-style: none; margin: 0; padding: 0; font-size: 12px; color: var(--muted); }
+  .invoice-doc .invoice-terms-list li { display: flex; gap: 8px; padding: 3px 0; }
+  .invoice-doc .invoice-terms-list li::before { content: "\2714"; color: var(--success); font-weight: 800; flex-shrink: 0; }
+
+  /* Signatory */
+  .invoice-doc .invoice-signatory-panel { text-align: center; background: var(--success-bg); border-color: var(--success-line); }
+  .invoice-doc .invoice-signatory-check { color: var(--success); font-size: 22px; margin-bottom: 4px; }
+  .invoice-doc .invoice-signatory-name { font-size: 15px; font-weight: 800; color: var(--success); margin: 6px 0 4px; font-style: italic; }
+  .invoice-doc .invoice-signatory-note { font-size: 11px; color: var(--muted); }
+
+  /* Footer */
+  .invoice-doc .invoice-footer { background: linear-gradient(135deg, var(--brand-deep), var(--brand-1)); color: rgba(255,255,255,0.92); padding: 18px 32px; text-align: center; font-size: 12px; }
+  .invoice-doc .invoice-footer-contact { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin-bottom: 8px; font-weight: 600; }
+  .invoice-doc .invoice-footer-thanks { color: rgba(255,255,255,0.78); font-size: 11px; }
+
+  @media (max-width: 560px) {
+    .invoice-doc .invoice-body { padding: 20px; }
+    .invoice-doc .invoice-header { padding: 22px; }
+    .invoice-doc .invoice-header-top { flex-direction: column; }
+    .invoice-doc .invoice-header-right { text-align: left; }
+    .invoice-doc .invoice-two-col { flex-direction: column; }
+    .invoice-doc .invoice-qr-panel { flex-direction: column; text-align: center; }
+    .invoice-doc .invoice-footer-contact { flex-direction: column; gap: 4px; }
+  }
+  @media print {
+    .invoice-doc { box-shadow: none; border-radius: 0; max-width: none; }
+  }
+</style>
+
+<div class="invoice-doc">
+  <div class="invoice-header">
+    <div class="invoice-header-top">
+      <div class="invoice-header-brand">
+        <%= invoice_logo_svg(invoice_brand_name(@invoice), size: 56, inverted: true) %>
+        <div>
+          <div class="invoice-brand"><%= invoice_brand_name(@invoice) %></div>
+          <div class="invoice-brand-sub"><%= invoice_brand_subtitle(@invoice) %></div>
+        </div>
+      </div>
+      <div class="invoice-header-right">
+        <div class="invoice-pill">Invoice</div>
+        <div class="invoice-number">#<%= @invoice.invoice_number %></div>
+        <div><span class="invoice-header-status status-<%= @invoice.status %>"><%= @invoice.status.titleize %></span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="invoice-body">
+    <div class="invoice-stat-cards">
+      <div class="invoice-stat-card is-total">
+        <div class="invoice-stat-icon">&#128176;</div>
+        <div>
+          <div class="invoice-stat-label">Amount</div>
+          <div class="invoice-stat-value">&#8377;<%= number_with_delimiter(@invoice.amount.to_i) %></div>
+        </div>
+      </div>
+      <div class="invoice-stat-card is-paid">
+        <div class="invoice-stat-icon">&#10004;</div>
+        <div>
+          <div class="invoice-stat-label">Paid</div>
+          <div class="invoice-stat-value">&#8377;<%= number_with_delimiter(@invoice.amount_paid.to_i) %></div>
+        </div>
+      </div>
+      <div class="invoice-stat-card is-balance">
+        <div class="invoice-stat-icon">&#8987;</div>
+        <div>
+          <div class="invoice-stat-label">Balance Due</div>
+          <div class="invoice-stat-value">&#8377;<%= number_with_delimiter(@invoice.balance_due.to_i) %></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="invoice-two-col">
+      <div class="invoice-panel">
+        <div class="invoice-panel-title"><span class="invoice-panel-icon">&#127970;</span> Billed To</div>
+        <div class="invoice-billed-name"><%= @invoice.billed_to_name %></div>
+        <% if @invoice.member_invoice? %>
+          <div class="invoice-billed-line"><%= @invoice.forum.name %></div>
+          <% if @invoice.user&.chapter %><div class="invoice-billed-line">Chapter: <%= @invoice.user.chapter.name %></div><% end %>
+          <% if @invoice.user&.email.present? %><div class="invoice-billed-line"><%= @invoice.user.email %></div><% end %>
+          <% if @invoice.user&.phone.present? %><div class="invoice-billed-line"><%= @invoice.user.phone %></div><% end %>
+        <% else %>
+          <div class="invoice-billed-line">GST: <%= @invoice.forum.gst_number.presence || "Not provided" %></div>
+          <div class="invoice-billed-line">Office: <%= @invoice.forum.office.presence || "Not provided" %></div>
+          <div class="invoice-billed-line">Address: <%= @invoice.forum.address.presence || "Not provided" %></div>
+        <% end %>
+      </div>
+
+      <div class="invoice-panel">
+        <div class="invoice-panel-title"><span class="invoice-panel-icon">&#128196;</span> Invoice Details</div>
+        <div class="invoice-detail-row"><div class="invoice-detail-label">Invoice No.</div><div class="invoice-detail-value"><%= @invoice.invoice_number %></div></div>
+        <div class="invoice-detail-row"><div class="invoice-detail-label">Issue Date</div><div class="invoice-detail-value"><%= @invoice.created_at.strftime("%d %b %Y") %></div></div>
+        <% overdue_display = @invoice.due_date < Date.current && !@invoice.paid? && !@invoice.cancelled? %>
+        <div class="invoice-detail-row">
+          <div class="invoice-detail-label">Due Date</div>
+          <div class="invoice-detail-value<%= " is-overdue" if overdue_display %>"><%= @invoice.due_date.strftime("%d %b %Y") %></div>
+        </div>
+        <% if @invoice.plan %>
+          <div class="invoice-detail-row"><div class="invoice-detail-label">Plan</div><div class="invoice-detail-value"><%= @invoice.plan.name %></div></div>
+        <% end %>
+        <div class="invoice-detail-row"><div class="invoice-detail-label">Status</div><div class="invoice-detail-value"><%= @invoice.status.titleize %></div></div>
+      </div>
+    </div>
+
+    <table class="invoice-items-table">
+      <thead>
+        <tr><th>Description</th><th class="num">Qty</th><th class="num">Unit Price</th><th class="num">Amount</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <div class="invoice-item-desc"><%= @invoice.description.presence || "#{@invoice.plan&.name || 'Subscription'} charges" %></div>
+            <% if @invoice.coupon %>
+              <div class="invoice-item-sub">Coupon applied: <%= @invoice.coupon.code %></div>
+            <% end %>
+          </td>
+          <td class="amount">1</td>
+          <td class="amount">&#8377;<%= number_with_delimiter(@invoice.amount.to_i) %></td>
+          <td class="amount">&#8377;<%= number_with_delimiter(@invoice.amount.to_i) %></td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr class="invoice-total-row"><td colspan="3">Total</td><td class="amount">&#8377;<%= number_with_delimiter(@invoice.amount.to_i) %></td></tr>
+        <% if @invoice.amount_paid.positive? %>
+          <tr class="invoice-paid-row"><td colspan="3">Paid</td><td class="amount">&#8211; &#8377;<%= number_with_delimiter(@invoice.amount_paid.to_i) %></td></tr>
+          <tr class="invoice-balance-row"><td colspan="3">Balance Due</td><td class="amount">&#8377;<%= number_with_delimiter(@invoice.balance_due.to_i) %></td></tr>
+        <% end %>
+      </tfoot>
+    </table>
+
+    <div class="invoice-two-col" style="margin-top: 20px;">
+      <div class="invoice-stack-col">
+        <div class="invoice-panel invoice-amount-words">
+          <div class="invoice-panel-icon">&#128288;</div>
+          <div>
+            <div class="invoice-panel-title" style="margin-bottom: 2px;">Amount in Words</div>
+            <div class="invoice-amount-words-value"><%= invoice_amount_in_words(@invoice.amount) %></div>
+          </div>
+        </div>
+
+        <% if @setting.bank_details_present? %>
+          <div class="invoice-panel">
+            <div class="invoice-panel-title"><span class="invoice-panel-icon">&#127974;</span> Payment Details</div>
+            <% if @setting.bank_account_holder.present? %><div class="invoice-detail-row"><div class="invoice-detail-label">Account Holder</div><div class="invoice-detail-value"><%= @setting.bank_account_holder %></div></div><% end %>
+            <% if @setting.bank_name.present? %><div class="invoice-detail-row"><div class="invoice-detail-label">Bank</div><div class="invoice-detail-value"><%= @setting.bank_name %></div></div><% end %>
+            <% if @setting.bank_account_number.present? %><div class="invoice-detail-row"><div class="invoice-detail-label">A/C No.</div><div class="invoice-detail-value"><%= @setting.bank_account_number %></div></div><% end %>
+            <% if @setting.bank_ifsc.present? %><div class="invoice-detail-row"><div class="invoice-detail-label">IFSC Code</div><div class="invoice-detail-value"><%= @setting.bank_ifsc %></div></div><% end %>
+            <% if @setting.bank_branch.present? %><div class="invoice-detail-row"><div class="invoice-detail-label">Branch</div><div class="invoice-detail-value"><%= @setting.bank_branch %></div></div><% end %>
+          </div>
+        <% end %>
+      </div>
+
+      <% if @setting.upi_id.present? %>
+        <div class="invoice-panel invoice-qr-panel">
+          <div class="invoice-qr-frame">
+            <%= upi_qr_code_svg(@setting.upi_id, payee_name: @setting.bank_account_holder.presence || invoice_brand_name(@invoice), amount: @invoice.balance_due, invoice_number: @invoice.invoice_number, size: 4) %>
+          </div>
+          <div>
+            <div class="invoice-panel-title"><span class="invoice-panel-icon">&#128241;</span> Scan &amp; Pay</div>
+            <div class="invoice-upi-id"><%= @setting.upi_id %></div>
+            <div class="invoice-upi-note">Scan QR code to pay</div>
+            <div class="invoice-upi-amount-pill">Amount: &#8377;<%= number_with_delimiter(@invoice.balance_due.to_i) %></div>
+            <div class="invoice-pay-app-badges">
+              <span class="invoice-pay-app-badge">UPI</span>
+              <span class="invoice-pay-app-badge">Google Pay</span>
+              <span class="invoice-pay-app-badge">PhonePe</span>
+              <span class="invoice-pay-app-badge">Paytm</span>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="invoice-two-col">
+      <div class="invoice-panel">
+        <div class="invoice-panel-title"><span class="invoice-panel-icon">&#128337;</span> Invoice Timeline</div>
+        <div class="invoice-timeline">
+          <div class="invoice-timeline-step is-done">
+            <div class="invoice-timeline-dot"></div>
+            <div class="invoice-timeline-label">Invoice Created</div>
+            <div class="invoice-timeline-date"><%= @invoice.created_at.strftime("%d %b %Y") %></div>
+          </div>
+          <div class="invoice-timeline-step <%= @invoice.paid? ? 'is-done' : 'is-current' %>">
+            <div class="invoice-timeline-line is-filled"></div>
+            <div class="invoice-timeline-dot"></div>
+            <div class="invoice-timeline-label">Due Date</div>
+            <div class="invoice-timeline-date"><%= @invoice.due_date.strftime("%d %b %Y") %></div>
+          </div>
+          <% if @invoice.paid? %>
+            <div class="invoice-timeline-step is-paid">
+              <div class="invoice-timeline-line is-filled"></div>
+              <div class="invoice-timeline-dot"></div>
+              <div class="invoice-timeline-label">Paid</div>
+              <div class="invoice-timeline-date"><%= @invoice.paid_on&.strftime("%d %b %Y") %></div>
+            </div>
+          <% elsif @invoice.cancelled? %>
+            <div class="invoice-timeline-step is-muted">
+              <div class="invoice-timeline-line"></div>
+              <div class="invoice-timeline-dot"></div>
+              <div class="invoice-timeline-label">Cancelled</div>
+            </div>
+          <% else %>
+            <div class="invoice-timeline-step is-muted">
+              <div class="invoice-timeline-line"></div>
+              <div class="invoice-timeline-dot"></div>
+              <div class="invoice-timeline-label">Payment Pending</div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <% if @invoice.paid? %>
+        <div class="invoice-status-alert is-paid">
+          <div class="invoice-status-alert-title">&#9989; Payment Received</div>
+          <div class="invoice-status-alert-body">Thank you! This invoice has been paid in full<% if @invoice.paid_on %> on <%= @invoice.paid_on.strftime("%d %b %Y") %><% end %>.</div>
+        </div>
+      <% elsif @invoice.cancelled? %>
+        <div class="invoice-status-alert is-cancelled">
+          <div class="invoice-status-alert-title">This invoice has been cancelled</div>
+        </div>
+      <% else %>
+        <div class="invoice-status-alert is-pending">
+          <div class="invoice-status-alert-title">&#9888; <%= overdue_display ? "Payment Overdue" : "Payment Pending" %></div>
+          <div class="invoice-status-alert-body">
+            <% if overdue_display %>
+              This invoice is past its due date. Please complete payment of the balance due below as soon as possible.
+            <% else %>
+              Please complete payment of the balance due below before the due date.
+            <% end %>
+          </div>
+          <div class="invoice-status-alert-amount-label">Outstanding Amount</div>
+          <div class="invoice-status-alert-amount">&#8377;<%= number_with_delimiter(@invoice.balance_due.to_i) %></div>
+        </div>
+      <% end %>
+    </div>
+
+    <% if @invoice.payments.any? %>
+      <div class="invoice-panel" style="margin-bottom: 16px;">
+        <div class="invoice-payments-title">Payment History</div>
+        <table class="invoice-payments-table">
+          <thead>
+            <tr><th>Date</th><th>Method</th><th class="num">Amount</th></tr>
+          </thead>
+          <tbody>
+            <% @invoice.payments.order(:paid_on).each do |payment| %>
+              <tr>
+                <td><%= payment.paid_on.strftime("%d %b %Y") %></td>
+                <td><%= payment.payment_method.titleize %></td>
+                <td class="amount">&#8377;<%= number_with_delimiter(payment.amount.to_i) %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% end %>
+
+    <div class="invoice-two-col">
+      <% if @setting.terms_and_conditions.present? %>
+        <div class="invoice-panel">
+          <div class="invoice-panel-title"><span class="invoice-panel-icon">&#128203;</span> Terms &amp; Conditions</div>
+          <ul class="invoice-terms-list">
+            <% @setting.terms_and_conditions.to_s.split("\n").reject(&:blank?).each do |line| %>
+              <li><%= line.strip %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <div class="invoice-panel invoice-signatory-panel">
+        <div class="invoice-signatory-check">&#9989;</div>
+        <div class="invoice-panel-title" style="justify-content: center; margin-bottom: 0;">Authorised Signatory</div>
+        <div class="invoice-signatory-name"><%= invoice_brand_name(@invoice) %></div>
+        <div class="invoice-signatory-note">Computer generated invoice &mdash; no signature required</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="invoice-footer">
+    <div class="invoice-footer-contact">
+      <span><%= invoice_brand_name(@invoice) %></span>
+      <% if !@invoice.member_invoice? && @setting.support_email.present? %>
+        <span>&#9993; <%= @setting.support_email %></span>
+      <% end %>
+    </div>
+    <div class="invoice-footer-thanks">Thank you for being a valued part of the <%= invoice_brand_name(@invoice) %> network. This is a system-generated invoice from the Business Network Forum platform.</div>
+  </div>
+</div>

@@ -2,7 +2,7 @@ module Forums
   class OfficeDarshansController < BaseController
     include OfficeDarshansHelper
 
-    before_action :set_darshan, only: [ :show, :edit, :update, :destroy, :accept, :decline, :complete, :thank ]
+    before_action :set_darshan, only: [ :show, :edit, :update, :destroy, :accept, :decline, :complete, :thank, :schedule, :remind ]
 
     def index
       authorize! :read, OfficeDarshan
@@ -12,12 +12,14 @@ module Forums
       @accepted_darshans = base.where(status: :accepted).count
       @completed_darshans = base.where(status: :completed).count
 
-      @darshans = base.includes(:host, :visitor).order(scheduled_at: :desc)
+      @darshans = base.includes(:host, :visitor, :chapter, :attendances).order(scheduled_at: :desc)
       @darshans = @darshans.where(status: params[:status]) if params[:status].present?
     end
 
     def show
       authorize! :read, @darshan
+      @attendances = @darshan.attendances.includes(:user).order(:rsvp_status) if @darshan.attendances.any?
+      @my_attendance = @darshan.attendances.find_by(user: current_user)
     end
 
     def new
@@ -30,10 +32,17 @@ module Forums
       is_admin = current_user.forum_admin? || current_user.chapter_admin?
       @darshan.host = current_user unless is_admin
       @darshan.status = :invited unless is_admin
+      @darshan.chapter ||= current_user.chapter if @darshan.scope_chapter?
       authorize! :create, @darshan
 
       if @darshan.save
-        notice = is_admin && !@darshan.invited? ? "Office Darshan visit logged." : "Office Darshan invite sent."
+        notice = if is_admin && !@darshan.invited?
+          "Office Darshan visit logged."
+        elsif @darshan.scope_member?
+          "Office Darshan invite sent."
+        else
+          "Office Darshan invite sent to #{@darshan.attendances.count} member(s)."
+        end
         redirect_to forum_office_darshan_path(forum_slug: @current_forum.slug, id: @darshan.id), notice: notice
       else
         flash.now[:alert] = @darshan.errors.full_messages.to_sentence
@@ -76,6 +85,7 @@ module Forums
     def complete
       authorize! :complete, @darshan
       @darshan.update!(status: :completed)
+      @darshan.attendances.coming.find_each { |a| a.update!(attended: true, attended_at: Time.current) }
       redirect_to forum_office_darshan_path(forum_slug: @current_forum.slug, id: @darshan.id), notice: "Visit marked as successfully visited."
     end
 
@@ -83,6 +93,9 @@ module Forums
       authorize! :thank, @darshan
       unless @darshan.completed?
         return redirect_to forum_office_darshan_path(forum_slug: @current_forum.slug, id: @darshan.id), alert: "Mark the visit completed before sending a thank-you."
+      end
+      if @darshan.attendances.any?
+        return redirect_to forum_office_darshan_path(forum_slug: @current_forum.slug, id: @darshan.id), alert: "This visit collects attendee reviews instead of a WhatsApp thank-you."
       end
 
       link = whatsapp_darshan_thankyou_link(@darshan, current_user)
@@ -94,6 +107,24 @@ module Forums
       end
     end
 
+    def schedule
+      authorize! :schedule, @darshan
+      if @darshan.update(schedule_params.merge(status: :scheduled))
+        redirect_to forum_office_darshan_path(forum_slug: @current_forum.slug, id: @darshan.id), notice: "Visit scheduled — reminders are now active."
+      else
+        redirect_to forum_office_darshan_path(forum_slug: @current_forum.slug, id: @darshan.id), alert: @darshan.errors.full_messages.to_sentence
+      end
+    end
+
+    def remind
+      authorize! :remind, @darshan
+      pending = @darshan.attendances.invited
+      pending.find_each { |a| a.user.notifications.create!(body: "Reminder: RSVP for #{@darshan.host.display_name}'s office darshan visit on #{@darshan.scheduled_at.strftime('%d %b %Y %H:%M')}.") }
+      @darshan.attendances.coming.find_each { |a| a.user.notifications.create!(body: "Reminder: office darshan visit on #{@darshan.scheduled_at.strftime('%d %b %Y %H:%M')}#{" at #{@darshan.venue}" if @darshan.venue.present?}.") }
+      @darshan.attendances.update_all(reminded_at: Time.current)
+      redirect_to forum_office_darshan_path(forum_slug: @current_forum.slug, id: @darshan.id), notice: "Reminder sent to #{@darshan.attendances.count} attendee(s)."
+    end
+
     private
 
     def set_darshan
@@ -101,7 +132,11 @@ module Forums
     end
 
     def darshan_params
-      params.require(:office_darshan).permit(:host_id, :visitor_id, :scheduled_at, :status, :notes, photos: [])
+      params.require(:office_darshan).permit(:host_id, :visitor_id, :scope, :chapter_id, :venue, :scheduled_at, :status, :notes, photos: [])
+    end
+
+    def schedule_params
+      params.require(:office_darshan).permit(:scheduled_at, :venue)
     end
   end
 end

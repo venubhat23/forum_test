@@ -100,10 +100,12 @@ class Ability
       can [ :read, :create, :update ], Meeting, chapter_id: user.chapter_id
       can :read, MeetingSchedule, chapter_id: user.chapter_id
       can [ :read, :create, :update ], WeeklyPresentation, chapter_id: user.chapter_id
-      can [ :read, :create ], OneToOneMeeting, requester_id: user.id
-      can [ :read, :update ], OneToOneMeeting, requested_with_id: user.id
-      can [ :read, :create, :complete, :thank ], OfficeDarshan, host_id: user.id
+      can [ :read, :create, :complete, :thank ], OneToOneMeeting, requester_id: user.id
+      can [ :read, :update, :complete, :thank ], OneToOneMeeting, requested_with_id: user.id
+      can [ :read, :create, :complete, :thank, :remind, :schedule ], OfficeDarshan, host_id: user.id
       can [ :read, :update, :complete, :thank ], OfficeDarshan, visitor_id: user.id
+      can [ :read, :update ], OfficeDarshanAttendance, user_id: user.id
+      can :read, OfficeDarshanAttendance, office_darshan: { host_id: user.id }
       can :read, Event, forum_id: user.forum_id
       can [ :read, :create, :destroy ], EventRegistration, user_id: user.id
       can :read, MembershipPlan, forum_id: user.forum_id
@@ -122,10 +124,12 @@ class Ability
       can :read, Meeting, chapter_id: user.chapter_id
       can :read, MeetingSchedule, chapter_id: user.chapter_id
       can :read, WeeklyPresentation, chapter_id: user.chapter_id
-      can [ :read, :create ], OneToOneMeeting, requester_id: user.id
-      can [ :read, :update ], OneToOneMeeting, requested_with_id: user.id
-      can [ :read, :create, :complete, :thank ], OfficeDarshan, host_id: user.id
+      can [ :read, :create, :complete, :thank ], OneToOneMeeting, requester_id: user.id
+      can [ :read, :update, :complete, :thank ], OneToOneMeeting, requested_with_id: user.id
+      can [ :read, :create, :complete, :thank, :remind, :schedule ], OfficeDarshan, host_id: user.id
       can [ :read, :update, :complete, :thank ], OfficeDarshan, visitor_id: user.id
+      can [ :read, :update ], OfficeDarshanAttendance, user_id: user.id
+      can :read, OfficeDarshanAttendance, office_darshan: { host_id: user.id }
       can :read, Event, forum_id: user.forum_id
       can [ :read, :create, :update, :destroy ], EventRegistration, user_id: user.id
       can :read, MembershipPlan, forum_id: user.forum_id

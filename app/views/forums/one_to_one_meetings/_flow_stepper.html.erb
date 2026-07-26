@@ -1,0 +1,25 @@
+<%# locals: meeting %>
+<% steps = [ [ "Requested", "bi-send" ], [ "Accepted", "bi-people" ], [ "Meeting Notes", "bi-journal-text" ], [ "Thanked", "bi-heart" ] ] %>
+<% current_step = if meeting.rejected?
+  0
+elsif meeting.requested?
+  1
+elsif meeting.accepted?
+  2
+elsif meeting.thanked_at.present?
+  5
+elsif meeting.notes.present?
+  4
+else
+  3
+end %>
+<div class="lead-stage-track mb-4">
+  <% steps.each_with_index do |(name, icon), index| %>
+    <% position = index + 1 %>
+    <% state = position < current_step ? "done" : (position == current_step ? "active" : "upcoming") %>
+    <div class="lead-stage-step <%= "lead-stage-step-#{state}" %>">
+      <div class="lead-stage-dot"><i class="bi <%= state == "done" ? "bi-check-lg" : icon %>"></i></div>
+      <div class="lead-stage-name"><%= name %></div>
+    </div>
+  <% end %>
+</div>

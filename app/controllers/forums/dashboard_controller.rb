@@ -47,13 +47,20 @@ module Forums
         @leads_created_count = base.count
         @leads_requested_count = base.where(stage: :requested).count
         @leads_converted_count = base.where(stage: :converted).count
-        @thanksgiving_slips_count = base.where.not(thanksgiving_given_at: nil).count
+        # Forum-wide, every slip's giver and receiver both belong to this
+        # forum, so the two totals are always equal — shown separately for
+        # symmetry with the personal view below, where they differ.
+        @thanksgiving_slips_given_count = base.where.not(thanksgiving_given_at: nil).count
+        @thanksgiving_slips_received_count = @thanksgiving_slips_given_count
       else
         @lead_stats_scope = :personal
         @leads_created_count = current_user.created_leads.count
         @leads_requested_count = current_user.lead_taggings.count
         @leads_converted_count = current_user.accepted_leads.where(stage: :converted).count
-        @thanksgiving_slips_count = current_user.accepted_leads.where.not(thanksgiving_given_at: nil).count
+        # A member gives a slip on leads they accepted and converted, and
+        # receives one on leads they created that someone else converted.
+        @thanksgiving_slips_given_count = current_user.accepted_leads.where.not(thanksgiving_given_at: nil).count
+        @thanksgiving_slips_received_count = current_user.created_leads.where.not(thanksgiving_given_at: nil).count
       end
     end
   end

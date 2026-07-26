@@ -8,16 +8,49 @@
   <div class="col-12 col-lg-7">
     <div class="card">
       <div class="card-body p-4">
-        <%= form_with model: @darshan, url: forum_office_darshans_path(forum_slug: @current_forum.slug), method: :post, local: true do |f| %>
+        <%= form_with model: @darshan, url: forum_office_darshans_path(forum_slug: @current_forum.slug), method: :post, local: true, data: { controller: "darshan-scope-toggle" } do |f| %>
           <% if current_user.forum_admin? || current_user.chapter_admin? %>
             <div class="mb-3">
               <%= f.label :host_id, "Host", class: "form-label" %>
               <%= f.collection_select :host_id, @current_forum.users.where(role: [ :member, :committee_member ]).order(:full_name), :id, :display_name, {}, class: "form-select", required: true, data: { controller: "searchable-select", placeholder: "Search host by name..." } %>
             </div>
           <% end %>
+
           <div class="mb-3">
+            <label class="form-label d-block">Who's invited?</label>
+            <div class="d-flex flex-wrap gap-3">
+              <div class="form-check">
+                <%= f.radio_button :scope, :member, checked: true, class: "form-check-input", data: { "darshan-scope-toggle-target": "radio", action: "darshan-scope-toggle#toggle" } %>
+                <%= f.label :scope_member, "Single Member", class: "form-check-label" %>
+              </div>
+              <div class="form-check">
+                <%= f.radio_button :scope, :chapter, class: "form-check-input", data: { "darshan-scope-toggle-target": "radio", action: "darshan-scope-toggle#toggle" } %>
+                <%= f.label :scope_chapter, "Entire Chapter", class: "form-check-label" %>
+              </div>
+              <div class="form-check">
+                <%= f.radio_button :scope, :forum_wide, class: "form-check-input", data: { "darshan-scope-toggle-target": "radio", action: "darshan-scope-toggle#toggle" } %>
+                <%= f.label :scope_forum_wide, "Entire Forum", class: "form-check-label" %>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-3" data-darshan-scope-toggle-target="memberWrap">
             <%= f.label :visitor_id, "Invite Member", class: "form-label" %>
-            <%= f.collection_select :visitor_id, @current_forum.users.where(role: [ :member, :committee_member ]).order(:full_name), :id, :display_name, { include_blank: true }, class: "form-select", required: true, data: { controller: "searchable-select", placeholder: "Search member by name..." } %>
+            <%= f.collection_select :visitor_id, @current_forum.users.where(role: [ :member, :committee_member ]).order(:full_name), :id, :display_name, { include_blank: true }, class: "form-select", data: { controller: "searchable-select", placeholder: "Search member by name..." } %>
+          </div>
+
+          <div class="mb-3 d-none" data-darshan-scope-toggle-target="chapterWrap">
+            <% if current_user.forum_admin? || current_user.chapter_admin? %>
+              <%= f.label :chapter_id, "Chapter", class: "form-label" %>
+              <%= f.collection_select :chapter_id, @current_forum.chapters.order(:name), :id, :name, { include_blank: "Select chapter" }, class: "form-select" %>
+            <% else %>
+              <p class="text-muted mb-0"><i class="bi bi-diagram-3 me-1"></i> Everyone in your chapter, <strong><%= current_user.chapter&.name %></strong>, will be invited.</p>
+            <% end %>
+          </div>
+
+          <div class="mb-3">
+            <%= f.label :venue, class: "form-label" %>
+            <%= f.text_field :venue, class: "form-control", placeholder: "Office address (optional — can be set later)" %>
           </div>
           <div class="mb-3">
             <%= f.label :scheduled_at, "Proposed Date & Time", class: "form-label" %>

@@ -213,6 +213,8 @@ Rails.application.routes.draw do
         patch :accept
         patch :reject
         patch :complete
+        patch :add_note
+        patch :thank
       end
     end
     resources :office_darshans, controller: "forums/office_darshans", except: [ :edit, :update ] do
@@ -221,6 +223,14 @@ Rails.application.routes.draw do
         patch :decline
         patch :complete
         patch :thank
+        patch :schedule
+        post :remind
+      end
+      resources :attendances, controller: "forums/office_darshan_attendances", only: [] do
+        member do
+          patch :rsvp
+          patch :review
+        end
       end
     end
     resources :leads, controller: "forums/leads" do

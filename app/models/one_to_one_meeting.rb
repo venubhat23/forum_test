@@ -11,6 +11,7 @@ class OneToOneMeeting < ApplicationRecord
   validate :requester_and_requested_with_differ
 
   after_create :notify_requested_with
+  after_update :notify_on_status_change, if: :saved_change_to_status?
 
   def paid_count
     fee_payments.paid.count
@@ -32,5 +33,14 @@ class OneToOneMeeting < ApplicationRecord
 
   def notify_requested_with
     requested_with.notifications.create!(body: "#{requester.display_name} requested a one-to-one meeting with you.")
+  end
+
+  def notify_on_status_change
+    case status
+    when "accepted"
+      requester.notifications.create!(body: "#{requested_with.display_name} accepted your one-to-one meeting request for #{scheduled_at.strftime('%d %b %Y %H:%M')}.")
+    when "rejected"
+      requester.notifications.create!(body: "#{requested_with.display_name} declined your one-to-one meeting request.")
+    end
   end
 end

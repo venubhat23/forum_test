@@ -18,6 +18,8 @@ class WhatsappTemplate < ApplicationRecord
     lead_update_default
     darshan_thankyou_host
     darshan_thankyou_visitor
+    one_to_one_thankyou_requester
+    one_to_one_thankyou_requested_with
     fee_receipt_share
     member_invoice_share
   ].freeze
@@ -39,6 +41,8 @@ class WhatsappTemplate < ApplicationRecord
     "lead_update_default" => "Lead Update — Other Stages",
     "darshan_thankyou_host" => "Office Visit — Host Thanks Visitor",
     "darshan_thankyou_visitor" => "Office Visit — Visitor Thanks Host",
+    "one_to_one_thankyou_requester" => "One-to-One Meeting — Requester Thanks",
+    "one_to_one_thankyou_requested_with" => "One-to-One Meeting — Recipient Thanks",
     "fee_receipt_share" => "Fee Receipt Share",
     "member_invoice_share" => "Member Invoice Share",
     "invoice_share" => "Platform Invoice Share"
@@ -59,6 +63,8 @@ class WhatsappTemplate < ApplicationRecord
     "lead_update_default" => %w[created_by_name prospect_name stage_label],
     "darshan_thankyou_host" => %w[visitor_name scheduled_at],
     "darshan_thankyou_visitor" => %w[host_name scheduled_at],
+    "one_to_one_thankyou_requester" => %w[requested_with_name scheduled_at],
+    "one_to_one_thankyou_requested_with" => %w[requester_name scheduled_at],
     "fee_receipt_share" => %w[display_name invoice_number amount forum_name status_text],
     "member_invoice_share" => %w[display_name invoice_number amount due_date forum_name invoice_url],
     "invoice_share" => %w[forum_name invoice_number amount due_date invoice_url]
@@ -183,6 +189,18 @@ class WhatsappTemplate < ApplicationRecord
       Hi %{host_name}! 🙏
 
       Thank you for hosting me at your office on %{scheduled_at}. Really enjoyed the visit and looking forward to working together! 🤝
+    MSG
+
+    "one_to_one_thankyou_requester" => <<~MSG.strip,
+      Hi %{requested_with_name}! 🙏
+
+      Thank you for taking the time to meet with me on %{scheduled_at}. Really appreciated the conversation — looking forward to doing business together! 🤝
+    MSG
+
+    "one_to_one_thankyou_requested_with" => <<~MSG.strip,
+      Hi %{requester_name}! 🙏
+
+      Thank you for a great one-to-one meeting on %{scheduled_at}. Enjoyed connecting — looking forward to more collaboration ahead! 🤝
     MSG
 
     "fee_receipt_share" => <<~MSG.strip,
