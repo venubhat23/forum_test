@@ -56,6 +56,7 @@ class User < ApplicationRecord
   validates :chapter, presence: true, if: -> { member? || guest? || committee_member? }
   validates :full_name, presence: true, if: -> { member? || guest? || committee_member? }
   validates :phone, presence: true, if: -> { member? || guest? || committee_member? }
+  validates :phone, uniqueness: { case_sensitive: false, allow_blank: true }
   validates :nature_of_business, presence: true, if: :guest?
   validates :designation, presence: true, if: :committee_member?
   validate :within_forum_member_limit, on: :create, if: :member?
@@ -66,6 +67,29 @@ class User < ApplicationRecord
 
   def display_name
     full_name.presence || email.split("@").first
+  end
+
+  # Virtual attribute backing the sign-in form's single "Phone or Email"
+  # field. Falls back to email so devise_error_messages! and other devise
+  # internals that read `resource.email`-style attributes keep working.
+  attr_writer :login
+
+  def login
+    @login || email
+  end
+
+  # Lets members sign in with either their phone number or their email,
+  # since most members find typing a phone number far more convenient than
+  # an email address. Staff/admin accounts without a phone on file still
+  # sign in with email. Overrides devise's default lookup because :login
+  # isn't a real column.
+  def self.find_for_database_authentication(warden_conditions)
+    conditions = warden_conditions.dup
+    login = conditions.delete(:login).to_s.strip
+
+    return where(conditions).first if login.blank?
+
+    where(conditions).where("lower(email) = :value OR phone = :value", value: login.downcase).first
   end
 
   # The calendar year this membership runs for (Jan 1 - Dec 31). Falls back

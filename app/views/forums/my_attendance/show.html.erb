@@ -21,8 +21,12 @@
             <% if @todays_meeting.venue.present? %> &middot; <%= @todays_meeting.venue %><% end %>
           </div>
         </div>
-        <% if @todays_meeting_attendance&.present? %>
-          <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>You're marked present</span>
+        <% if @todays_meeting_attendance&.attended? %>
+          <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>You're marked attended</span>
+        <% elsif @todays_meeting_attendance&.attending? %>
+          <span class="badge bg-info text-dark"><i class="bi bi-clock me-1"></i>Marked attending &middot; awaiting admin confirmation</span>
+        <% elsif @todays_meeting_attendance&.absent? %>
+          <span class="badge bg-danger"><i class="bi bi-x-circle me-1"></i>Marked absent</span>
         <% else %>
           <%= button_to "Mark My Attendance", check_in_forum_chapter_meeting_path(forum_slug: @current_forum.slug, chapter_id: @todays_meeting.chapter_id, id: @todays_meeting.id), method: :post, class: "btn btn-primary" %>
         <% end %>
@@ -73,7 +77,15 @@
             <td><%= attendance.occurred_on.strftime("%d %b %Y") %></td>
             <td><%= attendance.event_type.titleize %></td>
             <td>
-              <% if attendance.present? %>
+              <% if attendance.meeting? %>
+                <% if attendance.attended? %>
+                  <span class="badge bg-success">Attended</span>
+                <% elsif attendance.attending? %>
+                  <span class="badge bg-info text-dark">Attending</span>
+                <% else %>
+                  <span class="badge bg-danger">Absent</span>
+                <% end %>
+              <% elsif attendance.present? %>
                 <span class="badge bg-success">Present</span>
               <% else %>
                 <span class="badge bg-danger">Absent</span>

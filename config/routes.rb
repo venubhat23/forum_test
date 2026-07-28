@@ -230,6 +230,7 @@ Rails.application.routes.draw do
       resources :attendances, controller: "forums/office_darshan_attendances", only: [] do
         member do
           patch :rsvp
+          patch :mark_attended
           patch :review
         end
       end

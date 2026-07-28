@@ -11,6 +11,19 @@ module Forums
       redirect_to forum_office_darshan_path(forum_slug: @current_forum.slug, id: @darshan.id), notice: notice
     end
 
+    def mark_attended
+      authorize! :update, @attendance
+      unless @darshan.completed?
+        return redirect_to forum_office_darshan_path(forum_slug: @current_forum.slug, id: @darshan.id), alert: "This visit hasn't been completed yet."
+      end
+      if @attendance.attended?
+        return redirect_to forum_office_darshan_path(forum_slug: @current_forum.slug, id: @darshan.id), alert: "You're already marked as attended."
+      end
+
+      @attendance.update!(attended: true, attended_at: Time.current)
+      redirect_to forum_office_darshan_path(forum_slug: @current_forum.slug, id: @darshan.id), notice: "Thanks — you're marked as attended!"
+    end
+
     def review
       authorize! :update, @attendance
       unless @darshan.completed? && @attendance.attended?

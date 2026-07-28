@@ -25,9 +25,16 @@
                 <span class="row-avatar"><%= person.full_name.first.upcase %></span>
                 <span><%= person.display_name %></span>
                 <span class="badge bg-secondary"><%= person.role.titleize %></span>
+                <% if prior&.attending? %>
+                  <span class="badge bg-info text-dark">Marked attending</span>
+                <% elsif prior&.attended? %>
+                  <span class="badge bg-success">Attended</span>
+                <% elsif prior&.absent? %>
+                  <span class="badge bg-danger">Absent</span>
+                <% end %>
               </span>
               <input type="checkbox" class="form-check-input" name="present_user_ids[]" value="<%= person.id %>"
-                     <%= "checked" if prior.nil? || prior.present? %> data-attendance-checklist-target="checkbox">
+                     <%= "checked" if prior&.attending? || prior&.attended? %> data-attendance-checklist-target="checkbox">
             </label>
           <% end %>
           <% if @people.empty? %>

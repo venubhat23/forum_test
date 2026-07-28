@@ -26,6 +26,11 @@ module Forums
       @attendance = Attendance.new(attendance_params)
       authorize! :create, @attendance
 
+      # Weekly meetings drive `present` off `status` (attending/attended/absent);
+      # this generic form only collects a plain present checkbox, so translate
+      # it into a final status directly rather than the RSVP "attending" state.
+      @attendance.status = @attendance.present? ? :attended : :absent if @attendance.meeting?
+
       if @attendance.user && @attendance.user.chapter_id == @chapter.id && @attendance.save
         redirect_to forum_chapter_attendances_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id), notice: "Attendance recorded for #{@attendance.user.display_name}."
       else

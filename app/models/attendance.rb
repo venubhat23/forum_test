@@ -1,5 +1,6 @@
 class Attendance < ApplicationRecord
   enum :event_type, { meeting: 0, training: 1, event: 2 }
+  enum :status, { not_marked: 0, attending: 1, attended: 2, absent: 3 }
 
   ALLOWED_EVENT_TYPES = {
     "member" => %w[meeting training event],
@@ -14,7 +15,16 @@ class Attendance < ApplicationRecord
   validates :occurred_on, presence: true
   validate :event_type_allowed_for_role
 
+  # For weekly meetings, `status` (not_marked -> attending -> attended/absent)
+  # is the source of truth; keep `present` in sync so existing
+  # reports/percentages that key off `present` don't need to change.
+  before_validation :sync_present_from_status, if: :meeting?
+
   private
+
+  def sync_present_from_status
+    self.present = attended?
+  end
 
   def event_type_allowed_for_role
     return unless user && event_type

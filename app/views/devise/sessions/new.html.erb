@@ -12,8 +12,8 @@
 
     <%= form_for(resource, as: resource_name, url: session_path(resource_name), html: { data: { controller: "submit-loading", action: "submit->submit-loading#start" } }) do |f| %>
       <div class="mb-3">
-        <%= f.label :email, class: "form-label" %>
-        <%= f.email_field :email, autofocus: true, autocomplete: "email", class: "form-control form-control-lg", inputmode: "email" %>
+        <%= f.label :login, "Phone or Email", class: "form-label" %>
+        <%= f.text_field :login, autofocus: true, autocomplete: "username", class: "form-control form-control-lg" %>
       </div>
 
       <div class="mb-3">

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_26_120000) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_28_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -70,6 +70,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_26_120000) do
     t.datetime "updated_at", null: false
     t.bigint "meeting_id"
     t.bigint "event_id"
+    t.integer "status", default: 0, null: false
     t.index ["event_id"], name: "index_attendances_on_event_id"
     t.index ["meeting_id"], name: "index_attendances_on_meeting_id"
     t.index ["user_id", "event_id"], name: "index_attendances_on_user_id_and_event_id", unique: true
@@ -499,6 +500,24 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_26_120000) do
     t.index ["user_id"], name: "index_notifications_on_user_id"
   end
 
+  create_table "office_darshan_attendances", force: :cascade do |t|
+    t.bigint "office_darshan_id", null: false
+    t.bigint "user_id", null: false
+    t.integer "rsvp_status", default: 0, null: false
+    t.datetime "responded_at"
+    t.boolean "attended", default: false, null: false
+    t.datetime "attended_at"
+    t.datetime "reminded_at"
+    t.integer "rating"
+    t.text "review_comment"
+    t.datetime "reviewed_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["office_darshan_id", "user_id"], name: "index_office_darshan_attendances_on_darshan_and_user", unique: true
+    t.index ["office_darshan_id"], name: "index_office_darshan_attendances_on_office_darshan_id"
+    t.index ["user_id"], name: "index_office_darshan_attendances_on_user_id"
+  end
+
   create_table "office_darshans", force: :cascade do |t|
     t.bigint "forum_id", null: false
     t.integer "status", default: 0, null: false
@@ -506,10 +525,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_26_120000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "host_id", null: false
-    t.bigint "visitor_id", null: false
+    t.bigint "visitor_id"
     t.datetime "scheduled_at", null: false
     t.datetime "confirmed_at"
     t.datetime "thanked_at"
+    t.integer "scope", default: 0, null: false
+    t.bigint "chapter_id"
+    t.string "venue"
+    t.index ["chapter_id"], name: "index_office_darshans_on_chapter_id"
     t.index ["forum_id"], name: "index_office_darshans_on_forum_id"
     t.index ["host_id"], name: "index_office_darshans_on_host_id"
     t.index ["visitor_id"], name: "index_office_darshans_on_visitor_id"
@@ -526,6 +549,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_26_120000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.decimal "fee_amount", precision: 10, scale: 2
+    t.string "venue"
+    t.text "agenda"
+    t.datetime "thanked_at"
     t.index ["forum_id"], name: "index_one_to_one_meetings_on_forum_id"
     t.index ["requested_with_id"], name: "index_one_to_one_meetings_on_requested_with_id"
     t.index ["requester_id"], name: "index_one_to_one_meetings_on_requester_id"
@@ -1002,6 +1028,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_26_120000) do
   add_foreign_key "membership_applications", "users", column: "reviewed_by_id"
   add_foreign_key "membership_plans", "forums"
   add_foreign_key "notifications", "users"
+  add_foreign_key "office_darshan_attendances", "office_darshans"
+  add_foreign_key "office_darshan_attendances", "users"
+  add_foreign_key "office_darshans", "chapters"
   add_foreign_key "office_darshans", "forums"
   add_foreign_key "office_darshans", "users", column: "host_id"
   add_foreign_key "office_darshans", "users", column: "visitor_id"

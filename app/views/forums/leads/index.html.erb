@@ -32,10 +32,28 @@
   <div class="col-6 col-lg-3">
     <div class="mini-stat-card">
       <div>
+        <div class="mini-stat-label">Approved</div>
+        <div class="mini-stat-value text-primary"><%= @accepted_leads %></div>
+      </div>
+      <div class="mini-stat-icon mini-stat-icon-primary"><i class="bi bi-hand-thumbs-up"></i></div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="mini-stat-card">
+      <div>
         <div class="mini-stat-label">Converted</div>
         <div class="mini-stat-value text-success"><%= @converted_leads %></div>
       </div>
       <div class="mini-stat-icon mini-stat-icon-success"><i class="bi bi-trophy"></i></div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="mini-stat-card">
+      <div>
+        <div class="mini-stat-label">Declined</div>
+        <div class="mini-stat-value text-danger"><%= @declined_leads %></div>
+      </div>
+      <div class="mini-stat-icon mini-stat-icon-danger"><i class="bi bi-x-circle"></i></div>
     </div>
   </div>
   <div class="col-6 col-lg-3">
