@@ -89,7 +89,8 @@ module InvoicesHelper
     uri = "upi://pay?#{params.map { |k, v| "#{k}=#{ERB::Util.url_encode(v.to_s)}" }.join('&')}"
 
     RQRCode::QRCode.new(uri).as_svg(
-      offset: 0,
+      offset: size * 4,
+      fill: "ffffff",
       color: "1e293b",
       shape_rendering: "crispEdges",
       module_size: size,

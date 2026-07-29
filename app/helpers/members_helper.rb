@@ -5,12 +5,14 @@ module MembersHelper
   # card — instead of typing a URL by hand.
   def member_login_qr_code_svg(size: 4)
     RQRCode::QRCode.new(new_user_session_url).as_svg(
-      offset: 0,
+      offset: size * 4,
+      fill: "ffffff",
       color: "1e293b",
       shape_rendering: "crispEdges",
       module_size: size,
       standalone: true,
-      use_path: true
+      use_path: true,
+      viewbox: true
     ).html_safe
   end
 
