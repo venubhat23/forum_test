@@ -68,6 +68,7 @@
           <th>With</th>
           <th>Date</th>
           <th>Status</th>
+          <th>Business Generated</th>
           <th></th>
         </tr>
       </thead>
@@ -83,6 +84,13 @@
             <td><%= m.requested_with.display_name %></td>
             <td><%= m.scheduled_at.strftime("%d %b %Y %H:%M") %></td>
             <td><span class="badge bg-secondary"><%= m.status.titleize %></span></td>
+            <td>
+              <% if m.business_generated? %>
+                <span class="badge badge-status-active"><%= number_to_currency(m.business_generated_amount) %></span>
+              <% else %>
+                <span class="text-muted">&mdash;</span>
+              <% end %>
+            </td>
             <td class="text-end">
               <%= link_to forum_one_to_one_meeting_path(forum_slug: @current_forum.slug, id: m.id), class: "icon-btn icon-btn-view", title: "View" do %>
                 <i class="bi bi-eye"></i>
@@ -91,7 +99,7 @@
           </tr>
         <% end %>
         <% if @meetings.empty? %>
-          <tr><td colspan="5" class="text-center text-muted py-4">No one-to-one meetings yet.</td></tr>
+          <tr><td colspan="6" class="text-center text-muted py-4">No one-to-one meetings yet.</td></tr>
         <% end %>
       </tbody>
     </table>

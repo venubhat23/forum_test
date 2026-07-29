@@ -8,7 +8,9 @@ class OneToOneMeeting < ApplicationRecord
 
   validates :scheduled_at, presence: true
   validates :fee_amount, numericality: { greater_than: 0 }, allow_nil: true
+  validates :business_generated_amount, numericality: { greater_than: 0 }, allow_nil: true
   validate :requester_and_requested_with_differ
+  validate :business_generated_amount_present_when_generated
 
   after_create :notify_requested_with
   after_update :notify_on_status_change, if: :saved_change_to_status?
@@ -29,6 +31,10 @@ class OneToOneMeeting < ApplicationRecord
 
   def requester_and_requested_with_differ
     errors.add(:requested_with, "must be a different member than the requester") if requester_id == requested_with_id
+  end
+
+  def business_generated_amount_present_when_generated
+    errors.add(:business_generated_amount, "can't be blank when business was generated") if business_generated? && business_generated_amount.blank?
   end
 
   def notify_requested_with

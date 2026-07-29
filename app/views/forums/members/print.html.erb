@@ -10,6 +10,9 @@
     .id-card dl { text-align: left; font-size: 13px; margin-top: 12px; }
     .id-card dt { font-weight: 600; float: left; width: 40%; }
     .id-card dd { margin-left: 40%; }
+    .id-card .login-qr { margin-top: 16px; padding-top: 16px; border-top: 1px dashed #ccc; text-align: center; }
+    .id-card .login-qr svg { width: 120px; height: 120px; }
+    .id-card .login-qr p { font-size: 11px; color: #666; margin: 6px 0 0; }
     @media print { body { padding: 0; } }
   </style>
 </head>
@@ -24,6 +27,10 @@
       <dt>Business</dt><dd><%= @member.business_name %></dd>
       <dt>Member Since</dt><dd><%= @member.member_since.strftime("%b %Y") %></dd>
     </dl>
+    <div class="login-qr">
+      <%= member_login_qr_code_svg %>
+      <p>Scan to sign in &middot; login with mobile <%= @member.phone %></p>
+    </div>
   </div>
   <script>window.onload = () => window.print();</script>
 </body>

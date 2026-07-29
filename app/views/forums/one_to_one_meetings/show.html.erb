@@ -9,8 +9,6 @@
     <% if can?(:update, @meeting) && @meeting.requested? %>
       <%= button_to "Accept", accept_forum_one_to_one_meeting_path(forum_slug: @current_forum.slug, id: @meeting.id), method: :patch, class: "btn btn-success" %>
       <%= button_to "Reject", reject_forum_one_to_one_meeting_path(forum_slug: @current_forum.slug, id: @meeting.id), method: :patch, class: "btn btn-outline-danger" %>
-    <% elsif can?(:complete, @meeting) && @meeting.accepted? %>
-      <%= button_to "Mark Completed", complete_forum_one_to_one_meeting_path(forum_slug: @current_forum.slug, id: @meeting.id), method: :patch, class: "btn btn-primary" %>
     <% elsif can?(:thank, @meeting) && @meeting.completed? && @meeting.notes.present? && @meeting.thanked_at.blank? %>
       <%= button_to "Send Thank You", thank_forum_one_to_one_meeting_path(forum_slug: @current_forum.slug, id: @meeting.id), method: :patch, class: "btn btn-outline-success" %>
     <% end %>
@@ -46,6 +44,35 @@
 
 <% if @meeting.thanked_at.present? %>
   <p class="text-muted small">Thank-you sent <%= @meeting.thanked_at.strftime("%d %b %Y %H:%M") %></p>
+<% end %>
+
+<% if @meeting.accepted? && can?(:complete, @meeting) %>
+  <div class="card mb-4 border-primary">
+    <div class="card-header fw-semibold"><i class="bi bi-flag-fill me-1"></i>Complete Meeting</div>
+    <div class="card-body">
+      <%= form_with model: @meeting, url: complete_forum_one_to_one_meeting_path(forum_slug: @current_forum.slug, id: @meeting.id), method: :patch, local: true, data: { controller: "fee-toggle" } do |f| %>
+        <div class="form-check mb-2">
+          <%= f.check_box :business_generated, class: "form-check-input", data: { action: "fee-toggle#toggle", "fee-toggle-target": "checkbox" } %>
+          <%= f.label :business_generated, "Any business generated from this meeting?", class: "form-check-label" %>
+        </div>
+        <div class="mb-3 <%= "d-none" unless @meeting.business_generated? %>" data-fee-toggle-target="amountWrap">
+          <%= f.label :business_generated_amount, "Business Amount", class: "form-label" %>
+          <%= f.number_field :business_generated_amount, step: "0.01", min: "0.01", class: "form-control", style: "max-width: 220px;",
+                data: { "fee-toggle-target": "amountField" } %>
+        </div>
+        <%= f.submit "Mark Completed", class: "btn btn-primary" %>
+      <% end %>
+    </div>
+  </div>
+<% end %>
+
+<% if @meeting.business_generated? %>
+  <div class="card mb-4 border-success">
+    <div class="card-body d-flex align-items-center gap-2 text-success">
+      <i class="bi bi-graph-up-arrow"></i>
+      <span>Business generated: <strong><%= number_to_currency(@meeting.business_generated_amount) %></strong></span>
+    </div>
+  </div>
 <% end %>
 
 <% if @meeting.venue.present? || @meeting.agenda.present? %>

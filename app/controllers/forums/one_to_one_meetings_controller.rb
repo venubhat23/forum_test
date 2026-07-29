@@ -72,8 +72,11 @@ module Forums
 
     def complete
       authorize! :complete, @meeting
-      @meeting.update!(status: :completed)
-      redirect_to forum_one_to_one_meeting_path(forum_slug: @current_forum.slug, id: @meeting.id), notice: "Meeting marked completed."
+      if @meeting.update(complete_params.merge(status: :completed))
+        redirect_to forum_one_to_one_meeting_path(forum_slug: @current_forum.slug, id: @meeting.id), notice: "Meeting marked completed."
+      else
+        redirect_to forum_one_to_one_meeting_path(forum_slug: @current_forum.slug, id: @meeting.id), alert: @meeting.errors.full_messages.to_sentence
+      end
     end
 
     def add_note
@@ -115,6 +118,10 @@ module Forums
 
     def note_params
       params.require(:one_to_one_meeting).permit(:notes)
+    end
+
+    def complete_params
+      params.fetch(:one_to_one_meeting, {}).permit(:business_generated, :business_generated_amount)
     end
   end
 end

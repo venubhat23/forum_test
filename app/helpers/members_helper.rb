@@ -1,4 +1,19 @@
 module MembersHelper
+  # Renders an inline SVG QR code that opens the member sign-in page when
+  # scanned. Since there's no member mobile app, this is how a member gets
+  # from their phone camera straight to the portal — printed on their ID
+  # card — instead of typing a URL by hand.
+  def member_login_qr_code_svg(size: 4)
+    RQRCode::QRCode.new(new_user_session_url).as_svg(
+      offset: 0,
+      color: "1e293b",
+      shape_rendering: "crispEdges",
+      module_size: size,
+      standalone: true,
+      use_path: true
+    ).html_safe
+  end
+
   # Renewal date chip text for a member row: "Renews ..." while current,
   # flips to "Expired ..." once the date has passed (lifetime members never
   # reach here since callers check lifetime_member? first).
