@@ -20,8 +20,8 @@
 
     <%= form_with url: user_session_path, method: :post, local: true do %>
       <div class="mb-3">
-        <%= label_tag "user_email", "Email", class: "form-label" %>
-        <%= email_field_tag "user[email]", nil, autofocus: true, autocomplete: "email", class: "form-control form-control-lg", inputmode: "email" %>
+        <%= label_tag "user_login", "Mobile Number or Email", class: "form-label" %>
+        <%= text_field_tag "user[login]", nil, autofocus: true, autocomplete: "username", class: "form-control form-control-lg", placeholder: "e.g. 9876543210" %>
       </div>
 
       <div class="mb-3">
