@@ -1,5 +1,9 @@
 <% content_for :title, @member.display_name %>
 
+<style>
+  .member-login-qr svg { width: 140px; height: 140px; }
+</style>
+
 <div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-2">
   <div>
     <h1 class="page-title h4"><%= @member.display_name %></h1>
@@ -117,31 +121,39 @@
   <div class="card mb-4">
     <div class="card-header fw-semibold">Login Credentials</div>
     <div class="card-body">
-      <dl class="row mb-0">
-        <dt class="col-sm-3">Login URL</dt>
-        <dd class="col-sm-9">
-          <div class="d-flex align-items-center gap-2">
-            <code id="member-login-url"><%= forum_root_url(forum_slug: @current_forum.slug) %></code>
-            <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-1" onclick="navigator.clipboard.writeText(document.getElementById('member-login-url').innerText)" title="Copy URL"><i class="bi bi-clipboard small"></i></button>
-          </div>
-        </dd>
-        <dt class="col-sm-3">Username</dt>
-        <dd class="col-sm-9">
-          <div class="d-flex align-items-center gap-2">
-            <code id="member-username"><%= @member.email %></code>
-            <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-1" onclick="navigator.clipboard.writeText(document.getElementById('member-username').innerText)" title="Copy username"><i class="bi bi-clipboard small"></i></button>
-          </div>
-        </dd>
-        <dt class="col-sm-3">Password</dt>
-        <dd class="col-sm-9">
-          <div class="d-flex align-items-center gap-2">
-            <code id="member-password"><%= @member.original_password.presence || "Not available — use Reset Password below" %></code>
-            <% if @member.original_password.present? %>
-              <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-1" onclick="navigator.clipboard.writeText(document.getElementById('member-password').innerText)" title="Copy password"><i class="bi bi-clipboard small"></i></button>
-            <% end %>
-          </div>
-        </dd>
-      </dl>
+      <div class="row g-4">
+        <div class="col-md-8">
+          <dl class="row mb-0">
+            <dt class="col-sm-3">Login URL</dt>
+            <dd class="col-sm-9">
+              <div class="d-flex align-items-center gap-2">
+                <code id="member-login-url"><%= forum_root_url(forum_slug: @current_forum.slug) %></code>
+                <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-1" onclick="navigator.clipboard.writeText(document.getElementById('member-login-url').innerText)" title="Copy URL"><i class="bi bi-clipboard small"></i></button>
+              </div>
+            </dd>
+            <dt class="col-sm-3">Username</dt>
+            <dd class="col-sm-9">
+              <div class="d-flex align-items-center gap-2">
+                <code id="member-username"><%= @member.email %></code>
+                <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-1" onclick="navigator.clipboard.writeText(document.getElementById('member-username').innerText)" title="Copy username"><i class="bi bi-clipboard small"></i></button>
+              </div>
+            </dd>
+            <dt class="col-sm-3">Password</dt>
+            <dd class="col-sm-9">
+              <div class="d-flex align-items-center gap-2">
+                <code id="member-password"><%= @member.original_password.presence || "Not available — use Reset Password below" %></code>
+                <% if @member.original_password.present? %>
+                  <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-1" onclick="navigator.clipboard.writeText(document.getElementById('member-password').innerText)" title="Copy password"><i class="bi bi-clipboard small"></i></button>
+                <% end %>
+              </div>
+            </dd>
+          </dl>
+        </div>
+        <div class="col-md-4 text-center member-login-qr">
+          <%= member_login_qr_code_svg(size: 5) %>
+          <p class="text-muted small mb-0">Scan to sign in &middot; login with mobile <%= @member.phone %></p>
+        </div>
+      </div>
     </div>
   </div>
 

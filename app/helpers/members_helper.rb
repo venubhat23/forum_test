@@ -1,10 +1,12 @@
 module MembersHelper
-  # Renders an inline SVG QR code that opens the member sign-in page when
+  # Renders an inline SVG QR code that opens this forum's sign-in page when
   # scanned. Since there's no member mobile app, this is how a member gets
   # from their phone camera straight to the portal — printed on their ID
-  # card — instead of typing a URL by hand.
+  # card — instead of typing a URL by hand. Points at the forum-scoped
+  # gateway (e.g. /sampark3), which renders the login form directly, rather
+  # than the generic un-branded Devise sign-in page.
   def member_login_qr_code_svg(size: 4)
-    RQRCode::QRCode.new(new_user_session_url).as_svg(
+    RQRCode::QRCode.new(forum_root_url(forum_slug: @current_forum.slug)).as_svg(
       offset: size * 4,
       fill: "ffffff",
       color: "1e293b",
