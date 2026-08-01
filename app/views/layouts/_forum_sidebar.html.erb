@@ -35,6 +35,12 @@
           <% end %>
         </li>
         <li class="nav-item">
+          <%= link_to forum_chapter_guests_path(forum_slug: @current_forum.slug, chapter_id: current_user.chapter_id), class: "nav-link-modern #{'active' if request.path.include?('/guests')}", data: { tooltip: "My Guests" } do %>
+            <div class="nav-icon-modern"><div class="icon-bg gradient-teal"><i class="bi bi-person-badge"></i></div></div>
+            <span class="nav-text">My Guests</span>
+          <% end %>
+        </li>
+        <li class="nav-item">
           <%= link_to forum_website_path(forum_slug: @current_forum.slug), class: "nav-link-modern", target: "_blank", rel: "noopener", data: { tooltip: "Website" } do %>
             <div class="nav-icon-modern"><div class="icon-bg gradient-indigo"><i class="bi bi-globe2"></i></div></div>
             <span class="nav-text">Website</span>

@@ -32,19 +32,28 @@
       <%= f.select :speciality, [], {}, class: "form-select", data: { business_category_target: "speciality" } %>
     </div>
   </div>
-  <div class="mb-4">
-    <%= f.label :invited_by_id, "Invited By", class: "form-label" %>
-    <select name="guest[invited_by_selection]" id="guest_invited_by_id" class="form-select">
-      <option value="">Select an inviter</option>
-      <option value="chapter" <%= "selected" if guest.invited_by_id.blank? && guest.invited_by_note == "chapter" %>><%= @chapter.name %> (Chapter)</option>
-      <option value="forum" <%= "selected" if guest.invited_by_id.blank? && guest.invited_by_note == "forum" %>><%= @current_forum.name %> (Forum)</option>
-      <optgroup label="Members">
-        <% @chapter.members.order(:full_name).each do |member| %>
-          <option value="member_<%= member.id %>" <%= "selected" if guest.invited_by_id == member.id %>><%= member.display_name %></option>
-        <% end %>
-      </optgroup>
-    </select>
-  </div>
+  <% if current_user.member? %>
+    <div class="mb-4">
+      <label class="form-label">Invited By</label>
+      <div class="form-control-plaintext text-muted">
+        <i class="bi bi-person-check me-1"></i> You (<%= current_user.display_name %>) will be recorded as the inviter.
+      </div>
+    </div>
+  <% else %>
+    <div class="mb-4">
+      <%= f.label :invited_by_id, "Invited By", class: "form-label" %>
+      <select name="guest[invited_by_selection]" id="guest_invited_by_id" class="form-select">
+        <option value="">Select an inviter</option>
+        <option value="chapter" <%= "selected" if guest.invited_by_id.blank? && guest.invited_by_note == "chapter" %>><%= @chapter.name %> (Chapter)</option>
+        <option value="forum" <%= "selected" if guest.invited_by_id.blank? && guest.invited_by_note == "forum" %>><%= @current_forum.name %> (Forum)</option>
+        <optgroup label="Members">
+          <% @chapter.members.order(:full_name).each do |member| %>
+            <option value="member_<%= member.id %>" <%= "selected" if guest.invited_by_id == member.id %>><%= member.display_name %></option>
+          <% end %>
+        </optgroup>
+      </select>
+    </div>
+  <% end %>
 
   <% if @upcoming_meetings.present? %>
     <h2 class="h6 text-uppercase text-muted mb-3">Invite for Meeting</h2>

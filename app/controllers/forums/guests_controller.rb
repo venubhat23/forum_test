@@ -17,13 +17,17 @@ module Forums
       @guests = @guests.page(params[:page])
     end
 
+    # Members only ever see guests they personally invited; chapter/forum
+    # admins (and above) see every guest in the chapter.
     def index
       authorize! :read, User
-      @total_guests = @chapter.guests.count
-      @guests_this_month = @chapter.guests.where(created_at: Time.current.beginning_of_month..).count
+      scope = current_user.member? ? @chapter.guests.where(invited_by_id: current_user.id) : @chapter.guests
+
+      @total_guests = scope.count
+      @guests_this_month = scope.where(created_at: Time.current.beginning_of_month..).count
       @upcoming_event = @current_forum.events.where("starts_at >= ?", Time.current).order(:starts_at).first
 
-      @guests = @chapter.guests.includes(:invited_by).order(:full_name)
+      @guests = scope.includes(:invited_by).order(:full_name)
       @guests = @guests.where("full_name ILIKE ? OR email ILIKE ?", "%#{params[:q]}%", "%#{params[:q]}%") if params[:q].present?
       @guests = @guests.page(params[:page])
     end
@@ -125,8 +129,15 @@ module Forums
 
     # The "Invited By" field lets the guest be attributed to a specific
     # member, or generically to the chapter/forum for walk-in guests with
-    # no known individual inviter.
+    # no known individual inviter. Members inviting their own guest can't
+    # pick anyone else — always themselves, regardless of what's submitted.
     def apply_invited_by_selection(guest)
+      if current_user.member?
+        guest.invited_by_id = current_user.id
+        guest.invited_by_note = nil
+        return
+      end
+
       selection = params.dig(:guest, :invited_by_selection).to_s
 
       case selection

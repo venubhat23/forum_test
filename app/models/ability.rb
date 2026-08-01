@@ -114,6 +114,7 @@ class Ability
       can :read, Chapter, id: user.chapter_id
       can :read, User, id: user.id
       can :update, User, id: user.id
+      can [ :read, :create ], User, role: "guest", invited_by_id: user.id, chapter_id: user.chapter_id
       can [ :read, :create ], Referral, giver_id: user.id
       can [ :read, :update ], Referral, receiver_id: user.id
       can [ :read, :create ], ThanksgivingSlip, given_by_id: user.id
