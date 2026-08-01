@@ -19,8 +19,7 @@ class MeetingSchedule < ApplicationRecord
   validate :end_time_after_start_time
   validate :end_date_within_range
 
-  after_create :generate_meetings!
-  after_create :notify_attendees
+  after_create_commit :enqueue_generation
 
   before_destroy :clear_meetings
 
@@ -40,7 +39,32 @@ class MeetingSchedule < ApplicationRecord
     dates
   end
 
+  # Called by GenerateMeetingScheduleMeetingsJob. Guarded against double-run since
+  # ActiveJob can retry a job that already succeeded (e.g. after a worker crash
+  # post-perform but pre-ack).
+  def generate!
+    return if meetings_generated_at.present?
+
+    generate_meetings!
+    notify_attendees
+    update_column(:meetings_generated_at, Time.current)
+    broadcast_status
+  end
+
   private
+
+  def enqueue_generation
+    GenerateMeetingScheduleMeetingsJob.perform_later(id)
+  end
+
+  def broadcast_status
+    Turbo::StreamsChannel.broadcast_replace_to(
+      self,
+      target: "meeting_schedule_#{id}_status",
+      partial: "forums/meeting_schedules/status_panel",
+      locals: { schedule: self, occurrences: meetings.includes(:chapter).order(:scheduled_at) }
+    )
+  end
 
   def end_time_after_start_time
     return if start_time.blank? || end_time.blank?
@@ -73,6 +97,9 @@ class MeetingSchedule < ApplicationRecord
         scheduled_at: Time.zone.local(date.year, date.month, date.day, start_time.hour, start_time.min),
         venue: venue,
         agenda: agenda,
+        topic: topic,
+        speaker: speaker,
+        speaker_phone: speaker_phone,
         fee_amount: fee_amount
       )
     end

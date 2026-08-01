@@ -133,7 +133,7 @@ module Forums
       params.require(:guest).permit(:full_name, :email, :phone, :date_of_birth, :photo,
         :business_name, :business_category, :speciality, :business_category_id, :designation,
         :website, :gst_number, :pan_number, :aadhaar_number, :address, :city,
-        :service_area, :capacity, kyc_documents: [])
+        :service_area, :capacity, :company_logo, :social_media_handle, kyc_documents: [])
     end
   end
 end

@@ -8,6 +8,11 @@
   <% if can? :update, @guest %>
     <div class="d-flex flex-wrap gap-2">
       <%= link_to "Edit", edit_forum_chapter_guest_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: @guest.id), class: "btn btn-outline-secondary" %>
+      <% if (profile_link = whatsapp_profile_form_link(@guest, @current_forum)) %>
+        <%= link_to profile_link, class: "btn btn-outline-success", target: "_blank", rel: "noopener" do %>
+          <i class="bi bi-whatsapp me-1"></i> Ask to Fill Profile
+        <% end %>
+      <% end %>
       <%= link_to convert_forum_chapter_guest_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: @guest.id), class: "btn btn-success" do %>
         <i class="bi bi-arrow-right-circle me-1"></i> Convert to Member
       <% end %>
@@ -16,6 +21,13 @@
     </div>
   <% end %>
 </div>
+
+<% if @guest.profile_submitted_at.present? %>
+  <div class="alert alert-success d-flex align-items-center gap-2 mt-3 mb-0" role="alert">
+    <i class="bi bi-person-check fs-5"></i>
+    <div><%= @guest.display_name %> filled in their own profile on <%= @guest.profile_submitted_at.strftime("%d %b %Y at %I:%M %p") %>. It'll be ready to review on the Convert page.</div>
+  </div>
+<% end %>
 
 <div class="row g-3 mb-4">
   <div class="col-6 col-lg-4">

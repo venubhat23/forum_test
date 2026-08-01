@@ -12,7 +12,10 @@ class User < ApplicationRecord
 
   DESIGNATIONS = [ "President", "Vice President", "Associate Vice President", "Secretary", "Treasurer", "Coordinator" ].freeze
 
+  has_secure_token :profile_token
+
   has_one_attached :photo
+  has_one_attached :company_logo
   has_many_attached :kyc_documents
 
   belongs_to :forum, optional: true

@@ -102,6 +102,9 @@ Rails.application.routes.draw do
 
   get "invoices/:token", to: "public_invoices#show", as: :public_invoice
 
+  get "guest_profile/:token", to: "guest_profile_forms#edit", as: :guest_profile_form
+  patch "guest_profile/:token", to: "guest_profile_forms#update"
+
   scope "/:forum_slug", as: :forum do
     root to: "forums/gateway#show"
     get "dashboard", to: "forums/dashboard#show"

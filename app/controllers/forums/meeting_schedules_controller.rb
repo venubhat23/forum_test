@@ -21,7 +21,7 @@ module Forums
 
       if @schedule.save
         redirect_to forum_chapter_meeting_schedule_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: @schedule.id),
-          notice: "Meeting schedule created — #{@schedule.meetings.count} meetings generated."
+          notice: "Meeting schedule created — meetings are being generated in the background."
       else
         @candidates = pickable_people
         flash.now[:alert] = @schedule.errors.full_messages.to_sentence
@@ -32,11 +32,6 @@ module Forums
     def show
       authorize! :read, @schedule
       @occurrences = @schedule.meetings.includes(:chapter).order(:scheduled_at)
-      @attendance_by_meeting = Meeting.attendance_percentages(@occurrences, @chapter)
-      @paid_counts_by_meeting = Hash.new(0).merge(
-        FeePayment.where(feeable: @occurrences, status: :paid).group(:feeable_id).count
-      )
-      @chapter_members_count = @chapter.members.count
     end
 
     def destroy
@@ -60,8 +55,8 @@ module Forums
     end
 
     def meeting_schedule_params
-      params.require(:meeting_schedule).permit(:title, :day_of_week, :start_time, :end_time, :start_date, :end_date,
-        :venue, :agenda, :notes, :fee_amount, attendee_ids: [])
+      params.require(:meeting_schedule).permit(:title, :topic, :day_of_week, :start_time, :end_time, :start_date, :end_date,
+        :venue, :agenda, :notes, :speaker, :speaker_phone, :fee_amount, attendee_ids: [])
     end
   end
 end

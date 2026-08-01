@@ -52,24 +52,6 @@
             <span class="nav-text">Office Darshan</span>
           <% end %>
         </li>
-        <% if can? :read, MeetingSchedule %>
-          <%
-            meeting_schedules_target =
-              if current_user.chapter_id.present?
-                forum_chapter_meeting_schedules_path(forum_slug: @current_forum.slug, chapter_id: current_user.chapter_id)
-              elsif @current_forum.chapters.count == 1
-                forum_chapter_meeting_schedules_path(forum_slug: @current_forum.slug, chapter_id: @current_forum.chapters.first.id)
-              else
-                forum_chapters_path(forum_slug: @current_forum.slug)
-              end
-          %>
-          <li class="nav-item">
-            <%= link_to meeting_schedules_target, class: "nav-link-modern #{'active' if request.path.include?('/meeting_schedules')}", data: { tooltip: "Scheduled Meetings" } do %>
-              <div class="nav-icon-modern"><div class="icon-bg gradient-orange"><i class="bi bi-calendar-week"></i></div></div>
-              <span class="nav-text">Scheduled Meetings</span>
-            <% end %>
-          </li>
-        <% end %>
       </ul>
     </div>
 
@@ -118,6 +100,24 @@
             <span class="nav-text">Members</span>
           <% end %>
         </li>
+        <% if current_user.super_admin? || current_user.forum_admin? || current_user.chapter_admin? %>
+          <%
+            guest_users_target =
+              if current_user.chapter_id.present?
+                forum_chapter_guests_path(forum_slug: @current_forum.slug, chapter_id: current_user.chapter_id)
+              elsif @current_forum.chapters.count == 1
+                forum_chapter_guests_path(forum_slug: @current_forum.slug, chapter_id: @current_forum.chapters.first.id)
+              else
+                forum_chapters_path(forum_slug: @current_forum.slug)
+              end
+          %>
+          <li class="nav-item">
+            <%= link_to guest_users_target, class: "nav-link-modern #{'active' if request.path.include?('/guests')}", data: { tooltip: "Guest Users" } do %>
+              <div class="nav-icon-modern"><div class="icon-bg gradient-teal"><i class="bi bi-person-badge"></i></div></div>
+              <span class="nav-text">Guest Users</span>
+            <% end %>
+          </li>
+        <% end %>
         <li class="nav-item">
           <%= link_to forum_calendar_path(forum_slug: @current_forum.slug), class: "nav-link-modern #{'active' if current_page?(forum_calendar_path(forum_slug: @current_forum.slug))}", data: { tooltip: "Calendar" } do %>
             <div class="nav-icon-modern"><div class="icon-bg gradient-blue"><i class="bi bi-calendar3"></i></div></div>
@@ -192,7 +192,7 @@
             <span class="nav-text">Office Darshan</span>
           <% end %>
         </li>
-        <% if can? :read, MeetingSchedule %>
+        <% if current_user.forum_admin? || current_user.chapter_admin? %>
           <%
             meeting_schedules_target =
               if current_user.chapter_id.present?

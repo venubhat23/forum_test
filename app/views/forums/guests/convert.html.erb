@@ -9,6 +9,13 @@
   <div class="col-12 col-lg-8">
     <%= render "forums/shared/conversion_progress", step: 1 %>
 
+    <% if @guest.profile_submitted_at.present? %>
+      <div class="alert alert-info d-flex align-items-center gap-2 mb-3" role="alert">
+        <i class="bi bi-person-check fs-5"></i>
+        <div><%= @guest.display_name %> filled in these details themselves on <%= @guest.profile_submitted_at.strftime("%d %b %Y at %I:%M %p") %>. Review and edit as needed before converting.</div>
+      </div>
+    <% end %>
+
     <div class="card">
       <div class="card-body p-4">
         <%= form_with model: @guest, url: convert_to_member_forum_chapter_guest_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: @guest.id),
@@ -41,6 +48,10 @@
           </div>
 
           <h2 class="h6 text-uppercase text-muted mb-3">Business Details</h2>
+          <div class="mb-3">
+            <%= f.label :company_logo, "Company Logo", class: "form-label" %>
+            <%= f.file_field :company_logo, class: "form-control", accept: "image/*" %>
+          </div>
           <div class="mb-3">
             <%= f.label :business_name, "Business Name", class: "form-label" %>
             <%= f.text_field :business_name, class: "form-control", required: true %>
@@ -97,6 +108,10 @@
           <div class="mb-4">
             <%= f.label :city, "Location (City)", class: "form-label" %>
             <%= f.text_field :city, class: "form-control" %>
+          </div>
+          <div class="mb-4">
+            <%= f.label :social_media_handle, "Social Media Handle", class: "form-label" %>
+            <%= f.text_field :social_media_handle, class: "form-control", placeholder: "e.g. @business_handle or Instagram/Facebook link" %>
           </div>
 
           <h2 class="h6 text-uppercase text-muted mb-3">Statutory Details</h2>

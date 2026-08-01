@@ -1,0 +1,13 @@
+<% content_for :title, "Profile Already Processed" %>
+
+<div class="auth-wrapper">
+  <div class="auth-card text-center">
+    <div class="auth-brand-icon">
+      <i class="bi bi-check-circle"></i>
+    </div>
+    <h1 class="h4 fw-bold mb-2">You're All Set!</h1>
+    <p class="text-muted mb-0">
+      <%= @guest.display_name %>, your details have already been reviewed and you're now a member of <%= @guest.forum.name %>. No further action is needed on this link.
+    </p>
+  </div>
+</div>

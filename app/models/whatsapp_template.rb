@@ -22,6 +22,7 @@ class WhatsappTemplate < ApplicationRecord
     one_to_one_thankyou_requested_with
     fee_receipt_share
     member_invoice_share
+    guest_profile_form_invite
   ].freeze
 
   KEYS = (FORUM_KEYS + GLOBAL_KEYS).freeze
@@ -45,6 +46,7 @@ class WhatsappTemplate < ApplicationRecord
     "one_to_one_thankyou_requested_with" => "One-to-One Meeting — Recipient Thanks",
     "fee_receipt_share" => "Fee Receipt Share",
     "member_invoice_share" => "Member Invoice Share",
+    "guest_profile_form_invite" => "Guest Profile Form Invite",
     "invoice_share" => "Platform Invoice Share"
   }.freeze
 
@@ -67,6 +69,7 @@ class WhatsappTemplate < ApplicationRecord
     "one_to_one_thankyou_requested_with" => %w[requester_name scheduled_at],
     "fee_receipt_share" => %w[display_name invoice_number amount forum_name status_text],
     "member_invoice_share" => %w[display_name invoice_number amount due_date forum_name invoice_url],
+    "guest_profile_form_invite" => %w[full_name forum_name form_url],
     "invoice_share" => %w[forum_name invoice_number amount due_date invoice_url]
   }.freeze
 
@@ -217,12 +220,22 @@ class WhatsappTemplate < ApplicationRecord
       Thank you! 🙏
     MSG
 
-    "invoice_share" => <<~MSG.strip
+    "invoice_share" => <<~MSG.strip,
       Hi %{forum_name}! 👋
 
       Here's your invoice *%{invoice_number}* for %{amount}, due by *%{due_date}*.
 
       View & pay: %{invoice_url}
+
+      Thank you! 🙏
+    MSG
+
+    "guest_profile_form_invite" => <<~MSG.strip
+      Hi %{full_name}! 👋
+
+      Please fill in your details for %{forum_name} using the secure link below — it only takes a couple of minutes and helps us set up your profile correctly.
+
+      %{form_url}
 
       Thank you! 🙏
     MSG

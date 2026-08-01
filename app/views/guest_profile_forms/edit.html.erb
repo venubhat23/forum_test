@@ -1,0 +1,140 @@
+<% content_for :title, "Complete Your Profile" %>
+
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-12 col-lg-8">
+      <div class="text-center mb-4">
+        <h1 class="h4 fw-bold mb-1">Complete Your Profile</h1>
+        <p class="text-muted mb-0"><%= @guest.chapter.name %> &middot; <%= @guest.forum.name %></p>
+      </div>
+
+      <% if flash[:notice] %>
+        <div class="alert alert-success"><%= flash[:notice] %></div>
+      <% end %>
+
+      <div class="card">
+        <div class="card-body p-4">
+          <p class="text-muted mb-4">Fill in your details below. You can come back and update this anytime using the same link — it will be ready for our team to review when you're converted to a member.</p>
+
+          <%= form_with model: @guest, url: guest_profile_form_path(token: @guest.profile_token),
+                method: :patch, scope: :guest, local: true, html: { multipart: true },
+                data: { controller: "submit-loading", action: "submit->submit-loading#start" } do |f| %>
+            <h2 class="h6 text-uppercase text-muted mb-3">Basic Profile</h2>
+            <div class="mb-3">
+              <%= f.label :full_name, "Owner Name", class: "form-label" %>
+              <%= f.text_field :full_name, class: "form-control", required: true %>
+            </div>
+            <div class="row g-3 mb-3">
+              <div class="col-12 col-sm-6">
+                <%= f.label :email, class: "form-label" %>
+                <%= f.email_field :email, class: "form-control", required: true %>
+              </div>
+              <div class="col-12 col-sm-6">
+                <%= f.label :phone, "Phone Number", class: "form-label" %>
+                <%= f.telephone_field :phone, class: "form-control", required: true %>
+              </div>
+            </div>
+            <div class="row g-3 mb-4">
+              <div class="col-12 col-sm-6">
+                <%= f.label :date_of_birth, class: "form-label" %>
+                <%= f.date_field :date_of_birth, class: "form-control" %>
+              </div>
+              <div class="col-12 col-sm-6">
+                <%= f.label :photo, "Photo", class: "form-label" %>
+                <%= f.file_field :photo, class: "form-control", accept: "image/*" %>
+                <% if @guest.photo.attached? %><div class="form-text">A photo is already on file — choose a new one only to replace it.</div><% end %>
+              </div>
+            </div>
+
+            <h2 class="h6 text-uppercase text-muted mb-3">Business Details</h2>
+            <div class="mb-3">
+              <%= f.label :business_name, "Business Name", class: "form-label" %>
+              <%= f.text_field :business_name, class: "form-control", required: true %>
+            </div>
+            <% categories_map = business_categories_map(@guest.forum) %>
+            <div class="row g-3 mb-3" data-controller="business-category"
+                 data-business-category-categories-value="<%= categories_map.to_json %>"
+                 data-business-category-selected-value="<%= @guest.speciality %>">
+              <div class="col-12 col-sm-6">
+                <%= f.label :business_category, "Business Category", class: "form-label" %>
+                <%= f.select :business_category, categories_map.keys, {}, class: "form-select",
+                      data: { business_category_target: "category", action: "change->business-category#categoryChanged" } %>
+              </div>
+              <div class="col-12 col-sm-6">
+                <%= f.label :speciality, class: "form-label" %>
+                <%= f.select :speciality, [], {}, class: "form-select", data: { business_category_target: "speciality" } %>
+              </div>
+            </div>
+            <div class="row g-3 mb-3">
+              <div class="col-12 col-sm-6">
+                <%= f.label :business_category_id, "Category (from list)", class: "form-label" %>
+                <%= f.collection_select :business_category_id, @guest.forum.business_categories.order(:name), :id, :name, { include_blank: true }, class: "form-select" %>
+              </div>
+              <div class="col-12 col-sm-6">
+                <%= f.label :website, class: "form-label" %>
+                <%= f.text_field :website, class: "form-control", placeholder: "https://..." %>
+              </div>
+            </div>
+            <div class="row g-3 mb-3">
+              <div class="col-12 col-sm-6">
+                <%= f.label :capacity, "Business Capacity", class: "form-label" %>
+                <%= f.text_field :capacity, class: "form-control", placeholder: "e.g. 500 units/month, team of 12" %>
+              </div>
+              <div class="col-12 col-sm-6">
+                <%= f.label :service_area, "Service Coverage Area", class: "form-label" %>
+                <%= f.text_field :service_area, class: "form-control", placeholder: "e.g. Only Bengaluru" %>
+              </div>
+            </div>
+            <div class="mb-4">
+              <%= f.label :company_logo, "Company Logo", class: "form-label" %>
+              <%= f.file_field :company_logo, class: "form-control", accept: "image/*" %>
+              <% if @guest.company_logo.attached? %><div class="form-text">A logo is already on file — choose a new one only to replace it.</div><% end %>
+            </div>
+
+            <h2 class="h6 text-uppercase text-muted mb-3">Address</h2>
+            <div class="mb-3">
+              <%= f.label :address, class: "form-label" %>
+              <%= f.text_area :address, class: "form-control", rows: 2 %>
+            </div>
+            <div class="mb-4">
+              <%= f.label :city, "Location (City)", class: "form-label" %>
+              <%= f.text_field :city, class: "form-control" %>
+            </div>
+
+            <h2 class="h6 text-uppercase text-muted mb-3">Statutory Details</h2>
+            <div class="row g-3 mb-3">
+              <div class="col-12 col-sm-4">
+                <%= f.label :gst_number, "GST Number", class: "form-label" %>
+                <%= f.text_field :gst_number, class: "form-control" %>
+              </div>
+              <div class="col-12 col-sm-4">
+                <%= f.label :pan_number, "PAN Number", class: "form-label" %>
+                <%= f.text_field :pan_number, class: "form-control" %>
+              </div>
+              <div class="col-12 col-sm-4">
+                <%= f.label :aadhaar_number, "Aadhaar Number", class: "form-label" %>
+                <%= f.text_field :aadhaar_number, class: "form-control" %>
+              </div>
+            </div>
+            <div class="mb-4">
+              <%= f.label :kyc_documents, "KYC Documents (GST / PAN / Aadhaar copies — multiple allowed)", class: "form-label" %>
+              <%= f.file_field :kyc_documents, multiple: true, class: "form-control" %>
+              <% if @guest.kyc_documents.attached? %><div class="form-text"><%= pluralize(@guest.kyc_documents.count, "document") %> already on file — new uploads are added, not replaced.</div><% end %>
+            </div>
+
+            <h2 class="h6 text-uppercase text-muted mb-3">Social Media</h2>
+            <div class="mb-4">
+              <%= f.label :social_media_handle, "Social Media Handle(s)", class: "form-label" %>
+              <%= f.text_field :social_media_handle, class: "form-control", placeholder: "e.g. Instagram @yourbusiness, Facebook /yourbusiness" %>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-lg w-100" data-submit-loading-target="button" data-loading-text="Saving...">
+              <span data-submit-loading-target="spinner" class="spinner-border spinner-border-sm me-2 d-none" role="status" aria-hidden="true"></span>
+              <span data-submit-loading-target="label"><i class="bi bi-check-circle me-1"></i> Save My Details</span>
+            </button>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

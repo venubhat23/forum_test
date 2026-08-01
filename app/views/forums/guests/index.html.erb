@@ -66,6 +66,9 @@
               <div class="d-flex align-items-center gap-2">
                 <span class="row-avatar"><%= guest.full_name.first.upcase %></span>
                 <span class="fw-semibold"><%= guest.full_name %></span>
+                <% if guest.profile_submitted_at.present? %>
+                  <span class="badge bg-success-subtle text-success" title="Filled in their own profile on <%= guest.profile_submitted_at.strftime('%d %b %Y') %>">Profile filled</span>
+                <% end %>
               </div>
             </td>
             <td><%= guest.email %></td>
@@ -76,6 +79,11 @@
               <% if @upcoming_event && (invite_link = whatsapp_invite_link(guest, @upcoming_event, @current_forum)) %>
                 <%= link_to invite_link, class: "icon-btn icon-btn-whatsapp", title: "Invite to #{@upcoming_event.title} via WhatsApp", target: "_blank", rel: "noopener" do %>
                   <i class="bi bi-whatsapp"></i>
+                <% end %>
+              <% end %>
+              <% if (profile_link = whatsapp_profile_form_link(guest, @current_forum)) %>
+                <%= link_to profile_link, class: "icon-btn icon-btn-whatsapp", title: "Ask #{guest.display_name} to fill their profile", target: "_blank", rel: "noopener" do %>
+                  <i class="bi bi-person-lines-fill"></i>
                 <% end %>
               <% end %>
               <%= link_to forum_chapter_guest_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: guest.id), class: "icon-btn icon-btn-view", title: "View" do %>

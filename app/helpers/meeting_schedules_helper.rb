@@ -16,4 +16,22 @@ module MeetingSchedulesHelper
       forum_name: forum.name, when_text: when_text, range_text: range_text,
       venue_text: venue_text, agenda_text: agenda_text)
   end
+
+  # Builds a wa.me click-to-chat link that opens WhatsApp with a pre-filled
+  # invite message for the recurring schedule's guest speaker.
+  def whatsapp_schedule_speaker_invite_link(schedule, forum)
+    return nil if schedule.speaker.blank?
+
+    whatsapp_link(schedule.speaker_phone, whatsapp_schedule_speaker_invite_message(schedule, forum))
+  end
+
+  def whatsapp_schedule_speaker_invite_message(schedule, forum)
+    when_text = "Every #{schedule.day_name}, #{schedule.start_time.strftime('%I:%M %p')}–#{schedule.end_time.strftime('%I:%M %p')}, " \
+      "from #{schedule.start_date.strftime('%d %b %Y')} to #{schedule.end_date.strftime('%d %b %Y')}"
+    venue_text = schedule.venue.present? ? "\n📍 Venue: #{schedule.venue}" : ""
+
+    WhatsappTemplate.render(forum, :speaker_invite,
+      name: schedule.speaker, subject: schedule.topic.presence || schedule.title.presence || "our chapter meeting",
+      forum_name: forum.name, when_text: when_text, venue_text: venue_text)
+  end
 end
