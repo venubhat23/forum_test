@@ -6,8 +6,23 @@
     <p class="page-subtitle mb-0">Recurring meeting schedules across every chapter in <%= @current_forum.name %>.</p>
   </div>
   <% if can? :create, MeetingSchedule %>
-    <%= link_to forum_chapters_path(forum_slug: @current_forum.slug), class: "btn btn-primary" do %>
-      <i class="bi bi-plus-lg me-1"></i> Schedule Meeting
+    <% chapters = @current_forum.chapters.order(:name) %>
+    <% if chapters.size == 1 %>
+      <%= link_to new_forum_chapter_meeting_schedule_path(forum_slug: @current_forum.slug, chapter_id: chapters.first.id), class: "btn btn-primary" do %>
+        <i class="bi bi-plus-lg me-1"></i> Schedule Meeting
+      <% end %>
+    <% elsif chapters.any? %>
+      <div class="dropdown">
+        <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+          <i class="bi bi-plus-lg me-1"></i> Schedule Meeting
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end">
+          <li><h6 class="dropdown-header">Choose a chapter</h6></li>
+          <% chapters.each do |chapter| %>
+            <li><%= link_to chapter.name, new_forum_chapter_meeting_schedule_path(forum_slug: @current_forum.slug, chapter_id: chapter.id), class: "dropdown-item" %></li>
+          <% end %>
+        </ul>
+      </div>
     <% end %>
   <% end %>
 </div>
