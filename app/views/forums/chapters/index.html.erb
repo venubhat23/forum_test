@@ -96,6 +96,11 @@
                 <%= link_to forum_chapter_path(forum_slug: @current_forum.slug, id: chapter.id), class: "icon-btn icon-btn-view", title: "View" do %>
                   <i class="bi bi-eye"></i>
                 <% end %>
+                <% if can? :read, MeetingSchedule %>
+                  <%= link_to forum_chapter_meeting_schedules_path(forum_slug: @current_forum.slug, chapter_id: chapter.id), class: "icon-btn", title: "Scheduled Meetings" do %>
+                    <i class="bi bi-calendar-week"></i>
+                  <% end %>
+                <% end %>
                 <% if can? :destroy, chapter %>
                   <%= button_to destroy_permanently_forum_chapter_path(forum_slug: @current_forum.slug, id: chapter.id), method: :delete, class: "icon-btn icon-btn-danger", title: "Delete Permanently",
                         data: { turbo_confirm: "Permanently delete #{chapter.name}? This will also permanently delete all its members, guests, and committee members (and everything belonging to them), its meetings, meeting schedules, and presentations, and unlink its events, announcements, support tickets, applications, and referrals. This cannot be undone." } do %>
