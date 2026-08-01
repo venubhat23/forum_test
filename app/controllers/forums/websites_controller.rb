@@ -50,9 +50,15 @@ module Forums
     # profile_token is generated on create (has_secure_token), but members
     # created before that column existed have a blank one — backfill lazily
     # the first time they're shown on a public page, so every member ends up
-    # with a stable link without a one-off data migration.
+    # with a stable link without a one-off data migration. Uses update_column
+    # (skips validations) because regenerate_profile_token's update! would
+    # otherwise re-validate the whole record — a legacy member missing an
+    # unrelated required field (e.g. phone) would then take down this public,
+    # unauthenticated page for the entire forum.
     def ensure_profile_tokens!(members)
-      members.select { |m| m.profile_token.blank? }.each(&:regenerate_profile_token)
+      members.select { |m| m.profile_token.blank? }.each do |member|
+        member.update_column(:profile_token, User.generate_unique_secure_token)
+      end
     end
 
     def set_current_forum

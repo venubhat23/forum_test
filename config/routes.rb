@@ -199,7 +199,12 @@ Rails.application.routes.draw do
           post :check_in
         end
       end
-      resources :meeting_schedules, controller: "forums/meeting_schedules", only: [ :index, :new, :create, :show, :destroy ]
+      resources :meeting_schedules, controller: "forums/meeting_schedules", only: [ :index, :new, :create, :show, :destroy ] do
+        member do
+          post :add_attendees
+          delete :remove_attendee
+        end
+      end
       resources :weekly_presentations, controller: "forums/weekly_presentations", only: [ :index, :new, :create, :show, :edit, :update, :destroy ]
       resources :attendances, controller: "forums/attendances", only: [ :index, :new, :create ]
       resources :referrals, controller: "forums/referrals", only: [ :index, :new, :create, :show ] do

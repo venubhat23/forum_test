@@ -1,12 +1,12 @@
-<% content_for :title, "Leads · #{@current_forum.name}" %>
+<% content_for :title, "Referrals · #{@current_forum.name}" %>
 
 <div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-2">
   <div>
-    <h1 class="page-title h4">Leads</h1>
+    <h1 class="page-title h4">Referrals</h1>
     <p class="page-subtitle mb-0"><%= @current_forum.name %></p>
   </div>
   <%= link_to new_forum_lead_path(forum_slug: @current_forum.slug), class: "btn btn-primary" do %>
-    <i class="bi bi-plus-lg me-1"></i> Create Lead
+    <i class="bi bi-plus-lg me-1"></i> Create Referral
   <% end %>
 </div>
 
@@ -14,7 +14,7 @@
   <div class="col-6 col-lg-3">
     <div class="mini-stat-card">
       <div>
-        <div class="mini-stat-label">Total</div>
+        <div class="mini-stat-label">Total Referrals</div>
         <div class="mini-stat-value text-primary"><%= @total_leads %></div>
       </div>
       <div class="mini-stat-icon mini-stat-icon-primary"><i class="bi bi-lightbulb"></i></div>

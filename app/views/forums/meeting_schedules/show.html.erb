@@ -105,17 +105,44 @@
     <% @schedule.attendees.order(:full_name).each do |attendee| %>
       <div class="list-group-item d-flex justify-content-between align-items-center flex-wrap gap-2">
         <span><%= attendee.display_name %> <span class="text-muted small"><%= attendee.email %></span></span>
-        <% if can?(:update, @schedule) && (wa_link = whatsapp_schedule_invite_link(attendee, @schedule, @current_forum)) %>
-          <%= link_to wa_link, class: "icon-btn icon-btn-whatsapp", title: "Send invite via WhatsApp", target: "_blank", rel: "noopener" do %>
-            <i class="bi bi-whatsapp"></i>
+        <div class="d-flex align-items-center gap-2">
+          <% if can?(:update, @schedule) && (wa_link = whatsapp_schedule_invite_link(attendee, @schedule, @current_forum)) %>
+            <%= link_to wa_link, class: "icon-btn icon-btn-whatsapp", title: "Send invite via WhatsApp", target: "_blank", rel: "noopener" do %>
+              <i class="bi bi-whatsapp"></i>
+            <% end %>
           <% end %>
-        <% end %>
+          <% if can? :update, @schedule %>
+            <%= button_to remove_attendee_forum_chapter_meeting_schedule_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: @schedule.id, user_id: attendee.id),
+                  method: :delete, class: "icon-btn icon-btn-danger", title: "Remove attendee",
+                  data: { turbo_confirm: "Remove #{attendee.display_name} from this schedule?" } do %>
+              <i class="bi bi-x-lg"></i>
+            <% end %>
+          <% end %>
+        </div>
       </div>
     <% end %>
     <% if @schedule.attendees.empty? %>
       <div class="list-group-item text-muted text-center py-3">No attendees invited.</div>
     <% end %>
   </div>
+  <% if can?(:update, @schedule) && @addable_candidates.present? %>
+    <div class="card-body border-top">
+      <%= form_with url: add_attendees_forum_chapter_meeting_schedule_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: @schedule.id),
+            method: :post, local: true, data: { controller: "submit-loading", action: "submit->submit-loading#start" } do %>
+        <div class="mb-2">
+          <%= label_tag "attendee_ids", "Add Attendees", class: "form-label" %>
+          <% candidates_by_chapter = @addable_candidates.group_by(&:chapter) %>
+          <%= select_tag "attendee_ids[]",
+                grouped_options_for_select(candidates_by_chapter.map { |chapter, people| [ chapter&.name || "No Chapter", people.map { |p| [ p.display_name, p.id ] } ] }),
+                multiple: true, class: "form-select" %>
+        </div>
+        <button type="submit" class="btn btn-outline-primary btn-sm" data-submit-loading-target="button" data-loading-text="Adding...">
+          <span data-submit-loading-target="spinner" class="spinner-border spinner-border-sm me-2 d-none" role="status" aria-hidden="true"></span>
+          <span data-submit-loading-target="label"><i class="bi bi-person-plus me-1"></i> Add Selected</span>
+        </button>
+      <% end %>
+    </div>
+  <% end %>
 </div>
 
 <%= render "status_panel", schedule: @schedule, occurrences: @occurrences %>

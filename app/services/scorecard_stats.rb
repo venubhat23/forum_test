@@ -1,13 +1,13 @@
 class ScorecardStats
-  # Out of 100. Leads converted and business generated carry the most weight
-  # since they reflect closed value, not just activity volume.
+  # Out of 100. referrals_given/received each fold in the equivalent Lead
+  # activity (creating a Lead counts as "giving", converting one counts as
+  # "receiving") since Leads are presented as Referrals in the UI. Business
+  # generated carries the most weight since it reflects closed value, not
+  # just activity volume.
   COUNT_WEIGHTS = {
-    referrals_given: 15,
-    referrals_received: 10,
-    leads_created: 10,
-    leads_converted: 20,
-    one_to_ones: 15,
-    business_generated: 15
+    referrals_given: 25,
+    referrals_received: 30,
+    business_generated: 30
   }.freeze
   ATTENDANCE_WEIGHT = 15
 
@@ -21,13 +21,10 @@ class ScorecardStats
     date_range = @month.beginning_of_month..@month.end_of_month
     time_range = date_range.first.beginning_of_day..date_range.last.end_of_day
 
-    referrals_given = Referral.where(referrer_id: member_ids, created_at: time_range).group(:referrer_id).count
-    referrals_received = Referral.where(referred_user_id: member_ids, created_at: time_range).group(:referred_user_id).count
+    referrals_given_direct = Referral.where(referrer_id: member_ids, created_at: time_range).group(:referrer_id).count
+    referrals_received_direct = Referral.where(referred_user_id: member_ids, created_at: time_range).group(:referred_user_id).count
     leads_created = Lead.where(created_by_id: member_ids, created_at: time_range).group(:created_by_id).count
     leads_converted = Lead.where(accepted_by_id: member_ids, stage: :converted, thanksgiving_given_at: time_range).group(:accepted_by_id).count
-
-    one_to_ones_as_requester = OneToOneMeeting.where(status: :completed, requester_id: member_ids, scheduled_at: time_range).group(:requester_id).count
-    one_to_ones_as_requested = OneToOneMeeting.where(status: :completed, requested_with_id: member_ids, scheduled_at: time_range).group(:requested_with_id).count
 
     chapter_ids = @members.map(&:chapter_id).compact.uniq
     total_meetings_by_chapter = Meeting.where(chapter_id: chapter_ids, scheduled_at: time_range).group(:chapter_id).count
@@ -42,11 +39,8 @@ class ScorecardStats
       attendance_pct = total_meetings.positive? ? ((present.to_f / total_meetings) * 100).round(1) : 0
 
       hash[member.id] = {
-        referrals_given: referrals_given[member.id].to_i,
-        referrals_received: referrals_received[member.id].to_i,
-        leads_created: leads_created[member.id].to_i,
-        leads_converted: leads_converted[member.id].to_i,
-        one_to_ones: one_to_ones_as_requester[member.id].to_i + one_to_ones_as_requested[member.id].to_i,
+        referrals_given: referrals_given_direct[member.id].to_i + leads_created[member.id].to_i,
+        referrals_received: referrals_received_direct[member.id].to_i + leads_converted[member.id].to_i,
         attendance_pct: attendance_pct,
         business_generated: thanksgiving_business[member.id].to_i + lead_business[member.id].to_i
       }

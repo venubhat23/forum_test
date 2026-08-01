@@ -87,7 +87,7 @@
   <div class="mb-4" data-controller="attendee-picker" data-attendee-picker-chapter-id-value="<%= @chapter.id %>">
     <div class="mb-2">
       <%= label_tag nil, "Invite", class: "form-label" %>
-      <select class="form-select" style="max-width: 320px;" data-attendee-picker-target="scope" data-action="attendee-picker#scopeChanged">
+      <select name="meeting_schedule[attendee_scope]" class="form-select" style="max-width: 320px;" data-attendee-picker-target="scope" data-action="attendee-picker#scopeChanged">
         <option value="custom">Select specific people</option>
         <option value="chapter">Everyone in <%= @chapter.name %></option>
         <option value="forum">Everyone in <%= @current_forum.name %></option>

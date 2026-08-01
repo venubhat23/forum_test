@@ -5,6 +5,24 @@
   <p class="page-subtitle mb-0">Here's how <%= @current_forum.name %> is doing.</p>
 </div>
 
+<div class="card mb-4">
+  <div class="card-header fw-semibold"><i class="bi bi-globe2 me-1"></i> Our Website</div>
+  <div class="card-body">
+    <div class="d-flex flex-wrap align-items-center gap-2">
+      <code id="forum-website-url" class="flex-grow-1" style="min-width: 200px;"><%= forum_website_url(forum_slug: @current_forum.slug) %></code>
+      <button type="button" class="btn btn-outline-secondary btn-sm" onclick="navigator.clipboard.writeText(document.getElementById('forum-website-url').innerText)" title="Copy URL">
+        <i class="bi bi-clipboard me-1"></i> Copy
+      </button>
+      <%= link_to "https://wa.me/?text=#{ERB::Util.url_encode("Check out #{@current_forum.name}: #{forum_website_url(forum_slug: @current_forum.slug)}")}", class: "btn btn-sm", style: "background:#25d366; color:#fff;", target: "_blank", rel: "noopener" do %>
+        <i class="bi bi-whatsapp me-1"></i> Share on WhatsApp
+      <% end %>
+      <%= link_to forum_website_url(forum_slug: @current_forum.slug), class: "btn btn-outline-primary btn-sm", target: "_blank", rel: "noopener" do %>
+        <i class="bi bi-box-arrow-up-right me-1"></i> Visit
+      <% end %>
+    </div>
+  </div>
+</div>
+
 <% if @lead_stats_scope == :forum %>
   <div class="row g-3 mb-4">
     <div class="col-6 col-lg-4">
@@ -88,15 +106,15 @@
 <% if can? :read, Lead %>
   <div class="d-flex justify-content-between align-items-center mb-3">
     <h2 class="h6 text-uppercase text-muted mb-0">
-      <%= @lead_stats_scope == :forum ? "Leads (Forum-wide)" : "Your Leads" %>
+      <%= @lead_stats_scope == :forum ? "Referrals (Forum-wide)" : "Your Referrals" %>
     </h2>
-    <%= link_to "View Leads", forum_leads_path(forum_slug: @current_forum.slug), class: "btn btn-sm btn-outline-primary" %>
+    <%= link_to "View Referrals", forum_leads_path(forum_slug: @current_forum.slug), class: "btn btn-sm btn-outline-primary" %>
   </div>
   <div class="row g-3 mb-4">
     <div class="col-6 col-lg">
       <div class="mini-stat-card">
         <div>
-          <div class="mini-stat-label"><%= @lead_stats_scope == :forum ? "Total Leads" : "Created by You" %></div>
+          <div class="mini-stat-label"><%= @lead_stats_scope == :forum ? "Total Referrals" : "Created by You" %></div>
           <div class="mini-stat-value text-primary"><%= @leads_created_count %></div>
         </div>
         <div class="mini-stat-icon mini-stat-icon-primary"><i class="bi bi-lightbulb"></i></div>

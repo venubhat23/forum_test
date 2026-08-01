@@ -50,6 +50,21 @@ class MeetingSchedule < ApplicationRecord
     update_column(:meetings_generated_at, Time.current)
   end
 
+  # Notifies a specific set of attendees (defaults to everyone currently
+  # invited) about this recurring schedule — used both for the initial
+  # invite on creation and for anyone added later via add_attendees.
+  def notify_attendees(users = attendees)
+    return if users.none?
+
+    message = "You've been invited to a new recurring meeting schedule" \
+      "#{" \"#{title}\"" if title.present?}: every #{day_name}, " \
+      "#{start_time.strftime('%I:%M %p')}–#{end_time.strftime('%I:%M %p')}, " \
+      "from #{start_date.strftime('%d %b %Y')} to #{end_date.strftime('%d %b %Y')}" \
+      "#{" at #{venue}" if venue.present?}."
+    message += " Entry fee: #{ActiveSupport::NumberHelper.number_to_currency(fee_amount)} per meeting — see each meeting page for payment details." if fee_amount.present?
+    users.find_each { |user| user.notifications.create!(body: message) }
+  end
+
   private
 
   def end_time_after_start_time
@@ -89,18 +104,6 @@ class MeetingSchedule < ApplicationRecord
         fee_amount: fee_amount
       )
     end
-  end
-
-  def notify_attendees
-    return if attendees.none?
-
-    message = "You've been invited to a new recurring meeting schedule" \
-      "#{" \"#{title}\"" if title.present?}: every #{day_name}, " \
-      "#{start_time.strftime('%I:%M %p')}–#{end_time.strftime('%I:%M %p')}, " \
-      "from #{start_date.strftime('%d %b %Y')} to #{end_date.strftime('%d %b %Y')}" \
-      "#{" at #{venue}" if venue.present?}."
-    message += " Entry fee: #{ActiveSupport::NumberHelper.number_to_currency(fee_amount)} per meeting — see each meeting page for payment details." if fee_amount.present?
-    attendees.find_each { |user| user.notifications.create!(body: message) }
   end
 
   def clear_meetings

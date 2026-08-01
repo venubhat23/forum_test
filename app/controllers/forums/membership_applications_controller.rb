@@ -27,7 +27,7 @@ module Forums
           full_name: @application.name,
           email: @application.email,
           phone: @application.phone,
-          business_name: @application.business_name,
+          business_name: @application.company_name,
           password: password,
           password_confirmation: password
         )

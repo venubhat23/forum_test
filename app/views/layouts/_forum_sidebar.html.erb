@@ -47,9 +47,9 @@
       <div class="nav-section-title">Engagement</div>
       <ul class="nav-menu">
         <li class="nav-item">
-          <%= link_to forum_leads_path(forum_slug: @current_forum.slug), class: "nav-link-modern #{'active' if request.path.start_with?(forum_leads_path(forum_slug: @current_forum.slug))}", data: { tooltip: "Leads" } do %>
+          <%= link_to forum_leads_path(forum_slug: @current_forum.slug), class: "nav-link-modern #{'active' if request.path.start_with?(forum_leads_path(forum_slug: @current_forum.slug))}", data: { tooltip: "Referral" } do %>
             <div class="nav-icon-modern"><div class="icon-bg gradient-orange"><i class="bi bi-lightbulb"></i></div></div>
-            <span class="nav-text">Leads</span>
+            <span class="nav-text">Referral</span>
           <% end %>
         </li>
         <li class="nav-item">
@@ -182,9 +182,9 @@
         </li>
         <% if can? :read, Lead %>
           <li class="nav-item">
-            <%= link_to forum_leads_path(forum_slug: @current_forum.slug), class: "nav-link-modern #{'active' if request.path.start_with?(forum_leads_path(forum_slug: @current_forum.slug))}", data: { tooltip: "Leads" } do %>
+            <%= link_to forum_leads_path(forum_slug: @current_forum.slug), class: "nav-link-modern #{'active' if request.path.start_with?(forum_leads_path(forum_slug: @current_forum.slug))}", data: { tooltip: "Referral" } do %>
               <div class="nav-icon-modern"><div class="icon-bg gradient-orange"><i class="bi bi-lightbulb"></i></div></div>
-              <span class="nav-text">Leads</span>
+              <span class="nav-text">Referral</span>
             <% end %>
           </li>
         <% end %>

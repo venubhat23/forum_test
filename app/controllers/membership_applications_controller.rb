@@ -24,6 +24,6 @@ class MembershipApplicationsController < ApplicationController
   end
 
   def application_params
-    params.require(:membership_application).permit(:name, :email, :phone, :business_name, :nature_of_business)
+    params.require(:membership_application).permit(:name, :email, :phone, :company_name)
   end
 end

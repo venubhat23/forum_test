@@ -1,7 +1,7 @@
-<% content_for :title, "Create Lead" %>
+<% content_for :title, "Create Referral" %>
 
 <div class="page-header">
-  <h1 class="page-title h4">Create Lead</h1>
+  <h1 class="page-title h4">Create Referral</h1>
   <p class="page-subtitle mb-0"><%= @current_forum.name %></p>
 </div>
 
@@ -53,7 +53,7 @@
           <div class="d-flex flex-wrap gap-2">
             <button type="submit" class="btn btn-primary btn-lg" data-submit-loading-target="button" data-loading-text="Creating...">
               <span data-submit-loading-target="spinner" class="spinner-border spinner-border-sm me-2 d-none" role="status" aria-hidden="true"></span>
-              <span data-submit-loading-target="label">Create Lead</span>
+              <span data-submit-loading-target="label">Create Referral</span>
             </button>
             <%= link_to "Cancel", forum_leads_path(forum_slug: @current_forum.slug), class: "btn btn-outline-secondary btn-lg" %>
           </div>

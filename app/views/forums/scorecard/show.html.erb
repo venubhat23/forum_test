@@ -22,7 +22,7 @@
 </div>
 
 <div class="alert alert-info small mb-4">
-  <strong>How this is scored:</strong> Referrals &amp; Leads (given/received), 1-2-1 meetings completed, meeting attendance %, and Business Generated (₹) all feed into a single Score out of 100, weighted toward converted leads and closed business.
+  <strong>How this is scored:</strong> Referrals (given/received — including Leads created/converted), meeting attendance %, and Business Generated (₹) all feed into a single Score out of 100, weighted toward closed business.
   <%= "Ranked by Score." if @scope != :personal %>
 </div>
 
@@ -45,33 +45,6 @@
           <div class="mini-stat-value text-info"><%= stats[:referrals_received] %></div>
         </div>
         <div class="mini-stat-icon mini-stat-icon-info"><i class="bi bi-arrow-down-left-circle"></i></div>
-      </div>
-    </div>
-    <div class="col-6 col-lg-3">
-      <div class="mini-stat-card">
-        <div>
-          <div class="mini-stat-label">Leads Created</div>
-          <div class="mini-stat-value text-primary"><%= stats[:leads_created] %></div>
-        </div>
-        <div class="mini-stat-icon mini-stat-icon-primary"><i class="bi bi-lightbulb"></i></div>
-      </div>
-    </div>
-    <div class="col-6 col-lg-3">
-      <div class="mini-stat-card">
-        <div>
-          <div class="mini-stat-label">Leads Converted</div>
-          <div class="mini-stat-value text-success"><%= stats[:leads_converted] %></div>
-        </div>
-        <div class="mini-stat-icon mini-stat-icon-success"><i class="bi bi-trophy"></i></div>
-      </div>
-    </div>
-    <div class="col-6 col-lg-3">
-      <div class="mini-stat-card">
-        <div>
-          <div class="mini-stat-label">1-2-1 Meetings</div>
-          <div class="mini-stat-value text-info"><%= stats[:one_to_ones] %></div>
-        </div>
-        <div class="mini-stat-icon mini-stat-icon-info"><i class="bi bi-people"></i></div>
       </div>
     </div>
     <div class="col-6 col-lg-3">
@@ -134,9 +107,6 @@
             <th>Member</th>
             <th class="text-center">Referrals Given</th>
             <th class="text-center">Referrals Received</th>
-            <th class="text-center">Leads Created</th>
-            <th class="text-center">Leads Converted</th>
-            <th class="text-center">1-2-1s</th>
             <th class="text-center">Attendance</th>
             <th class="text-end">Business Generated</th>
             <th class="text-end">Score</th>
@@ -169,16 +139,13 @@
               </td>
               <td class="text-center"><%= stats[:referrals_given] %></td>
               <td class="text-center"><%= stats[:referrals_received] %></td>
-              <td class="text-center"><%= stats[:leads_created] %></td>
-              <td class="text-center"><%= stats[:leads_converted] %></td>
-              <td class="text-center"><%= stats[:one_to_ones] %></td>
               <td class="text-center"><%= stats[:attendance_pct] %>%</td>
               <td class="text-end fw-semibold text-success"><%= number_to_currency(stats[:business_generated]) %></td>
               <td class="text-end fw-semibold"><%= stats[:score] %></td>
             </tr>
           <% end %>
           <% if @sorted_members.empty? %>
-            <tr><td colspan="10" class="text-center text-muted py-4">No members yet.</td></tr>
+            <tr><td colspan="7" class="text-center text-muted py-4">No members yet.</td></tr>
           <% end %>
         </tbody>
       </table>
