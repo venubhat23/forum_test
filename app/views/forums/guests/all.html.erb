@@ -11,6 +11,26 @@
       <% end %>
     </p>
   </div>
+  <% if current_user.chapter_admin? %>
+    <%= link_to new_forum_chapter_guest_path(forum_slug: @current_forum.slug, chapter_id: current_user.chapter_id), class: "btn btn-primary" do %>
+      <i class="bi bi-plus-lg me-1"></i> Add Guest
+    <% end %>
+  <% else %>
+    <div class="dropdown">
+      <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <i class="bi bi-plus-lg me-1"></i> Add Guest
+      </button>
+      <ul class="dropdown-menu dropdown-menu-end">
+        <li><h6 class="dropdown-header">Choose a chapter</h6></li>
+        <% @current_forum.chapters.active.order(:name).each do |chapter| %>
+          <li><%= link_to chapter.name, new_forum_chapter_guest_path(forum_slug: @current_forum.slug, chapter_id: chapter.id), class: "dropdown-item" %></li>
+        <% end %>
+        <% if @current_forum.chapters.active.none? %>
+          <li><span class="dropdown-item-text text-muted">No active chapters yet</span></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
 </div>
 
 <div class="row g-3 mb-4">

@@ -12,6 +12,33 @@
         <div class="alert alert-success"><%= flash[:notice] %></div>
       <% end %>
 
+      <% if @invited_meetings.present? %>
+        <div class="card mb-4">
+          <div class="card-header fw-semibold"><i class="bi bi-calendar-event me-1"></i> Meeting Invitation<%= "s" if @invited_meetings.size > 1 %></div>
+          <div class="card-body">
+            <% @invited_meetings.each do |meeting| %>
+              <div class="d-flex flex-wrap justify-content-between align-items-start gap-3<%= " pb-3 mb-3 border-bottom" unless meeting == @invited_meetings.last %>">
+                <div>
+                  <div class="fw-semibold"><%= meeting.topic.presence || "#{meeting.meeting_type.titleize} Meeting" %></div>
+                  <div class="text-muted small">
+                    <i class="bi bi-calendar3 me-1"></i><%= meeting.scheduled_at.strftime("%d %b %Y") %>
+                    &middot; <i class="bi bi-clock me-1"></i><%= meeting.scheduled_at.strftime("%I:%M %p") %>
+                    <% if meeting.venue.present? %>&middot; <i class="bi bi-geo-alt me-1"></i><%= meeting.venue %><% end %>
+                  </div>
+                </div>
+                <div class="text-end">
+                  <% if meeting.fee_amount.present? %>
+                    <span class="badge bg-warning-subtle text-warning-emphasis fs-6"><%= number_to_currency(meeting.fee_amount) %> fee</span>
+                  <% else %>
+                    <span class="badge bg-success-subtle text-success">No fee</span>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+
       <div class="card">
         <div class="card-body p-4">
           <p class="text-muted mb-4">Fill in your details below. You can come back and update this anytime using the same link — it will be ready for our team to review when you're converted to a member.</p>
@@ -141,10 +168,18 @@
 
             <h2 class="h6 text-uppercase text-muted mb-3">Meeting Fee</h2>
             <div class="mb-4" data-controller="fee-toggle">
+              <% fee_meetings = @invited_meetings.select { |m| m.fee_amount.present? } %>
+              <% fee_label = if fee_meetings.size == 1
+                   "I have paid the #{number_to_currency(fee_meetings.first.fee_amount)} meeting fee"
+                 elsif fee_meetings.size > 1
+                   "I have paid the meeting fee(s) (#{fee_meetings.map { |m| number_to_currency(m.fee_amount) }.join(', ')})"
+                 else
+                   "I have paid the meeting fee"
+                 end %>
               <div class="form-check mb-2">
                 <%= f.check_box :meeting_fee_paid, class: "form-check-input",
                       data: { action: "fee-toggle#toggle", "fee-toggle-target": "checkbox" } %>
-                <%= f.label :meeting_fee_paid, "I have paid the meeting fee", class: "form-check-label" %>
+                <%= f.label :meeting_fee_paid, fee_label, class: "form-check-label" %>
               </div>
               <div data-fee-toggle-target="amountWrap" class="<%= "d-none" unless @guest.meeting_fee_paid? %>">
                 <%= f.label :meeting_fee_screenshot, "Upload Payment Screenshot", class: "form-label" %>

@@ -4,7 +4,10 @@ class GuestProfileFormsController < ApplicationController
   rescue_from ActiveRecord::RecordNotFound, with: :guest_not_found
 
   def edit
-    render :already_converted unless @guest.guest?
+    return render :already_converted unless @guest.guest?
+
+    @invited_meetings = @guest.attendances.where(event_type: :meeting).where.not(meeting_id: nil)
+      .includes(:meeting).map(&:meeting).compact.uniq.sort_by(&:scheduled_at)
   end
 
   def update

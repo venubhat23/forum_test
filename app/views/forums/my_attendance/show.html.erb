@@ -3,56 +3,65 @@
 <div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-2">
   <div>
     <h1 class="page-title h4">My Attendance</h1>
-    <p class="page-subtitle mb-0">Mark yourself present for today's weekly meeting or events.</p>
+    <p class="page-subtitle mb-0">Your upcoming meetings, events, one-to-ones and office darshan visits &mdash; mark yourself present as they happen.</p>
   </div>
 </div>
 
 <div class="card mb-4">
-  <div class="card-header fw-semibold">Today's Weekly Meeting</div>
+  <div class="card-header fw-semibold">Weekly Meetings</div>
   <div class="card-body">
-    <% if @todays_meeting.nil? %>
-      <p class="text-muted mb-0">No meeting scheduled today for your chapter.</p>
+    <% if @upcoming_meetings.empty? %>
+      <p class="text-muted mb-0">No upcoming meetings scheduled for your chapter.</p>
     <% else %>
-      <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
-        <div>
-          <div class="fw-semibold"><%= @todays_meeting.meeting_type.titleize %> Meeting</div>
-          <div class="text-muted small">
-            <%= @todays_meeting.scheduled_at.strftime("%d %b %Y %H:%M") %>
-            <% if @todays_meeting.venue.present? %> &middot; <%= @todays_meeting.venue %><% end %>
-          </div>
-        </div>
-        <% if @todays_meeting_attendance&.attended? %>
-          <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>You're marked attended</span>
-        <% else %>
-          <div class="d-flex align-items-center gap-2">
-            <% if @todays_meeting_attendance&.attending? %>
-              <span class="badge bg-info text-dark"><i class="bi bi-clock me-1"></i>Marked attending &middot; awaiting admin confirmation</span>
-            <% elsif @todays_meeting_attendance&.absent? %>
-              <span class="badge bg-danger"><i class="bi bi-x-circle me-1"></i>Marked not attending</span>
+      <ul class="list-group list-group-flush">
+        <% @upcoming_meetings.each do |meeting| %>
+          <% attendance = @meeting_attendances[meeting.id] %>
+          <% is_today = meeting.scheduled_at.to_date == Date.current %>
+          <li class="list-group-item d-flex flex-wrap justify-content-between align-items-center gap-2 px-0">
+            <div>
+              <div class="fw-semibold"><%= meeting.meeting_type.titleize %> Meeting</div>
+              <div class="text-muted small">
+                <%= meeting.scheduled_at.strftime("%d %b %Y %H:%M") %>
+                <% if meeting.venue.present? %> &middot; <%= meeting.venue %><% end %>
+              </div>
+            </div>
+            <% if attendance&.attended? %>
+              <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>You're marked attended</span>
+            <% elsif !is_today %>
+              <span class="badge bg-secondary-subtle text-secondary-emphasis">Scheduled &mdash; check in on the day</span>
+            <% else %>
+              <div class="d-flex align-items-center gap-2">
+                <% if attendance&.attending? %>
+                  <span class="badge bg-info text-dark"><i class="bi bi-clock me-1"></i>Marked attending &middot; awaiting admin confirmation</span>
+                <% elsif attendance&.absent? %>
+                  <span class="badge bg-danger"><i class="bi bi-x-circle me-1"></i>Marked not attending</span>
+                <% end %>
+                <% unless attendance&.attending? %>
+                  <%= button_to "Yes, I'm Attending", check_in_forum_chapter_meeting_path(forum_slug: @current_forum.slug, chapter_id: meeting.chapter_id, id: meeting.id),
+                        method: :post, params: { attending: "1" }, class: "btn btn-success btn-sm" %>
+                <% end %>
+                <% unless attendance&.absent? %>
+                  <%= button_to "No, Not Attending", check_in_forum_chapter_meeting_path(forum_slug: @current_forum.slug, chapter_id: meeting.chapter_id, id: meeting.id),
+                        method: :post, params: { attending: "0" }, class: "btn btn-outline-danger btn-sm" %>
+                <% end %>
+              </div>
             <% end %>
-            <% unless @todays_meeting_attendance&.attending? %>
-              <%= button_to "Yes, I'm Attending", check_in_forum_chapter_meeting_path(forum_slug: @current_forum.slug, chapter_id: @todays_meeting.chapter_id, id: @todays_meeting.id),
-                    method: :post, params: { attending: "1" }, class: "btn btn-success" %>
-            <% end %>
-            <% unless @todays_meeting_attendance&.absent? %>
-              <%= button_to "No, Not Attending", check_in_forum_chapter_meeting_path(forum_slug: @current_forum.slug, chapter_id: @todays_meeting.chapter_id, id: @todays_meeting.id),
-                    method: :post, params: { attending: "0" }, class: "btn btn-outline-danger" %>
-            <% end %>
-          </div>
+          </li>
         <% end %>
-      </div>
+      </ul>
     <% end %>
   </div>
 </div>
 
 <div class="card mb-4">
-  <div class="card-header fw-semibold">Today's Events</div>
+  <div class="card-header fw-semibold">Events</div>
   <div class="card-body">
-    <% if @todays_registrations.empty? %>
-      <p class="text-muted mb-0">No events today you're registered for.</p>
+    <% if @upcoming_registrations.empty? %>
+      <p class="text-muted mb-0">No upcoming events you're registered for.</p>
     <% else %>
       <ul class="list-group list-group-flush">
-        <% @todays_registrations.each do |registration| %>
+        <% @upcoming_registrations.each do |registration| %>
+          <% is_today = registration.event.starts_at.to_date == Date.current %>
           <li class="list-group-item d-flex flex-wrap justify-content-between align-items-center gap-2 px-0">
             <div>
               <div class="fw-semibold"><%= registration.event.title %></div>
@@ -60,9 +69,84 @@
             </div>
             <% if registration.attended? %>
               <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>You're marked present</span>
+            <% elsif is_today %>
+              <%= button_to "Mark My Attendance", check_in_forum_event_path(forum_slug: @current_forum.slug, id: registration.event_id), method: :post, class: "btn btn-primary btn-sm" %>
             <% else %>
-              <%= button_to "Mark My Attendance", check_in_forum_event_path(forum_slug: @current_forum.slug, id: registration.event_id), method: :post, class: "btn btn-primary" %>
+              <span class="badge bg-secondary-subtle text-secondary-emphasis">Registered &mdash; check in on the day</span>
             <% end %>
+          </li>
+        <% end %>
+      </ul>
+    <% end %>
+  </div>
+</div>
+
+<div class="card mb-4">
+  <div class="card-header fw-semibold">One-to-One Meetings</div>
+  <div class="card-body">
+    <% if @upcoming_one_to_ones.empty? %>
+      <p class="text-muted mb-0">No upcoming one-to-one meetings.</p>
+    <% else %>
+      <ul class="list-group list-group-flush">
+        <% @upcoming_one_to_ones.each do |otm| %>
+          <% other_party = otm.requester_id == current_user.id ? otm.requested_with : otm.requester %>
+          <li class="list-group-item d-flex flex-wrap justify-content-between align-items-center gap-2 px-0">
+            <div>
+              <div class="fw-semibold">With <%= other_party.display_name %></div>
+              <div class="text-muted small"><%= otm.scheduled_at.strftime("%d %b %Y %H:%M") %></div>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+              <% if otm.requested? && otm.requested_with_id == current_user.id %>
+                <%= button_to "Accept", accept_forum_one_to_one_meeting_path(forum_slug: @current_forum.slug, id: otm.id), method: :patch, class: "btn btn-success btn-sm" %>
+                <%= button_to "Reject", reject_forum_one_to_one_meeting_path(forum_slug: @current_forum.slug, id: otm.id), method: :patch, class: "btn btn-outline-danger btn-sm" %>
+              <% elsif otm.requested? %>
+                <span class="badge bg-secondary-subtle text-secondary-emphasis">Awaiting their response</span>
+              <% elsif otm.accepted? %>
+                <%= link_to "Mark Attended / Complete", forum_one_to_one_meeting_path(forum_slug: @current_forum.slug, id: otm.id), class: "btn btn-primary btn-sm" %>
+              <% end %>
+            </div>
+          </li>
+        <% end %>
+      </ul>
+    <% end %>
+  </div>
+</div>
+
+<div class="card mb-4">
+  <div class="card-header fw-semibold">Office Darshan</div>
+  <div class="card-body">
+    <% if @upcoming_darshan_attendances.empty? && @hosted_darshans.empty? %>
+      <p class="text-muted mb-0">No upcoming office darshan visits.</p>
+    <% else %>
+      <ul class="list-group list-group-flush">
+        <% @upcoming_darshan_attendances.each do |attendance| %>
+          <% darshan = attendance.office_darshan %>
+          <li class="list-group-item d-flex flex-wrap justify-content-between align-items-center gap-2 px-0">
+            <div>
+              <div class="fw-semibold">Visit <%= darshan.host.display_name %>'s office</div>
+              <div class="text-muted small"><%= darshan.scheduled_at.strftime("%d %b %Y %H:%M") %></div>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+              <% if attendance.attended? %>
+                <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>You're marked attended</span>
+              <% elsif darshan.completed? %>
+                <%= button_to "Mark Attended", mark_attended_forum_office_darshan_attendance_path(forum_slug: @current_forum.slug, office_darshan_id: darshan.id, id: attendance.id), method: :patch, class: "btn btn-primary btn-sm" %>
+              <% elsif attendance.invited? %>
+                <%= button_to "Coming", rsvp_forum_office_darshan_attendance_path(forum_slug: @current_forum.slug, office_darshan_id: darshan.id, id: attendance.id), method: :patch, params: { rsvp_status: "coming" }, class: "btn btn-success btn-sm" %>
+                <%= button_to "Not Coming", rsvp_forum_office_darshan_attendance_path(forum_slug: @current_forum.slug, office_darshan_id: darshan.id, id: attendance.id), method: :patch, params: { rsvp_status: "not_coming" }, class: "btn btn-outline-danger btn-sm" %>
+              <% else %>
+                <span class="badge bg-secondary-subtle text-secondary-emphasis"><%= attendance.rsvp_status.titleize %> &mdash; not yet completed</span>
+              <% end %>
+            </div>
+          </li>
+        <% end %>
+        <% @hosted_darshans.each do |darshan| %>
+          <li class="list-group-item d-flex flex-wrap justify-content-between align-items-center gap-2 px-0">
+            <div>
+              <div class="fw-semibold">Hosting a visit &middot; <%= darshan.status.titleize %></div>
+              <div class="text-muted small"><%= darshan.scheduled_at.strftime("%d %b %Y %H:%M") %></div>
+            </div>
+            <%= link_to "Manage", forum_office_darshan_path(forum_slug: @current_forum.slug, id: darshan.id), class: "btn btn-outline-secondary btn-sm" %>
           </li>
         <% end %>
       </ul>

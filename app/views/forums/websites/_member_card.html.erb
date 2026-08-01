@@ -49,7 +49,7 @@
 
   <div class="ps-card-contact">
     <% if member.phone.present? %>
-      <%= link_to member.phone, "tel:#{member.phone}", class: "ps-card-contact-link" do %>
+      <%= link_to "tel:#{member.phone}", class: "ps-card-contact-link" do %>
         <i class="bi bi-telephone-fill"></i> <%= member.phone %>
       <% end %>
     <% end %>

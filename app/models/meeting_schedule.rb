@@ -19,7 +19,7 @@ class MeetingSchedule < ApplicationRecord
   validate :end_time_after_start_time
   validate :end_date_within_range
 
-  after_create_commit :enqueue_generation
+  after_create :generate!
 
   before_destroy :clear_meetings
 
@@ -39,32 +39,18 @@ class MeetingSchedule < ApplicationRecord
     dates
   end
 
-  # Called by GenerateMeetingScheduleMeetingsJob. Guarded against double-run since
-  # ActiveJob can retry a job that already succeeded (e.g. after a worker crash
-  # post-perform but pre-ack).
+  # Runs synchronously, right after the schedule row is created, in the same
+  # transaction — no background worker involved. Guarded so it's a no-op if
+  # ever called twice on the same record.
   def generate!
     return if meetings_generated_at.present?
 
     generate_meetings!
     notify_attendees
     update_column(:meetings_generated_at, Time.current)
-    broadcast_status
   end
 
   private
-
-  def enqueue_generation
-    GenerateMeetingScheduleMeetingsJob.perform_later(id)
-  end
-
-  def broadcast_status
-    Turbo::StreamsChannel.broadcast_replace_to(
-      self,
-      target: "meeting_schedule_#{id}_status",
-      partial: "forums/meeting_schedules/status_panel",
-      locals: { schedule: self, occurrences: meetings.includes(:chapter).order(:scheduled_at) }
-    )
-  end
 
   def end_time_after_start_time
     return if start_time.blank? || end_time.blank?

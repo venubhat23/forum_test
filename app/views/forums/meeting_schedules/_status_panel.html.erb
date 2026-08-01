@@ -3,15 +3,20 @@
     <div class="card mb-4">
       <div class="card-header fw-semibold">Generated Meetings</div>
       <div class="card-body text-center py-5">
-        <div class="spinner-border text-primary mb-3" role="status">
-          <span class="visually-hidden">Generating…</span>
-        </div>
-        <p class="text-muted mb-0">Generating meetings for this schedule&hellip; this page will update automatically.</p>
+        <i class="bi bi-exclamation-triangle text-warning fs-3 mb-3 d-block"></i>
+        <p class="text-muted mb-0">Meetings haven't been generated for this schedule yet. Refresh the page — if this persists, contact support.</p>
       </div>
     </div>
   <% else %>
+    <div class="alert alert-success d-flex align-items-center gap-2 mb-4" role="alert">
+      <i class="bi bi-check-circle-fill fs-5"></i>
+      <div><strong><%= pluralize(occurrences.size, "meeting") %></strong> scheduled successfully.</div>
+    </div>
     <div class="card mb-4">
-      <div class="card-header fw-semibold">Generated Meetings</div>
+      <div class="card-header fw-semibold d-flex justify-content-between align-items-center">
+        <span>Generated Meetings</span>
+        <span class="badge bg-primary"><%= pluralize(occurrences.size, "meeting") %></span>
+      </div>
       <div class="table-responsive">
         <table class="table table-hover align-middle mb-0">
           <thead>

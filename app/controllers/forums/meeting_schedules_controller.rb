@@ -30,7 +30,7 @@ module Forums
 
       if @schedule.save
         redirect_to forum_chapter_meeting_schedule_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: @schedule.id),
-          notice: "Meeting schedule created — meetings are being generated in the background."
+          notice: "Meeting schedule created — #{helpers.pluralize(@schedule.meetings.count, 'meeting')} scheduled."
       else
         @candidates = pickable_people
         flash.now[:alert] = @schedule.errors.full_messages.to_sentence
