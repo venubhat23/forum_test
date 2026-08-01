@@ -26,6 +26,7 @@ module Forums
 
     def create
       @guest = @chapter.guests.new(guest_params)
+      apply_invited_by_selection(@guest)
       @guest.forum = @current_forum
       @guest.role = :guest
       authorize! :create, @guest
@@ -44,7 +45,9 @@ module Forums
 
     def update
       authorize! :update, @guest
-      if @guest.update(guest_update_params)
+      @guest.assign_attributes(guest_update_params)
+      apply_invited_by_selection(@guest)
+      if @guest.save
         redirect_to forum_chapter_guest_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: @guest.id), notice: "#{@guest.display_name} was updated."
       else
         flash.now[:alert] = @guest.errors.full_messages.to_sentence
@@ -94,12 +97,36 @@ module Forums
 
     def guest_params
       params.require(:guest).permit(:full_name, :email, :phone, :nature_of_business,
-        :business_category, :speciality, :invited_by_id)
+        :business_category, :speciality)
     end
 
     def guest_update_params
-      params.require(:guest).permit(:full_name, :email, :phone, :nature_of_business,
-        :business_category, :speciality, :invited_by_id)
+      guest_params
+    end
+
+    # The "Invited By" field lets the guest be attributed to a specific
+    # member, or generically to the chapter/forum for walk-in guests with
+    # no known individual inviter.
+    def apply_invited_by_selection(guest)
+      selection = params.dig(:guest, :invited_by_selection).to_s
+
+      case selection
+      when "chapter"
+        guest.invited_by_id = nil
+        guest.invited_by_note = "chapter"
+      when "forum"
+        guest.invited_by_id = nil
+        guest.invited_by_note = "forum"
+      when /\Amember_(\d+)\z/
+        member_id = $1
+        if @chapter.members.exists?(id: member_id)
+          guest.invited_by_id = member_id
+          guest.invited_by_note = nil
+        end
+      else
+        guest.invited_by_id = nil
+        guest.invited_by_note = nil
+      end
     end
 
     def guest_conversion_params

@@ -34,7 +34,16 @@
   </div>
   <div class="mb-4">
     <%= f.label :invited_by_id, "Invited By", class: "form-label" %>
-    <%= f.collection_select :invited_by_id, @chapter.members.order(:full_name), :id, :display_name, { include_blank: "Select a member" }, class: "form-select" %>
+    <select name="guest[invited_by_selection]" id="guest_invited_by_id" class="form-select">
+      <option value="">Select an inviter</option>
+      <option value="chapter" <%= "selected" if guest.invited_by_id.blank? && guest.invited_by_note == "chapter" %>><%= @chapter.name %> (Chapter)</option>
+      <option value="forum" <%= "selected" if guest.invited_by_id.blank? && guest.invited_by_note == "forum" %>><%= @current_forum.name %> (Forum)</option>
+      <optgroup label="Members">
+        <% @chapter.members.order(:full_name).each do |member| %>
+          <option value="member_<%= member.id %>" <%= "selected" if guest.invited_by_id == member.id %>><%= member.display_name %></option>
+        <% end %>
+      </optgroup>
+    </select>
   </div>
 
   <div class="d-flex flex-wrap gap-2">

@@ -69,6 +69,17 @@ class User < ApplicationRecord
     full_name.presence || email.split("@").first
   end
 
+  # Shows who/what a guest was invited by, falling back to the chapter or
+  # forum itself when no specific member was recorded (e.g. walk-in guests).
+  def invited_by_display
+    return invited_by.display_name if invited_by.present?
+
+    case invited_by_note
+    when "chapter" then chapter&.name
+    when "forum" then forum&.name
+    end
+  end
+
   # Virtual attribute backing the sign-in form's single "Phone or Email"
   # field. Falls back to email so devise_error_messages! and other devise
   # internals that read `resource.email`-style attributes keep working.

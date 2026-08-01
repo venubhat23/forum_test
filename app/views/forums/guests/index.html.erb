@@ -71,7 +71,7 @@
             <td><%= guest.email %></td>
             <td><%= guest.phone %></td>
             <td><%= guest.nature_of_business %></td>
-            <td><%= guest.invited_by&.display_name || "—" %></td>
+            <td><%= guest.invited_by_display || "—" %></td>
             <td class="text-end">
               <% if @upcoming_event && (invite_link = whatsapp_invite_link(guest, @upcoming_event, @current_forum)) %>
                 <%= link_to invite_link, class: "icon-btn icon-btn-whatsapp", title: "Invite to #{@upcoming_event.title} via WhatsApp", target: "_blank", rel: "noopener" do %>

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_29_073344) do
+ActiveRecord::Schema[8.0].define(version: 2026_08_01_000000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -939,6 +939,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_29_073344) do
     t.string "capacity"
     t.boolean "lifetime_member", default: false, null: false
     t.integer "membership_year"
+    t.string "invited_by_note"
     t.index "lower((phone)::text)", name: "index_users_on_lower_phone", unique: true, where: "((phone IS NOT NULL) AND ((phone)::text <> ''::text))"
     t.index ["business_category_id"], name: "index_users_on_business_category_id"
     t.index ["chapter_id"], name: "index_users_on_chapter_id"

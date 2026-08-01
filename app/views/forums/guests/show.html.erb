@@ -31,7 +31,7 @@
     <div class="stats-card">
       <div class="icon-bg gradient-purple"><i class="bi bi-person-heart"></i></div>
       <div>
-        <div class="stats-value h6 mb-0"><%= @guest.invited_by&.display_name || "&mdash;".html_safe %></div>
+        <div class="stats-value h6 mb-0"><%= @guest.invited_by_display || "&mdash;".html_safe %></div>
         <div class="stats-label">Invited By</div>
       </div>
     </div>
