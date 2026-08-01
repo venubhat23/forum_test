@@ -69,15 +69,21 @@ module SuperAdmin
     end
 
     def edit
+      @setting = ForumSetting.for(@forum)
     end
 
     def update
-      if @forum.update(forum_update_params)
-        redirect_to super_admin_forum_path(@forum), notice: "#{@forum.name} was updated."
-      else
-        flash.now[:alert] = @forum.errors.full_messages.to_sentence
-        render :edit, status: :unprocessable_entity
+      @setting = ForumSetting.for(@forum)
+      template_param = params.dig(:forum_setting, :website_template)
+
+      ActiveRecord::Base.transaction do
+        @forum.update!(forum_update_params)
+        @setting.update!(website_template: template_param) if template_param.present?
       end
+      redirect_to super_admin_forum_path(@forum), notice: "#{@forum.name} was updated."
+    rescue ActiveRecord::RecordInvalid => e
+      flash.now[:alert] = e.record.errors.full_messages.to_sentence
+      render :edit, status: :unprocessable_entity
     end
 
     def destroy
