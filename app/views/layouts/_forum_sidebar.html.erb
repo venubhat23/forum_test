@@ -11,6 +11,12 @@
           <% end %>
         </li>
         <li class="nav-item">
+          <%= link_to forum_people_path(forum_slug: @current_forum.slug), class: "nav-link-modern #{'active' if current_page?(forum_people_path(forum_slug: @current_forum.slug))}", data: { tooltip: "People" } do %>
+            <div class="nav-icon-modern"><div class="icon-bg gradient-teal"><i class="bi bi-person-lines-fill"></i></div></div>
+            <span class="nav-text">People</span>
+          <% end %>
+        </li>
+        <li class="nav-item">
           <%= link_to forum_calendar_path(forum_slug: @current_forum.slug), class: "nav-link-modern #{'active' if current_page?(forum_calendar_path(forum_slug: @current_forum.slug))}", data: { tooltip: "Calendar" } do %>
             <div class="nav-icon-modern"><div class="icon-bg gradient-blue"><i class="bi bi-calendar3"></i></div></div>
             <span class="nav-text">Calendar</span>

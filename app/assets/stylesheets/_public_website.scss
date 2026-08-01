@@ -535,6 +535,197 @@
   color: var(--brand);
 }
 
+.ps-card-name-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.ps-card-name-link:hover {
+  color: var(--brand);
+}
+
+.ps-card-profile-link {
+  display: block;
+  margin-top: 0.9rem;
+  text-align: center;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--brand);
+  text-decoration: none;
+  padding-top: 0.75rem;
+  border-top: 1px solid #f1f5f9;
+}
+
+.ps-card-profile-link:hover {
+  text-decoration: underline;
+}
+
+/* ── Individual member profile page ── */
+.ps-profile-hero {
+  background: linear-gradient(135deg, var(--brand) 0%, #764ba2 100%);
+  color: #fff;
+  padding: 3rem 1.5rem;
+}
+
+.ps-profile-hero-inner {
+  max-width: 1160px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.ps-profile-photo {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid rgba(255, 255, 255, 0.6);
+  flex-shrink: 0;
+}
+
+.ps-profile-photo-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.15);
+  font-weight: 700;
+  font-size: 2.2rem;
+}
+
+.ps-profile-name {
+  font-size: 1.9rem;
+  font-weight: 800;
+  margin: 0 0 0.35rem;
+}
+
+.ps-profile-hero .ps-card-designation {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.ps-profile-business {
+  margin: 0.6rem 0 0.5rem;
+  font-weight: 600;
+  opacity: 0.95;
+}
+
+.ps-profile-hero .ps-chip {
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+}
+
+.ps-profile-grid {
+  max-width: 1160px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 2.2fr 1fr;
+  gap: 2.5rem;
+}
+
+.ps-profile-block {
+  margin-bottom: 2rem;
+}
+
+.ps-profile-block h2 {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 0.85rem;
+}
+
+.ps-profile-block p {
+  color: #475569;
+  line-height: 1.6;
+}
+
+.ps-profile-facts {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.ps-profile-facts li {
+  font-size: 0.92rem;
+  color: #334155;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ps-profile-facts i {
+  color: var(--brand);
+  width: 16px;
+}
+
+.ps-profile-contact {
+  border-top: none;
+  padding-top: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.ps-profile-side h3 {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 1rem;
+}
+
+.ps-related-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.ps-related-link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  text-decoration: none;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.ps-related-link:hover {
+  border-color: var(--brand);
+  background: color-mix(in srgb, var(--brand) 6%, transparent);
+}
+
+.ps-related-photo {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  font-size: 1rem;
+}
+
+.ps-related-name {
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: #0f172a;
+}
+
+.ps-related-business {
+  font-size: 0.78rem;
+  color: #64748b;
+}
+
+@media (max-width: 900px) {
+  .ps-profile-grid { grid-template-columns: 1fr; }
+}
+
 /* ── Empty state ── */
 .ps-empty-state {
   text-align: center;
@@ -590,8 +781,24 @@
 :root[data-theme="dark"] .ps-stat-value,
 :root[data-theme="dark"] .ps-section-header h2,
 :root[data-theme="dark"] .ps-card-name,
-:root[data-theme="dark"] .ps-card-business-name {
+:root[data-theme="dark"] .ps-card-business-name,
+:root[data-theme="dark"] .ps-profile-block h2,
+:root[data-theme="dark"] .ps-profile-side h3,
+:root[data-theme="dark"] .ps-related-name {
   color: #f1f5f9;
+}
+
+:root[data-theme="dark"] .ps-profile-block p,
+:root[data-theme="dark"] .ps-profile-facts li {
+  color: #cbd5e1;
+}
+
+:root[data-theme="dark"] .ps-related-link {
+  border-color: #1e293b;
+}
+
+:root[data-theme="dark"] .ps-card-profile-link {
+  border-color: #1e293b;
 }
 
 :root[data-theme="dark"] .ps-nav-link {

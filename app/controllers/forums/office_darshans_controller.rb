@@ -24,7 +24,8 @@ module Forums
 
     def new
       authorize! :create, OfficeDarshan
-      @darshan = @current_forum.office_darshans.new(host: current_user, scheduled_at: 1.day.from_now)
+      @darshan = @current_forum.office_darshans.new(host: current_user, scheduled_at: 1.day.from_now,
+        scope: :member, visitor_id: params[:visitor_id])
     end
 
     def create

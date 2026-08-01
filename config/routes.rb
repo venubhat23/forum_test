@@ -109,7 +109,9 @@ Rails.application.routes.draw do
     root to: "forums/gateway#show"
     get "website", to: "forums/websites#show"
     get "website/our-members", to: "forums/websites#members", as: :website_members
+    get "website/our-members/:profile_token", to: "forums/websites#member", as: :website_member
     get "dashboard", to: "forums/dashboard#show"
+    get "people", to: "forums/people#index"
     get "members", to: "forums/members#all"
     get "guests", to: "forums/guests#all"
     get "meeting_schedules", to: "forums/meeting_schedules#all"

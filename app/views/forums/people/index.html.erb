@@ -1,0 +1,67 @@
+<% content_for :title, "People" %>
+
+<div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+  <div>
+    <h1 class="page-title h4">People</h1>
+    <p class="page-subtitle mb-0">Every member of <%= @current_forum.name %> — invite anyone to a One-to-One or Office Darshan.</p>
+  </div>
+</div>
+
+<%= form_with url: forum_people_path(forum_slug: @current_forum.slug), method: :get, local: true, class: "card mb-3" do %>
+  <div class="card-body d-flex flex-wrap gap-2">
+    <%= text_field_tag :q, params[:q], class: "form-control", placeholder: "Search by name or business...", style: "max-width: 280px;" %>
+    <%= submit_tag "Filter", class: "btn btn-outline-secondary" %>
+    <%= link_to "Reset", forum_people_path(forum_slug: @current_forum.slug), class: "btn btn-link" %>
+  </div>
+<% end %>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Chapter</th>
+          <th>Business</th>
+          <th>Category</th>
+          <th>Contact</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @people.each do |person| %>
+          <tr>
+            <td>
+              <div class="d-flex align-items-center gap-2">
+                <span class="row-avatar"><%= person.full_name.first.upcase %></span>
+                <span class="fw-semibold"><%= person.display_name %></span>
+              </div>
+            </td>
+            <td><%= person.chapter&.name || "—" %></td>
+            <td><%= person.business_name.presence || "—" %></td>
+            <td><%= (person.business_category_id ? person.business_category_ref&.name : person.business_category).presence || "—" %></td>
+            <td>
+              <% if person.phone.present? %><div class="small"><%= person.phone %></div><% end %>
+              <div class="text-muted small"><%= person.email %></div>
+            </td>
+            <td class="text-end">
+              <div class="d-flex gap-1 justify-content-end">
+                <%= link_to new_forum_one_to_one_meeting_path(forum_slug: @current_forum.slug, requested_with_id: person.id), class: "icon-btn", title: "Invite to One-to-One" do %>
+                  <i class="bi bi-people"></i>
+                <% end %>
+                <%= link_to new_forum_office_darshan_path(forum_slug: @current_forum.slug, visitor_id: person.id), class: "icon-btn", title: "Invite to Office Darshan" do %>
+                  <i class="bi bi-building-check"></i>
+                <% end %>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+        <% if @people.empty? %>
+          <tr><td colspan="6" class="text-center text-muted py-4">No other members yet.</td></tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<%= paginate @people %>

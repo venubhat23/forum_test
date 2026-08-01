@@ -22,7 +22,8 @@ module Forums
 
     def new
       authorize! :create, OneToOneMeeting
-      @meeting = @current_forum.one_to_one_meetings.new(requester: current_user, scheduled_at: 1.day.from_now)
+      @meeting = @current_forum.one_to_one_meetings.new(requester: current_user, scheduled_at: 1.day.from_now,
+        requested_with_id: params[:requested_with_id])
     end
 
     def create

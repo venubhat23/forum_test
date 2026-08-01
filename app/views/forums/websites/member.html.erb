@@ -1,0 +1,109 @@
+<% content_for :title, "#{@member.display_name} · #{@current_forum.name}" %>
+
+<div class="public-site" style="--brand: <%= @setting.theme_color.presence || '#4f46e5' %>;">
+  <%= render "forums/websites/nav" %>
+
+  <section class="ps-profile-hero">
+    <div class="ps-profile-hero-inner">
+      <% if @member.photo.attached? %>
+        <%= image_tag @member.photo, class: "ps-profile-photo", alt: @member.display_name %>
+      <% else %>
+        <div class="ps-profile-photo ps-profile-photo-fallback"><%= @member.display_name.first.upcase %></div>
+      <% end %>
+      <div>
+        <h1 class="ps-profile-name"><%= @member.display_name %></h1>
+        <% if @member.designation.present? %>
+          <span class="ps-card-designation"><%= @member.designation %></span>
+        <% end %>
+        <% if @member.business_name.present? %>
+          <p class="ps-profile-business"><i class="bi bi-briefcase-fill"></i> <%= @member.business_name %></p>
+        <% end %>
+        <% category_name = @member.business_category_ref&.name || @member.business_category %>
+        <% if category_name.present? %>
+          <span class="ps-chip"><i class="bi bi-tag-fill"></i> <%= category_name %></span>
+        <% end %>
+      </div>
+    </div>
+  </section>
+
+  <section class="ps-section">
+    <div class="ps-profile-grid">
+      <div class="ps-profile-main">
+        <% if @member.speciality.present? %>
+          <div class="ps-profile-block">
+            <h2>About</h2>
+            <p><%= @member.speciality %></p>
+          </div>
+        <% end %>
+
+        <div class="ps-profile-block">
+          <h2>Business Details</h2>
+          <ul class="ps-profile-facts">
+            <% if @member.chapter.present? %>
+              <li><i class="bi bi-diagram-3"></i> <strong>Chapter:</strong> <%= @member.chapter.name %></li>
+            <% end %>
+            <% if @member.service_area.present? %>
+              <li><i class="bi bi-geo-alt"></i> <strong>Service Area:</strong> <%= @member.service_area %></li>
+            <% end %>
+            <% if @member.capacity.present? %>
+              <li><i class="bi bi-building"></i> <strong>Capacity:</strong> <%= @member.capacity %></li>
+            <% end %>
+            <% if @member.experience_years.present? %>
+              <li><i class="bi bi-award"></i> <strong>Experience:</strong> <%= pluralize(@member.experience_years, "year") %></li>
+            <% end %>
+          </ul>
+        </div>
+
+        <div class="ps-profile-block">
+          <h2>Get In Touch</h2>
+          <div class="ps-card-contact ps-profile-contact">
+            <% if @member.phone.present? %>
+              <%= link_to "tel:#{@member.phone}", class: "ps-card-contact-link" do %>
+                <i class="bi bi-telephone-fill"></i> <%= @member.phone %>
+              <% end %>
+            <% end %>
+            <% if @member.email.present? %>
+              <%= link_to @member.email, "mailto:#{@member.email}", class: "ps-card-contact-link" %>
+            <% end %>
+            <% if @member.website.present? %>
+              <%= link_to external_url(@member.website), target: "_blank", rel: "noopener", class: "ps-card-contact-link" do %>
+                <i class="bi bi-globe2"></i> <%= @member.website %>
+              <% end %>
+            <% end %>
+            <% if @member.social_media_handle.present? %>
+              <span class="ps-card-contact-link"><i class="bi bi-share-fill"></i> <%= @member.social_media_handle %></span>
+            <% end %>
+          </div>
+        </div>
+      </div>
+
+      <aside class="ps-profile-side">
+        <% if @related_members.any? %>
+          <h3>More Members</h3>
+          <ul class="ps-related-list">
+            <% @related_members.each do |related| %>
+              <li>
+                <%= link_to forum_website_member_path(forum_slug: @current_forum.slug, profile_token: related.profile_token), class: "ps-related-link" do %>
+                  <% if related.photo.attached? %>
+                    <%= image_tag related.photo, class: "ps-related-photo", alt: related.display_name %>
+                  <% else %>
+                    <div class="ps-related-photo ps-card-photo-fallback"><%= related.display_name.first.upcase %></div>
+                  <% end %>
+                  <div>
+                    <div class="ps-related-name"><%= related.display_name %></div>
+                    <% if related.business_name.present? %>
+                      <div class="ps-related-business"><%= related.business_name %></div>
+                    <% end %>
+                  </div>
+                <% end %>
+              </li>
+            <% end %>
+          </ul>
+        <% end %>
+        <%= link_to "← All Members", forum_website_members_path(forum_slug: @current_forum.slug), class: "ps-link" %>
+      </aside>
+    </div>
+  </section>
+
+  <%= render "forums/websites/footer" %>
+</div>
