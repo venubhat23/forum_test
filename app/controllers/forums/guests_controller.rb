@@ -1,7 +1,21 @@
 module Forums
   class GuestsController < BaseController
-    before_action :set_chapter
+    before_action :set_chapter, except: [ :all ]
     before_action :set_guest, only: [ :show, :edit, :update, :destroy, :convert, :convert_to_member ]
+
+    # Forum-wide guest list, shown chapter-by-chapter. Chapter admins only
+    # ever see their own chapter's guests; forum/super admins see all of them.
+    def all
+      authorize! :read, User
+      scope = current_user.chapter_admin? ? @current_forum.guests.where(chapter_id: current_user.chapter_id) : @current_forum.guests
+
+      @total_guests = scope.count
+      @guests_this_month = scope.where(created_at: Time.current.beginning_of_month..).count
+
+      @guests = scope.includes(:invited_by, :chapter).order(:full_name)
+      @guests = @guests.where("full_name ILIKE ? OR email ILIKE ?", "%#{params[:q]}%", "%#{params[:q]}%") if params[:q].present?
+      @guests = @guests.page(params[:page])
+    end
 
     def index
       authorize! :read, User

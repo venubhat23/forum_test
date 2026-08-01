@@ -1,0 +1,54 @@
+<% content_for :title, "Scheduled Meetings · #{@current_forum.name}" %>
+
+<div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+  <div>
+    <h1 class="page-title h4">Scheduled Meetings</h1>
+    <p class="page-subtitle mb-0">Recurring meeting schedules across every chapter in <%= @current_forum.name %>.</p>
+  </div>
+  <% if can? :create, MeetingSchedule %>
+    <%= link_to forum_chapters_path(forum_slug: @current_forum.slug), class: "btn btn-primary" do %>
+      <i class="bi bi-plus-lg me-1"></i> Schedule Meeting
+    <% end %>
+  <% end %>
+</div>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th>Chapter</th>
+          <th>Title</th>
+          <th>Recurs</th>
+          <th>Date Range</th>
+          <th>Occurrences</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @schedules.each do |schedule| %>
+          <tr>
+            <td>
+              <div class="d-flex align-items-center gap-2">
+                <span class="row-avatar"><%= schedule.chapter.name.first.upcase %></span>
+                <%= schedule.chapter.name %>
+              </div>
+            </td>
+            <td><%= schedule.title.presence || "#{schedule.day_name} Meeting" %></td>
+            <td>Every <%= schedule.day_name %>, <%= schedule.start_time.strftime("%I:%M %p") %>–<%= schedule.end_time.strftime("%I:%M %p") %></td>
+            <td><%= schedule.start_date.strftime("%d %b %Y") %> – <%= schedule.end_date.strftime("%d %b %Y") %></td>
+            <td><%= schedule.meetings.size %></td>
+            <td class="text-end">
+              <%= link_to forum_chapter_meeting_schedule_path(forum_slug: @current_forum.slug, chapter_id: schedule.chapter_id, id: schedule.id), class: "icon-btn icon-btn-view", title: "View" do %>
+                <i class="bi bi-eye"></i>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+        <% if @schedules.empty? %>
+          <tr><td colspan="6" class="text-center text-muted py-4">No recurring schedules yet. Open a chapter and click "Schedule Meeting" to create one.</td></tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

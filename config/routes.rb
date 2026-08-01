@@ -109,6 +109,8 @@ Rails.application.routes.draw do
     root to: "forums/gateway#show"
     get "dashboard", to: "forums/dashboard#show"
     get "members", to: "forums/members#all"
+    get "guests", to: "forums/guests#all"
+    get "meeting_schedules", to: "forums/meeting_schedules#all"
     get "apply", to: "membership_applications#new"
     post "apply", to: "membership_applications#create"
     resources :membership_applications, controller: "forums/membership_applications", only: [ :index, :show ] do

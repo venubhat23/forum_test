@@ -1,7 +1,16 @@
 module Forums
   class MeetingSchedulesController < BaseController
-    before_action :set_chapter
+    before_action :set_chapter, except: [ :all ]
     before_action :set_schedule, only: [ :show, :destroy ]
+
+    # Forum-wide view across every chapter — this is where the sidebar sends
+    # forum/super admins who aren't scoped to a single chapter, instead of
+    # dumping them on the generic chapters list.
+    def all
+      authorize! :read, MeetingSchedule
+      @schedules = MeetingSchedule.where(chapter_id: @current_forum.chapters.select(:id))
+        .includes(:chapter, :meetings).order(created_at: :desc)
+    end
 
     def index
       authorize! :read, MeetingSchedule

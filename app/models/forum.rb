@@ -11,6 +11,7 @@ class Forum < ApplicationRecord
   has_many :chapters, dependent: :destroy
   has_many :users, dependent: :destroy
   has_many :members, -> { where(role: :member) }, class_name: "User"
+  has_many :guests, -> { where(role: :guest) }, class_name: "User"
   has_many :business_categories, dependent: :destroy
   has_many :one_to_one_meetings, dependent: :destroy
   has_many :office_darshans, dependent: :destroy
