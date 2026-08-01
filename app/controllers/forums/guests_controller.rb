@@ -31,11 +31,13 @@ module Forums
     def show
       authorize! :read, @guest
       @visit_count = Attendance.where(user_id: @guest.id).count
+      @guest_meeting_fees = @guest.fee_payments.where(fee_type: :meeting).includes(:feeable).order(created_at: :desc)
     end
 
     def new
       authorize! :create, User
       @guest = @chapter.guests.new
+      @upcoming_meetings = @chapter.meetings.where("scheduled_at >= ?", Time.current).order(:scheduled_at)
     end
 
     def create
@@ -46,8 +48,10 @@ module Forums
       authorize! :create, @guest
 
       if @guest.save
+        invite_to_meeting(@guest)
         redirect_to forum_chapter_guests_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id), notice: "#{@guest.display_name} was added as a guest."
       else
+        @upcoming_meetings = @chapter.meetings.where("scheduled_at >= ?", Time.current).order(:scheduled_at)
         flash.now[:alert] = @guest.errors.full_messages.to_sentence
         render :new, status: :unprocessable_entity
       end
@@ -81,8 +85,9 @@ module Forums
     end
 
     # Step 2: save the full business profile and flip the guest to a member.
-    # The member then lands on their profile with the "collect membership
-    # fee" and "send welcome message" steps still to go.
+    # The member then lands on the "invite to a meeting" screen, then their
+    # profile with the "collect membership fee" and "send welcome message"
+    # steps still to go.
     def convert_to_member
       authorize! :update, @guest
       @guest.assign_attributes(guest_conversion_params)
@@ -90,8 +95,8 @@ module Forums
       @guest.converted_at = Time.current
 
       if @guest.save
-        redirect_to forum_chapter_member_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: @guest.id),
-          notice: "🎉 #{@guest.display_name} is now a member! Next: collect the membership fee below."
+        redirect_to invite_to_meeting_forum_chapter_member_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: @guest.id),
+          notice: "🎉 #{@guest.display_name} is now a member!"
       else
         @guest.role = :guest
         flash.now[:alert] = @guest.errors.full_messages.to_sentence
@@ -143,11 +148,32 @@ module Forums
       end
     end
 
+    # Records the guest as invited to the selected meeting (so it shows up
+    # on their profile) and, if the meeting has a fee and the admin asked
+    # for it, opens a pending fee for the guest to be reminded/collected.
+    def invite_to_meeting(guest)
+      meeting_id = params.dig(:guest, :invited_meeting_id)
+      return if meeting_id.blank?
+
+      meeting = @chapter.meetings.find_by(id: meeting_id)
+      return unless meeting
+
+      guest.attendances.find_or_create_by!(meeting: meeting) do |attendance|
+        attendance.event_type = :meeting
+        attendance.occurred_on = meeting.scheduled_at.to_date
+      end
+
+      if params.dig(:guest, :collect_meeting_fee) == "1" && meeting.fee_amount.present?
+        guest.fee_payments.create!(fee_type: :meeting, feeable: meeting, amount: meeting.fee_amount, due_date: meeting.scheduled_at.to_date)
+      end
+    end
+
     def guest_conversion_params
       params.require(:guest).permit(:full_name, :email, :phone, :date_of_birth, :photo,
         :business_name, :business_category, :speciality, :business_category_id, :designation,
         :website, :gst_number, :pan_number, :aadhaar_number, :address, :city,
-        :service_area, :capacity, :company_logo, :social_media_handle, kyc_documents: [])
+        :service_area, :capacity, :company_logo, :social_media_handle,
+        :aadhaar_document, :pan_document, :gst_document, kyc_documents: [])
     end
   end
 end

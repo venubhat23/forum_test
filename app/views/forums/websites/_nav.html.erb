@@ -1,0 +1,18 @@
+<nav class="ps-nav">
+  <div class="ps-nav-inner">
+    <%= link_to forum_website_path(forum_slug: @current_forum.slug), class: "ps-nav-brand" do %>
+      <% if @setting&.logo&.attached? %>
+        <%= image_tag @setting.logo, class: "ps-nav-logo", alt: @current_forum.name %>
+      <% else %>
+        <div class="ps-nav-logo ps-nav-logo-fallback"><i class="bi bi-people-fill"></i></div>
+      <% end %>
+      <span><%= @current_forum.name %></span>
+    <% end %>
+
+    <div class="ps-nav-links">
+      <%= link_to "Home", forum_website_path(forum_slug: @current_forum.slug), class: "ps-nav-link #{'active' if current_page?(forum_website_path(forum_slug: @current_forum.slug))}" %>
+      <%= link_to "Our Members", forum_website_members_path(forum_slug: @current_forum.slug), class: "ps-nav-link #{'active' if current_page?(forum_website_members_path(forum_slug: @current_forum.slug))}" %>
+      <%= link_to "Member Login", forum_root_path(forum_slug: @current_forum.slug), class: "ps-nav-link ps-nav-login" %>
+    </div>
+  </div>
+</nav>

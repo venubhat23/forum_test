@@ -1,0 +1,86 @@
+<% content_for :title, @current_forum.name %>
+
+<div class="public-site" style="--brand: <%= @setting.theme_color.presence || '#4f46e5' %>;">
+  <%= render "forums/websites/nav" %>
+
+  <section class="ps-hero">
+    <div class="ps-hero-inner">
+      <% if @setting&.logo&.attached? %>
+        <%= image_tag @setting.logo, class: "ps-hero-logo", alt: @current_forum.name %>
+      <% else %>
+        <div class="ps-hero-logo ps-hero-logo-fallback"><i class="bi bi-people-fill"></i></div>
+      <% end %>
+      <h1 class="ps-hero-title"><%= @current_forum.name %></h1>
+      <p class="ps-hero-tagline">A trusted network of local businesses &mdash; connect, refer, and grow together.</p>
+      <div class="ps-hero-actions">
+        <%= link_to "Meet Our Members", forum_website_members_path(forum_slug: @current_forum.slug), class: "ps-btn ps-btn-primary" %>
+        <%= link_to "Apply for Membership", forum_apply_path(forum_slug: @current_forum.slug), class: "ps-btn ps-btn-outline" %>
+      </div>
+    </div>
+  </section>
+
+  <section class="ps-stats">
+    <div class="ps-stats-inner">
+      <div class="ps-stat-card">
+        <div class="ps-stat-icon gradient-teal"><i class="bi bi-people-fill"></i></div>
+        <div class="ps-stat-value"><%= @members_count %></div>
+        <div class="ps-stat-label">Active Members</div>
+      </div>
+      <div class="ps-stat-card">
+        <div class="ps-stat-icon gradient-blue"><i class="bi bi-diagram-3-fill"></i></div>
+        <div class="ps-stat-value"><%= @chapters_count %></div>
+        <div class="ps-stat-label">Chapters</div>
+      </div>
+      <div class="ps-stat-card">
+        <div class="ps-stat-icon gradient-orange"><i class="bi bi-briefcase-fill"></i></div>
+        <div class="ps-stat-value"><%= @categories.count %></div>
+        <div class="ps-stat-label">Business Categories</div>
+      </div>
+      <div class="ps-stat-card">
+        <div class="ps-stat-icon gradient-purple"><i class="bi bi-calendar2-check-fill"></i></div>
+        <div class="ps-stat-value"><%= @current_forum.created_at.year %></div>
+        <div class="ps-stat-label">Est.</div>
+      </div>
+    </div>
+  </section>
+
+  <% if @featured_members.any? %>
+    <section class="ps-section">
+      <div class="ps-section-header">
+        <h2>Featured Members</h2>
+        <%= link_to "View all members →", forum_website_members_path(forum_slug: @current_forum.slug), class: "ps-link" %>
+      </div>
+      <div class="ps-member-grid">
+        <% @featured_members.each do |member| %>
+          <%= render "forums/websites/member_card", member: member %>
+        <% end %>
+      </div>
+    </section>
+  <% end %>
+
+  <% if @categories.any? %>
+    <section class="ps-section ps-section-muted">
+      <div class="ps-section-header">
+        <h2>Business Categories</h2>
+      </div>
+      <div class="ps-chip-cloud">
+        <% @categories.each do |category| %>
+          <span class="ps-chip"><i class="bi bi-tag-fill"></i> <%= category.name %></span>
+        <% end %>
+      </div>
+    </section>
+  <% end %>
+
+  <section class="ps-cta">
+    <div class="ps-cta-inner">
+      <h2>Ready to grow your business network?</h2>
+      <p>Join <%= @current_forum.name %> and connect with members who refer real business to each other.</p>
+      <div class="ps-hero-actions">
+        <%= link_to "Apply for Membership", forum_apply_path(forum_slug: @current_forum.slug), class: "ps-btn ps-btn-primary" %>
+        <%= link_to "Member Login", forum_root_path(forum_slug: @current_forum.slug), class: "ps-btn ps-btn-outline" %>
+      </div>
+    </div>
+  </section>
+
+  <%= render "forums/websites/footer" %>
+</div>

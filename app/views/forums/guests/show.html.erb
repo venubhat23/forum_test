@@ -59,14 +59,140 @@
   </div>
 </div>
 
-<div class="card">
+<% if @guest.photo.attached? || @guest.company_logo.attached? %>
+  <div class="card mb-4">
+    <div class="card-header fw-semibold">Photos</div>
+    <div class="card-body d-flex flex-wrap gap-4">
+      <% if @guest.photo.attached? %>
+        <div>
+          <div class="text-muted small mb-1">Photo</div>
+          <%= image_tag @guest.photo, style: "height: 140px; border-radius: 8px; object-fit: cover;" %>
+        </div>
+      <% end %>
+      <% if @guest.company_logo.attached? %>
+        <div>
+          <div class="text-muted small mb-1">Company Logo</div>
+          <%= image_tag @guest.company_logo, style: "height: 140px; border-radius: 8px; object-fit: cover;" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+<% end %>
+
+<% if @guest_meeting_fees.present? %>
+  <div class="card mb-4">
+    <div class="card-header fw-semibold">Meeting Fees</div>
+    <div class="list-group list-group-flush">
+      <% @guest_meeting_fees.each do |fee| %>
+        <% meeting = fee.feeable %>
+        <div class="list-group-item d-flex justify-content-between align-items-center flex-wrap gap-2">
+          <span>
+            <%= meeting&.topic.presence || meeting&.meeting_type&.titleize || "Meeting" %>
+            <% if meeting %> &middot; <%= meeting.scheduled_at.strftime("%d %b %Y") %><% end %>
+            &middot; <%= number_to_currency(fee.amount) %>
+          </span>
+          <div class="d-flex align-items-center gap-2">
+            <% if fee.paid? %>
+              <span class="badge badge-status-active"><i class="bi bi-check-circle-fill me-1"></i>Paid</span>
+            <% elsif fee.partially_paid? %>
+              <span class="badge badge-status-partial"><i class="bi bi-exclamation-triangle-fill me-1"></i>Partially Paid</span>
+            <% else %>
+              <span class="badge badge-status-trial"><i class="bi bi-exclamation-circle-fill me-1"></i>Due</span>
+            <% end %>
+            <% if !fee.paid? && (wa_link = whatsapp_item_fee_reminder_link(@guest, fee, meeting&.topic.presence || "the meeting", @current_forum)) %>
+              <%= link_to wa_link, class: "icon-btn icon-btn-whatsapp", title: "Remind to pay via WhatsApp", target: "_blank", rel: "noopener" do %>
+                <i class="bi bi-whatsapp"></i>
+              <% end %>
+            <% end %>
+            <% if !fee.paid? %>
+              <%= button_to mark_paid_forum_chapter_fee_payment_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: fee.id), method: :patch, class: "icon-btn icon-btn-success", title: "Mark Paid (full balance)" do %>
+                <i class="bi bi-check-lg"></i>
+              <% end %>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+<% end %>
+
+<% if @guest.meeting_fee_paid? || @guest.meeting_fee_screenshot.attached? %>
+  <div class="card mb-4">
+    <div class="card-header fw-semibold">Meeting Fee (Self-Reported)</div>
+    <div class="card-body d-flex flex-wrap align-items-center justify-content-between gap-3">
+      <span class="badge <%= @guest.meeting_fee_paid? ? "bg-success" : "bg-secondary" %>">
+        <i class="bi <%= @guest.meeting_fee_paid? ? "bi-check-circle" : "bi-x-circle" %> me-1"></i>
+        <%= @guest.meeting_fee_paid? ? "Reported as paid" : "Reported as not paid" %>
+      </span>
+      <% if @guest.meeting_fee_screenshot.attached? %>
+        <a href="<%= rails_blob_path(@guest.meeting_fee_screenshot) %>" target="_blank" rel="noopener">
+          <%= image_tag @guest.meeting_fee_screenshot, style: "height: 100px; border-radius: 8px; object-fit: cover;", alt: "Payment screenshot" %>
+        </a>
+      <% end %>
+    </div>
+  </div>
+<% end %>
+
+<div class="card mb-4">
   <div class="card-header fw-semibold">Profile</div>
   <div class="card-body">
     <dl class="row mb-0">
       <dt class="col-sm-3">Phone</dt><dd class="col-sm-9"><%= @guest.phone %></dd>
-      <dt class="col-sm-3">Nature of Business</dt><dd class="col-sm-9"><%= @guest.nature_of_business %></dd>
-      <dt class="col-sm-3">Business Category</dt><dd class="col-sm-9"><%= @guest.business_category %></dd>
-      <dt class="col-sm-3">Speciality</dt><dd class="col-sm-9"><%= @guest.speciality %></dd>
+      <dt class="col-sm-3">Date of Birth</dt><dd class="col-sm-9"><%= @guest.date_of_birth&.strftime("%d %b %Y") || "—" %></dd>
+      <dt class="col-sm-3">Nature of Business</dt><dd class="col-sm-9"><%= @guest.nature_of_business.presence || "—" %></dd>
+      <dt class="col-sm-3">Business Name</dt><dd class="col-sm-9"><%= @guest.business_name.presence || "—" %></dd>
+      <dt class="col-sm-3">Business Category</dt><dd class="col-sm-9"><%= (@guest.business_category_id ? @guest.business_category_ref&.name : @guest.business_category).presence || "—" %></dd>
+      <dt class="col-sm-3">Speciality</dt><dd class="col-sm-9"><%= @guest.speciality.presence || "—" %></dd>
+      <dt class="col-sm-3">Website</dt><dd class="col-sm-9"><%= @guest.website.presence || "—" %></dd>
+      <dt class="col-sm-3">Business Capacity</dt><dd class="col-sm-9"><%= @guest.capacity.presence || "—" %></dd>
+      <dt class="col-sm-3">Service Coverage Area</dt><dd class="col-sm-9"><%= @guest.service_area.presence || "—" %></dd>
+      <dt class="col-sm-3">Address</dt><dd class="col-sm-9"><%= @guest.address.presence || "—" %></dd>
+      <dt class="col-sm-3">Location (City)</dt><dd class="col-sm-9"><%= @guest.city.presence || "—" %></dd>
+      <dt class="col-sm-3">Social Media</dt><dd class="col-sm-9"><%= @guest.social_media_handle.presence || "—" %></dd>
     </dl>
+  </div>
+</div>
+
+<div class="card mb-4">
+  <div class="card-header fw-semibold">Statutory Details</div>
+  <div class="card-body">
+    <dl class="row mb-0">
+      <dt class="col-sm-3">GST Number</dt><dd class="col-sm-9"><%= @guest.gst_number.presence || "—" %></dd>
+      <dt class="col-sm-3">PAN Number</dt><dd class="col-sm-9"><%= @guest.pan_number.presence || "—" %></dd>
+      <dt class="col-sm-3">Aadhaar Number</dt><dd class="col-sm-9"><%= @guest.aadhaar_number.presence || "—" %></dd>
+    </dl>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header fw-semibold">Uploaded Documents</div>
+  <div class="list-group list-group-flush">
+    <% if @guest.gst_document.attached? %>
+      <div class="list-group-item d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-file-earmark-text me-1"></i> GST Certificate</span>
+        <%= link_to "View", rails_blob_path(@guest.gst_document, disposition: "attachment"), class: "btn btn-sm btn-outline-secondary" %>
+      </div>
+    <% end %>
+    <% if @guest.pan_document.attached? %>
+      <div class="list-group-item d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-file-earmark-text me-1"></i> PAN Card</span>
+        <%= link_to "View", rails_blob_path(@guest.pan_document, disposition: "attachment"), class: "btn btn-sm btn-outline-secondary" %>
+      </div>
+    <% end %>
+    <% if @guest.aadhaar_document.attached? %>
+      <div class="list-group-item d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-file-earmark-text me-1"></i> Aadhaar Card</span>
+        <%= link_to "View", rails_blob_path(@guest.aadhaar_document, disposition: "attachment"), class: "btn btn-sm btn-outline-secondary" %>
+      </div>
+    <% end %>
+    <% @guest.kyc_documents.each do |doc| %>
+      <div class="list-group-item d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-file-earmark me-1"></i> <%= doc.filename %></span>
+        <%= link_to "View", rails_blob_path(doc, disposition: "attachment"), class: "btn btn-sm btn-outline-secondary" %>
+      </div>
+    <% end %>
+    <% unless @guest.gst_document.attached? || @guest.pan_document.attached? || @guest.aadhaar_document.attached? || @guest.kyc_documents.attached? %>
+      <div class="list-group-item text-muted text-center py-3">No documents uploaded yet.</div>
+    <% end %>
   </div>
 </div>

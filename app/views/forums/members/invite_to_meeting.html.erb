@@ -1,0 +1,48 @@
+<% content_for :title, "Invite #{@member.display_name} to a Meeting" %>
+
+<div class="page-header">
+  <h1 class="page-title h4">One More Thing — Invite <%= @member.display_name %> to a Meeting</h1>
+  <p class="page-subtitle mb-0"><%= @chapter.name %> &middot; <%= @current_forum.name %></p>
+</div>
+
+<div class="row justify-content-center">
+  <div class="col-12 col-lg-8">
+    <div class="card">
+      <div class="card-body p-4">
+        <p class="text-muted mb-4">
+          Pick an already-scheduled meeting to add <%= @member.display_name %> to. They'll be marked as attending
+          and get the same notification everyone else got when the meeting was first scheduled.
+        </p>
+
+        <% if @meetings.any? %>
+          <%= form_with url: send_meeting_invite_forum_chapter_member_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: @member.id),
+                method: :patch, local: true do %>
+            <div class="list-group mb-4">
+              <% @meetings.each_with_index do |meeting, index| %>
+                <label class="list-group-item d-flex align-items-start gap-3">
+                  <input class="form-check-input mt-1" type="radio" name="meeting_id" value="<%= meeting.id %>" <%= "checked" if index.zero? %> required>
+                  <span>
+                    <span class="fw-semibold d-block"><%= meeting.meeting_type.titleize %> Meeting &middot; <%= meeting.scheduled_at.strftime("%d %b %Y at %I:%M %p") %></span>
+                    <span class="text-muted small">
+                      <% if meeting.venue.present? %>📍 <%= meeting.venue %><% end %>
+                      <% if meeting.speaker.present? %> &middot; Speaker: <%= meeting.speaker %><% end %>
+                    </span>
+                  </span>
+                </label>
+              <% end %>
+            </div>
+            <div class="d-flex flex-wrap gap-2">
+              <button type="submit" class="btn btn-primary btn-lg">
+                <i class="bi bi-calendar-check me-1"></i> Invite & Continue
+              </button>
+              <%= link_to "Skip for now", forum_chapter_member_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: @member.id), class: "btn btn-outline-secondary btn-lg" %>
+            </div>
+          <% end %>
+        <% else %>
+          <p class="text-muted">No upcoming meetings are scheduled for <%= @chapter.name %> right now.</p>
+          <%= link_to "Continue", forum_chapter_member_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: @member.id), class: "btn btn-primary btn-lg" %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

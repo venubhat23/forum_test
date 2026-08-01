@@ -28,6 +28,12 @@
             <span class="nav-text">Events</span>
           <% end %>
         </li>
+        <li class="nav-item">
+          <%= link_to forum_website_path(forum_slug: @current_forum.slug), class: "nav-link-modern", target: "_blank", rel: "noopener", data: { tooltip: "Website" } do %>
+            <div class="nav-icon-modern"><div class="icon-bg gradient-indigo"><i class="bi bi-globe2"></i></div></div>
+            <span class="nav-text">Website</span>
+          <% end %>
+        </li>
       </ul>
     </div>
 
@@ -89,7 +95,7 @@
           <% end %>
         </li>
         <li class="nav-item">
-          <%= link_to forum_chapters_path(forum_slug: @current_forum.slug), class: "nav-link-modern #{'active' if request.path.start_with?(forum_chapters_path(forum_slug: @current_forum.slug))}", data: { tooltip: "Chapters" } do %>
+          <%= link_to forum_chapters_path(forum_slug: @current_forum.slug), class: "nav-link-modern #{'active' if request.path.match?(%r{\A#{Regexp.escape(forum_chapters_path(forum_slug: @current_forum.slug))}(/new|/\d+(/edit)?)?\z})}", data: { tooltip: "Chapters" } do %>
             <div class="nav-icon-modern"><div class="icon-bg gradient-purple"><i class="bi bi-diagram-3"></i></div></div>
             <span class="nav-text">Chapters</span>
           <% end %>
@@ -112,6 +118,12 @@
           <%= link_to forum_calendar_path(forum_slug: @current_forum.slug), class: "nav-link-modern #{'active' if current_page?(forum_calendar_path(forum_slug: @current_forum.slug))}", data: { tooltip: "Calendar" } do %>
             <div class="nav-icon-modern"><div class="icon-bg gradient-blue"><i class="bi bi-calendar3"></i></div></div>
             <span class="nav-text">Calendar</span>
+          <% end %>
+        </li>
+        <li class="nav-item">
+          <%= link_to forum_website_path(forum_slug: @current_forum.slug), class: "nav-link-modern", target: "_blank", rel: "noopener", data: { tooltip: "Website" } do %>
+            <div class="nav-icon-modern"><div class="icon-bg gradient-indigo"><i class="bi bi-globe2"></i></div></div>
+            <span class="nav-text">Website</span>
           <% end %>
         </li>
       </ul>

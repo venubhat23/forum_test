@@ -107,6 +107,8 @@ Rails.application.routes.draw do
 
   scope "/:forum_slug", as: :forum do
     root to: "forums/gateway#show"
+    get "website", to: "forums/websites#show"
+    get "website/our-members", to: "forums/websites#members", as: :website_members
     get "dashboard", to: "forums/dashboard#show"
     get "members", to: "forums/members#all"
     get "guests", to: "forums/guests#all"
@@ -170,6 +172,8 @@ Rails.application.routes.draw do
           patch :renew
           patch :update_role
           get :print
+          get :invite_to_meeting
+          patch :send_meeting_invite
         end
       end
       resources :guests, controller: "forums/guests", only: [ :index, :new, :create, :show, :edit, :update, :destroy ] do

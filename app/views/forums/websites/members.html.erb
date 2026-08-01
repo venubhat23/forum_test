@@ -1,0 +1,43 @@
+<% content_for :title, "Our Members · #{@current_forum.name}" %>
+
+<div class="public-site" style="--brand: <%= @setting.theme_color.presence || '#4f46e5' %>;">
+  <%= render "forums/websites/nav" %>
+
+  <section class="ps-page-header">
+    <div class="ps-page-header-inner">
+      <h1>Our Members</h1>
+      <p><%= pluralize(@members.size, "member") %> ready to do business with you.</p>
+    </div>
+  </section>
+
+  <section class="ps-section ps-members-section">
+    <%= form_with url: forum_website_members_path(forum_slug: @current_forum.slug), method: :get, local: true, class: "ps-filter-bar" do %>
+      <div class="ps-filter-search">
+        <i class="bi bi-search"></i>
+        <%= text_field_tag :q, params[:q], placeholder: "Search by name, business, or speciality...", class: "ps-filter-input" %>
+      </div>
+      <%= select_tag :category_id,
+            options_for_select([ [ "All Categories", "" ] ] + @categories.map { |c| [ c.name, c.id ] }, params[:category_id]),
+            class: "ps-filter-select", onchange: "this.form.requestSubmit()" %>
+      <button type="submit" class="ps-btn ps-btn-primary ps-filter-submit">Search</button>
+      <% if params[:q].present? || params[:category_id].present? %>
+        <%= link_to "Clear", forum_website_members_path(forum_slug: @current_forum.slug), class: "ps-link" %>
+      <% end %>
+    <% end %>
+
+    <% if @members.any? %>
+      <div class="ps-member-grid">
+        <% @members.each do |member| %>
+          <%= render "forums/websites/member_card", member: member %>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="ps-empty-state">
+        <i class="bi bi-people"></i>
+        <p>No members match your search.</p>
+      </div>
+    <% end %>
+  </section>
+
+  <%= render "forums/websites/footer" %>
+</div>

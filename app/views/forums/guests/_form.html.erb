@@ -46,6 +46,25 @@
     </select>
   </div>
 
+  <% if @upcoming_meetings.present? %>
+    <h2 class="h6 text-uppercase text-muted mb-3">Invite for Meeting</h2>
+    <div class="mb-3" data-controller="guest-meeting-invite">
+      <%= label_tag "guest_invited_meeting_id", "Invite to a scheduled meeting", class: "form-label" %>
+      <select name="guest[invited_meeting_id]" id="guest_invited_meeting_id" class="form-select" data-guest-meeting-invite-target="select" data-action="change->guest-meeting-invite#toggleFee">
+        <option value="">Don't invite to a meeting right now</option>
+        <% @upcoming_meetings.each do |meeting| %>
+          <option value="<%= meeting.id %>" data-fee="<%= meeting.fee_amount %>">
+            <%= meeting.topic.presence || meeting.meeting_type.titleize %> &middot; <%= meeting.scheduled_at.strftime("%d %b %Y, %I:%M %p") %><%= " (Fee: #{number_to_currency(meeting.fee_amount)})" if meeting.fee_amount.present? %>
+          </option>
+        <% end %>
+      </select>
+      <div class="form-check mt-2 d-none" data-guest-meeting-invite-target="feeOption">
+        <%= check_box_tag "guest[collect_meeting_fee]", "1", false, class: "form-check-input" %>
+        <%= label_tag "guest_collect_meeting_fee", "This meeting has a fee — ask the guest to pay it (creates a pending fee you can send a WhatsApp reminder for)", class: "form-check-label" %>
+      </div>
+    </div>
+  <% end %>
+
   <div class="d-flex flex-wrap gap-2">
     <button type="submit" class="btn btn-primary btn-lg" data-submit-loading-target="button" data-loading-text="<%= guest.new_record? ? "Adding..." : "Saving..." %>">
       <span data-submit-loading-target="spinner" class="spinner-border spinner-border-sm me-2 d-none" role="status" aria-hidden="true"></span>

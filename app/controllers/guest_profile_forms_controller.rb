@@ -37,6 +37,8 @@ class GuestProfileFormsController < ApplicationController
     params.require(:guest).permit(:full_name, :email, :phone, :date_of_birth, :photo, :company_logo,
       :business_name, :business_category, :speciality, :business_category_id,
       :website, :gst_number, :pan_number, :aadhaar_number, :address, :city,
-      :service_area, :capacity, :social_media_handle, kyc_documents: [])
+      :service_area, :capacity, :social_media_handle,
+      :aadhaar_document, :pan_document, :gst_document,
+      :meeting_fee_paid, :meeting_fee_screenshot, kyc_documents: [])
   end
 end

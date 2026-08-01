@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_29_073344) do
+ActiveRecord::Schema[8.0].define(version: 2026_08_01_030000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -412,6 +412,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_29_073344) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.decimal "fee_amount", precision: 10, scale: 2
+    t.string "topic"
+    t.string "speaker"
+    t.string "speaker_phone"
+    t.datetime "meetings_generated_at"
     t.index ["chapter_id"], name: "index_meeting_schedules_on_chapter_id"
     t.index ["created_by_id"], name: "index_meeting_schedules_on_created_by_id"
   end
@@ -431,6 +435,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_29_073344) do
     t.text "payment_bank_details"
     t.bigint "meeting_schedule_id"
     t.string "speaker_phone"
+    t.string "topic"
     t.index ["chapter_id"], name: "index_meetings_on_chapter_id"
     t.index ["meeting_schedule_id"], name: "index_meetings_on_meeting_schedule_id"
   end
@@ -939,6 +944,11 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_29_073344) do
     t.string "capacity"
     t.boolean "lifetime_member", default: false, null: false
     t.integer "membership_year"
+    t.string "invited_by_note"
+    t.string "profile_token"
+    t.string "social_media_handle"
+    t.datetime "profile_submitted_at"
+    t.boolean "meeting_fee_paid", default: false, null: false
     t.index "lower((phone)::text)", name: "index_users_on_lower_phone", unique: true, where: "((phone IS NOT NULL) AND ((phone)::text <> ''::text))"
     t.index ["business_category_id"], name: "index_users_on_business_category_id"
     t.index ["chapter_id"], name: "index_users_on_chapter_id"
@@ -946,6 +956,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_29_073344) do
     t.index ["forum_id"], name: "index_users_on_forum_id"
     t.index ["invited_by_id"], name: "index_users_on_invited_by_id"
     t.index ["membership_plan_id"], name: "index_users_on_membership_plan_id"
+    t.index ["profile_token"], name: "index_users_on_profile_token", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
     t.index ["role_id"], name: "idx_users_role_id"
     t.index ["role_id"], name: "index_users_on_role_id"

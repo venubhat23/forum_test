@@ -4,7 +4,8 @@ require "roo"
 module Forums
   class MembersController < BaseController
     before_action :set_chapter, except: [ :import, :bulk_import, :all ]
-    before_action :set_member, only: [ :show, :edit, :update, :destroy, :suspend, :activate, :reset_password, :force_logout, :renew, :print, :update_role ]
+    before_action :set_member, only: [ :show, :edit, :update, :destroy, :suspend, :activate, :reset_password, :force_logout, :renew, :print, :update_role,
+      :invite_to_meeting, :send_meeting_invite ]
 
     def all
       authorize! :read, User
@@ -165,6 +166,41 @@ module Forums
     def print
       authorize! :read, @member
       render layout: false
+    end
+
+    # An extra screen shown right after converting a guest to a member: lets
+    # the admin pick an already-scheduled meeting (created before this person
+    # was a member, so they never got the original "meeting scheduled"
+    # notification) to add them to.
+    def invite_to_meeting
+      authorize! :update, @member
+      @meetings = @chapter.meetings.where("scheduled_at >= ?", Time.current).order(:scheduled_at)
+    end
+
+    # Marks the member as attending the chosen meeting (same "attending"
+    # status self check-in uses) and sends them the same notification they'd
+    # have gotten had they been a member when the meeting was first scheduled.
+    def send_meeting_invite
+      authorize! :update, @member
+      meeting = @chapter.meetings.find_by(id: params[:meeting_id])
+
+      if meeting
+        attendance = @member.attendances.find_or_initialize_by(meeting: meeting)
+        attendance.event_type = :meeting
+        attendance.occurred_on = meeting.scheduled_at.to_date
+        attendance.status = :attending
+        attendance.save!
+
+        when_text = meeting.scheduled_at.strftime("%d %b %Y at %I:%M %p")
+        venue_text = meeting.venue.present? ? " at #{meeting.venue}" : ""
+        @member.notifications.create!(body: "You're invited to the #{meeting.meeting_type} meeting on #{when_text}#{venue_text}! 🎉")
+
+        notice = "#{@member.display_name} was added to the #{meeting.meeting_type} meeting on #{meeting.scheduled_at.strftime('%d %b %Y')} and notified."
+      else
+        notice = nil
+      end
+
+      redirect_to forum_chapter_member_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: @member.id), notice: notice
     end
 
     def invite_to_event

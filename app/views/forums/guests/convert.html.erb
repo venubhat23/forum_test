@@ -131,8 +131,25 @@
           </div>
 
           <h2 class="h6 text-uppercase text-muted mb-3">KYC Documents</h2>
+          <div class="row g-3 mb-3">
+            <div class="col-12 col-sm-4">
+              <%= f.label :gst_document, "Upload GST Certificate", class: "form-label" %>
+              <%= f.file_field :gst_document, class: "form-control" %>
+              <% if @guest.gst_document.attached? %><div class="form-text">Already on file — choose a new one only to replace it.</div><% end %>
+            </div>
+            <div class="col-12 col-sm-4">
+              <%= f.label :pan_document, "Upload PAN Card", class: "form-label" %>
+              <%= f.file_field :pan_document, class: "form-control" %>
+              <% if @guest.pan_document.attached? %><div class="form-text">Already on file — choose a new one only to replace it.</div><% end %>
+            </div>
+            <div class="col-12 col-sm-4">
+              <%= f.label :aadhaar_document, "Upload Aadhaar Card", class: "form-label" %>
+              <%= f.file_field :aadhaar_document, class: "form-control" %>
+              <% if @guest.aadhaar_document.attached? %><div class="form-text">Already on file — choose a new one only to replace it.</div><% end %>
+            </div>
+          </div>
           <div class="mb-4">
-            <%= f.label :kyc_documents, "Upload documents (multiple allowed)", class: "form-label" %>
+            <%= f.label :kyc_documents, "Other KYC Documents (optional, multiple allowed)", class: "form-label" %>
             <%= f.file_field :kyc_documents, multiple: true, class: "form-control" %>
           </div>
 

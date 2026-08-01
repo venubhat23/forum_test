@@ -1,0 +1,73 @@
+<div class="ps-card">
+  <div class="ps-card-top">
+    <% if member.photo.attached? %>
+      <%= image_tag member.photo, class: "ps-card-photo", alt: member.display_name %>
+    <% else %>
+      <div class="ps-card-photo ps-card-photo-fallback"><%= member.display_name.first.upcase %></div>
+    <% end %>
+    <div class="ps-card-heading">
+      <h3 class="ps-card-name"><%= member.display_name %></h3>
+      <% if member.designation.present? %>
+        <span class="ps-card-designation"><%= member.designation %></span>
+      <% end %>
+    </div>
+  </div>
+
+  <% if member.business_name.present? %>
+    <div class="ps-card-business">
+      <% if member.company_logo.attached? %>
+        <%= image_tag member.company_logo, class: "ps-card-company-logo", alt: member.business_name %>
+      <% end %>
+      <div>
+        <div class="ps-card-business-name"><%= member.business_name %></div>
+        <% category_name = member.business_category_ref&.name || member.business_category %>
+        <% if category_name.present? %>
+          <div class="ps-card-category"><i class="bi bi-tag-fill"></i> <%= category_name %></div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
+  <% if member.speciality.present? %>
+    <p class="ps-card-speciality"><%= member.speciality %></p>
+  <% end %>
+
+  <ul class="ps-card-meta">
+    <% if member.chapter.present? %>
+      <li><i class="bi bi-diagram-3"></i> <%= member.chapter.name %></li>
+    <% end %>
+    <% if member.service_area.present? %>
+      <li><i class="bi bi-geo-alt"></i> <%= member.service_area %></li>
+    <% end %>
+    <% if member.capacity.present? %>
+      <li><i class="bi bi-building"></i> <%= member.capacity %></li>
+    <% end %>
+    <% if member.experience_years.present? %>
+      <li><i class="bi bi-award"></i> <%= pluralize(member.experience_years, "year") %> experience</li>
+    <% end %>
+  </ul>
+
+  <div class="ps-card-contact">
+    <% if member.phone.present? %>
+      <%= link_to member.phone, "tel:#{member.phone}", class: "ps-card-contact-link" do %>
+        <i class="bi bi-telephone-fill"></i> <%= member.phone %>
+      <% end %>
+    <% end %>
+    <% if member.email.present? %>
+      <%= link_to member.email, "mailto:#{member.email}", class: "ps-card-contact-link" %>
+    <% end %>
+  </div>
+
+  <% if member.website.present? || member.social_media_handle.present? %>
+    <div class="ps-card-links">
+      <% if member.website.present? %>
+        <%= link_to external_url(member.website), target: "_blank", rel: "noopener", class: "ps-card-icon-link", title: "Website" do %>
+          <i class="bi bi-globe2"></i>
+        <% end %>
+      <% end %>
+      <% if member.social_media_handle.present? %>
+        <span class="ps-card-icon-link" title="<%= member.social_media_handle %>"><i class="bi bi-share-fill"></i> <%= member.social_media_handle %></span>
+      <% end %>
+    </div>
+  <% end %>
+</div>

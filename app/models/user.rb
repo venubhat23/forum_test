@@ -16,6 +16,10 @@ class User < ApplicationRecord
 
   has_one_attached :photo
   has_one_attached :company_logo
+  has_one_attached :aadhaar_document
+  has_one_attached :pan_document
+  has_one_attached :gst_document
+  has_one_attached :meeting_fee_screenshot
   has_many_attached :kyc_documents
 
   belongs_to :forum, optional: true
