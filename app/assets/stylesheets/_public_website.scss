@@ -823,3 +823,341 @@
   border-color: #1e293b;
   color: #e2e8f0;
 }
+
+/* ============================================================
+   Website templates — alternate skins over the same markup.
+   Selected per-forum via ForumSetting#website_template, applied
+   as [data-template] on the .public-site wrapper. "classic" is
+   the base style above; the rest override component-by-component.
+   ============================================================ */
+
+/* ── Modern: crisp light layout, solid navy hero, sky-blue accent ── */
+.public-site[data-template="modern"] {
+  --brand: #0ea5e9;
+  background: #ffffff;
+}
+
+.public-site[data-template="modern"] .ps-hero,
+.public-site[data-template="modern"] .ps-page-header {
+  background: #0f172a;
+  position: relative;
+}
+
+.public-site[data-template="modern"] .ps-hero::after,
+.public-site[data-template="modern"] .ps-page-header::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 5px;
+  background: linear-gradient(90deg, var(--brand), #38bdf8);
+}
+
+.public-site[data-template="modern"] .ps-btn-primary {
+  background: var(--brand);
+  color: #fff;
+}
+
+.public-site[data-template="modern"] .ps-hero-logo-fallback,
+.public-site[data-template="modern"] .ps-nav-logo-fallback {
+  background: var(--brand);
+}
+
+.public-site[data-template="modern"] .ps-stats-inner,
+.public-site[data-template="modern"] .ps-card,
+.public-site[data-template="modern"] .ps-filter-bar {
+  border-radius: 0.4rem;
+  box-shadow: none;
+  border: 1px solid #e2e8f0;
+}
+
+.public-site[data-template="modern"] .ps-card {
+  border-left: 3px solid var(--brand);
+}
+
+.public-site[data-template="modern"] .ps-section-header h2::after {
+  content: "";
+  display: block;
+  width: 42px;
+  height: 3px;
+  background: var(--brand);
+  margin-top: 0.5rem;
+  border-radius: 2px;
+}
+
+.public-site[data-template="modern"] .ps-cta {
+  background: var(--brand);
+}
+
+/* ── Minimal: monochrome, no gradients, generous whitespace ── */
+.public-site[data-template="minimal"] {
+  --brand: #111827;
+  background: #ffffff;
+}
+
+.public-site[data-template="minimal"] .ps-nav {
+  background: #ffffff;
+  box-shadow: none;
+}
+
+.public-site[data-template="minimal"] .ps-hero,
+.public-site[data-template="minimal"] .ps-page-header {
+  background: #ffffff;
+  color: #111827;
+  border-bottom: 1px solid #e5e7eb;
+  padding-top: 5.5rem;
+  padding-bottom: 5.5rem;
+}
+
+.public-site[data-template="minimal"] .ps-hero-tagline {
+  color: #6b7280;
+}
+
+.public-site[data-template="minimal"] .ps-page-header p {
+  color: #6b7280;
+  opacity: 1;
+}
+
+.public-site[data-template="minimal"] .ps-hero-logo-fallback {
+  background: #f3f4f6;
+  color: #111827;
+  border-color: #e5e7eb;
+}
+
+.public-site[data-template="minimal"] .ps-btn-primary {
+  background: #111827;
+  color: #fff;
+  box-shadow: none;
+  border-radius: 0.25rem;
+}
+
+.public-site[data-template="minimal"] .ps-hero .ps-btn-outline {
+  border-color: #111827;
+  color: #111827;
+}
+
+.public-site[data-template="minimal"] .ps-stats-inner {
+  box-shadow: none;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.25rem;
+}
+
+.public-site[data-template="minimal"] .ps-stat-icon {
+  background: #f3f4f6 !important;
+  color: #111827;
+  border-radius: 0.25rem;
+}
+
+.public-site[data-template="minimal"] .ps-card {
+  border-radius: 0.25rem;
+  box-shadow: none;
+}
+
+.public-site[data-template="minimal"] .ps-card:hover {
+  transform: none;
+  box-shadow: none;
+  border-color: #111827;
+}
+
+.public-site[data-template="minimal"] .ps-chip {
+  background: transparent;
+  border: 1px solid #d1d5db;
+  color: #111827;
+  border-radius: 0.25rem;
+}
+
+.public-site[data-template="minimal"] .ps-cta {
+  background: #f9fafb;
+  color: #111827;
+}
+
+.public-site[data-template="minimal"] .ps-cta p {
+  opacity: 0.7;
+}
+
+.public-site[data-template="minimal"] .ps-cta .ps-btn-outline {
+  border-color: #111827;
+  color: #111827;
+}
+
+.public-site[data-template="minimal"] .ps-filter-bar,
+.public-site[data-template="minimal"] .ps-filter-search,
+.public-site[data-template="minimal"] .ps-filter-select {
+  border-radius: 0.25rem;
+}
+
+/* ── Bold: dark-mode-first, oversized type, vivid rose accent ── */
+.public-site[data-template="bold"] {
+  --brand: #f43f5e;
+  background: #0b0f19;
+  color: #e5e7eb;
+}
+
+.public-site[data-template="bold"] .ps-nav {
+  background: rgba(11, 15, 25, 0.92);
+  border-color: #1f2937;
+}
+
+.public-site[data-template="bold"] .ps-nav-brand {
+  color: #fff;
+}
+
+.public-site[data-template="bold"] .ps-nav-link {
+  color: #9ca3af;
+}
+
+.public-site[data-template="bold"] .ps-hero,
+.public-site[data-template="bold"] .ps-page-header {
+  background: radial-gradient(circle at 30% 20%, rgba(244, 63, 94, 0.35), transparent 55%), #0b0f19;
+}
+
+.public-site[data-template="bold"] .ps-hero-title {
+  font-size: 3.1rem;
+  text-transform: uppercase;
+  letter-spacing: -1px;
+}
+
+.public-site[data-template="bold"] .ps-page-header h1 {
+  font-size: 2.5rem;
+  text-transform: uppercase;
+}
+
+.public-site[data-template="bold"] .ps-btn-primary {
+  background: var(--brand);
+  color: #fff;
+  box-shadow: 0 0 24px rgba(244, 63, 94, 0.5);
+}
+
+.public-site[data-template="bold"] .ps-section-muted,
+.public-site[data-template="bold"] .ps-stats-inner,
+.public-site[data-template="bold"] .ps-card,
+.public-site[data-template="bold"] .ps-filter-bar {
+  background: #131a2b;
+  border: 1px solid #1f2937;
+}
+
+.public-site[data-template="bold"] .ps-section-header h2,
+.public-site[data-template="bold"] .ps-stat-value,
+.public-site[data-template="bold"] .ps-card-name,
+.public-site[data-template="bold"] .ps-card-business-name {
+  color: #fff;
+}
+
+.public-site[data-template="bold"] .ps-card:hover {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 1px var(--brand), 0 12px 28px rgba(244, 63, 94, 0.25);
+}
+
+.public-site[data-template="bold"] .ps-card-business {
+  background: #0f1626;
+}
+
+.public-site[data-template="bold"] .ps-card-speciality,
+.public-site[data-template="bold"] .ps-card-meta li,
+.public-site[data-template="bold"] .ps-card-category {
+  color: #9ca3af;
+}
+
+.public-site[data-template="bold"] .ps-filter-select,
+.public-site[data-template="bold"] .ps-filter-search {
+  background: #0f1626;
+  border-color: #1f2937;
+  color: #e5e7eb;
+}
+
+.public-site[data-template="bold"] .ps-cta {
+  background: #05070c;
+}
+
+.public-site[data-template="bold"] .ps-footer {
+  border-color: #1f2937;
+}
+
+/* ── Elegant: serif headings, ivory background, gold accent ── */
+.public-site[data-template="elegant"] {
+  --brand: #b8860b;
+  background: #fffdf7;
+  color: #2d2a24;
+}
+
+.public-site[data-template="elegant"] .ps-nav-brand,
+.public-site[data-template="elegant"] .ps-hero-title,
+.public-site[data-template="elegant"] .ps-page-header h1,
+.public-site[data-template="elegant"] .ps-section-header h2,
+.public-site[data-template="elegant"] .ps-cta h2,
+.public-site[data-template="elegant"] .ps-card-name,
+.public-site[data-template="elegant"] .ps-card-business-name {
+  font-family: "Playfair Display", Georgia, serif;
+}
+
+.public-site[data-template="elegant"] .ps-nav {
+  background: rgba(255, 253, 247, 0.94);
+  border-color: #ecdfc0;
+}
+
+.public-site[data-template="elegant"] .ps-hero,
+.public-site[data-template="elegant"] .ps-page-header {
+  background: #fffdf7;
+  color: #2d2a24;
+  border-bottom: 1px solid #ecdfc0;
+}
+
+.public-site[data-template="elegant"] .ps-hero-title,
+.public-site[data-template="elegant"] .ps-page-header h1 {
+  font-weight: 700;
+}
+
+.public-site[data-template="elegant"] .ps-hero-tagline,
+.public-site[data-template="elegant"] .ps-page-header p {
+  color: #6b6355;
+  opacity: 1;
+}
+
+.public-site[data-template="elegant"] .ps-hero-logo-fallback {
+  background: #f4ecd8;
+  color: var(--brand);
+}
+
+.public-site[data-template="elegant"] .ps-btn-primary {
+  background: var(--brand);
+  color: #fff;
+  box-shadow: none;
+  border-radius: 0.3rem;
+}
+
+.public-site[data-template="elegant"] .ps-hero .ps-btn-outline {
+  border-color: var(--brand);
+  color: var(--brand);
+}
+
+.public-site[data-template="elegant"] .ps-stats-inner,
+.public-site[data-template="elegant"] .ps-card,
+.public-site[data-template="elegant"] .ps-filter-bar {
+  background: #fffdf7;
+  border: 1px solid #ecdfc0;
+  border-radius: 0.4rem;
+  box-shadow: none;
+}
+
+.public-site[data-template="elegant"] .ps-card:hover {
+  border-color: var(--brand);
+  box-shadow: 0 8px 20px rgba(184, 134, 11, 0.12);
+}
+
+.public-site[data-template="elegant"] .ps-card-business {
+  background: #faf4e6;
+}
+
+.public-site[data-template="elegant"] .ps-chip {
+  background: #f4ecd8;
+  color: #8a6c14;
+}
+
+.public-site[data-template="elegant"] .ps-cta {
+  background: #2d2a24;
+}
+
+.public-site[data-template="elegant"] .ps-footer {
+  border-color: #ecdfc0;
+}

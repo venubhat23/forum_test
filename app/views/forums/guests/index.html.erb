@@ -56,6 +56,7 @@
           <th>Phone</th>
           <th>Nature of Business</th>
           <th>Invited By</th>
+          <th>Created</th>
           <th></th>
         </tr>
       </thead>
@@ -75,6 +76,7 @@
             <td><%= guest.phone %></td>
             <td><%= guest.nature_of_business %></td>
             <td><%= guest.invited_by_display || "—" %></td>
+            <td><%= guest.created_at.strftime("%d %b %Y") %></td>
             <td class="text-end">
               <% if @upcoming_event && (invite_link = whatsapp_invite_link(guest, @upcoming_event, @current_forum)) %>
                 <%= link_to invite_link, class: "icon-btn icon-btn-whatsapp", title: "Invite to #{@upcoming_event.title} via WhatsApp", target: "_blank", rel: "noopener" do %>
@@ -93,7 +95,7 @@
           </tr>
         <% end %>
         <% if @guests.empty? %>
-          <tr><td colspan="6" class="text-center text-muted py-4">No guests yet. Add the first one to get started.</td></tr>
+          <tr><td colspan="7" class="text-center text-muted py-4">No guests yet. Add the first one to get started.</td></tr>
         <% end %>
       </tbody>
     </table>

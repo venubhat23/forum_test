@@ -177,25 +177,30 @@ module Forums
       @meetings = @chapter.meetings.where("scheduled_at >= ?", Time.current).order(:scheduled_at)
     end
 
-    # Marks the member as attending the chosen meeting (same "attending"
+    # Marks the member as attending each chosen meeting (same "attending"
     # status self check-in uses) and sends them the same notification they'd
-    # have gotten had they been a member when the meeting was first scheduled.
+    # have gotten had they been a member when each meeting was first
+    # scheduled. Accepts one or many meetings — the invite_to_meeting screen
+    # lets the admin pick specific meetings, all of them, or all meetings
+    # that fall on a given weekday.
     def send_meeting_invite
       authorize! :update, @member
-      meeting = @chapter.meetings.find_by(id: params[:meeting_id])
+      meetings = @chapter.meetings.where(id: Array(params[:meeting_ids]).reject(&:blank?)).order(:scheduled_at)
 
-      if meeting
-        attendance = @member.attendances.find_or_initialize_by(meeting: meeting)
-        attendance.event_type = :meeting
-        attendance.occurred_on = meeting.scheduled_at.to_date
-        attendance.status = :attending
-        attendance.save!
+      if meetings.any?
+        meetings.each do |meeting|
+          attendance = @member.attendances.find_or_initialize_by(meeting: meeting)
+          attendance.event_type = :meeting
+          attendance.occurred_on = meeting.scheduled_at.to_date
+          attendance.status = :attending
+          attendance.save!
 
-        when_text = meeting.scheduled_at.strftime("%d %b %Y at %I:%M %p")
-        venue_text = meeting.venue.present? ? " at #{meeting.venue}" : ""
-        @member.notifications.create!(body: "You're invited to the #{meeting.meeting_type} meeting on #{when_text}#{venue_text}! 🎉")
+          when_text = meeting.scheduled_at.strftime("%d %b %Y at %I:%M %p")
+          venue_text = meeting.venue.present? ? " at #{meeting.venue}" : ""
+          @member.notifications.create!(body: "You're invited to the #{meeting.meeting_type} meeting on #{when_text}#{venue_text}! 🎉")
+        end
 
-        notice = "#{@member.display_name} was added to the #{meeting.meeting_type} meeting on #{meeting.scheduled_at.strftime('%d %b %Y')} and notified."
+        notice = "#{@member.display_name} was added to #{helpers.pluralize(meetings.size, 'meeting')} and notified."
       else
         notice = nil
       end

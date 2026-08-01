@@ -27,7 +27,7 @@ module Forums
       @guests_this_month = scope.where(created_at: Time.current.beginning_of_month..).count
       @upcoming_event = @current_forum.events.where("starts_at >= ?", Time.current).order(:starts_at).first
 
-      @guests = scope.includes(:invited_by).order(:full_name)
+      @guests = scope.includes(:invited_by).order(created_at: :desc)
       @guests = @guests.where("full_name ILIKE ? OR email ILIKE ?", "%#{params[:q]}%", "%#{params[:q]}%") if params[:q].present?
       @guests = @guests.page(params[:page])
     end

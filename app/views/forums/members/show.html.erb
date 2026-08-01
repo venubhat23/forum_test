@@ -87,9 +87,15 @@
             <h2 class="h6 mb-1"><i class="bi bi-cash-coin text-primary me-1"></i> Collect the membership fee</h2>
             <p class="text-muted mb-0">Set the amount and how long this membership covers — a year, several years, or a one-time lifetime fee.</p>
           </div>
-          <button type="button" class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#collect-fee-<%= @member.id %>">
-            <i class="bi bi-cash-coin me-1"></i> Collect Membership Fee
-          </button>
+          <div class="d-flex flex-wrap gap-2">
+            <button type="button" class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#collect-fee-<%= @member.id %>">
+              <i class="bi bi-cash-coin me-1"></i> Collect Membership Fee
+            </button>
+            <% if can? :destroy, @member %>
+              <%= button_to "Remove Member", forum_chapter_member_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: @member.id), method: :delete, class: "btn btn-outline-danger btn-lg",
+                    data: { turbo_confirm: "Permanently delete #{@member.full_name}? No membership fee has been collected yet. This will also permanently delete all their fee payments, attendance records, referrals, leads, event registrations, notifications, badges, support tickets, and other data. This cannot be undone." } %>
+            <% end %>
+          </div>
         </div>
         <%= render "collect_fee_modal", member: @member %>
       <% end %>

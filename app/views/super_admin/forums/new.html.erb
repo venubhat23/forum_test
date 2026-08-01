@@ -27,6 +27,27 @@
             </div>
           </div>
 
+          <div class="d-flex align-items-center justify-content-between mb-3">
+            <h2 class="h6 text-uppercase text-muted mb-0">Website Template</h2>
+            <%= link_to "Preview all", super_admin_website_templates_path, target: "_blank", rel: "noopener", class: "small" %>
+          </div>
+          <div class="row g-3 mb-4">
+            <% ForumSetting::TEMPLATES.each do |key, info| %>
+              <div class="col-12 col-sm-6 col-lg-4">
+                <label class="card h-100 plan-option-card p-0">
+                  <div class="ratio ratio-16x9" style="background: linear-gradient(135deg, <%= info[:swatches][0] %> 0%, <%= info[:swatches][1] %> 100%); border-radius: 0.85rem 0.85rem 0 0;"></div>
+                  <div class="p-3">
+                    <div class="form-check mb-1">
+                      <%= radio_button_tag "forum[website_template]", key, key == ForumSetting::DEFAULT_TEMPLATE, class: "form-check-input" %>
+                      <%= label_tag "forum_website_template_#{key}", info[:name], class: "form-check-label fw-semibold" %>
+                    </div>
+                    <p class="text-muted small mb-0"><%= info[:tagline] %></p>
+                  </div>
+                </label>
+              </div>
+            <% end %>
+          </div>
+
           <h2 class="h6 text-uppercase text-muted mb-3">Subscription Plan</h2>
           <div class="row g-3 mb-4">
             <% @plans.each_with_index do |plan, index| %>

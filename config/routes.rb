@@ -14,6 +14,11 @@ Rails.application.routes.draw do
     get "dashboard", to: "dashboard#show"
     get "analytics", to: "analytics#show"
     get "roles", to: "roles#index"
+    resources :website_templates, only: [ :index ] do
+      member do
+        get :preview
+      end
+    end
     resources :forums, only: [ :index, :new, :create, :show, :edit, :update, :destroy ] do
       member do
         get :tree

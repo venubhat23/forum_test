@@ -1,6 +1,7 @@
 <% content_for :title, @current_forum.name %>
 
-<div class="public-site" style="--brand: <%= @setting.theme_color.presence || '#4f46e5' %>;">
+<% brand_style = @setting.website_template == ForumSetting::DEFAULT_TEMPLATE ? "--brand: #{@setting.theme_color.presence || '#4f46e5'};" : nil %>
+<div class="public-site" data-template="<%= @setting.website_template %>" style="<%= brand_style %>">
   <%= render "forums/websites/nav" %>
 
   <section class="ps-hero">

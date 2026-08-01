@@ -21,6 +21,27 @@
             <%= f.label :theme_color, class: "form-label" %>
             <%= f.color_field :theme_color, class: "form-control form-control-color" %>
           </div>
+
+          <div class="d-flex align-items-center justify-content-between mb-2">
+            <%= f.label :website_template, "Website Template", class: "form-label mb-0" %>
+            <%= link_to "View my public website", forum_website_path(forum_slug: @current_forum.slug), target: "_blank", rel: "noopener", class: "small" %>
+          </div>
+          <div class="row g-2 mb-4">
+            <% ForumSetting::TEMPLATES.each do |key, info| %>
+              <div class="col-12 col-sm-6">
+                <label class="card h-100 plan-option-card p-0">
+                  <div class="ratio ratio-21x9" style="background: linear-gradient(135deg, <%= info[:swatches][0] %> 0%, <%= info[:swatches][1] %> 100%); border-radius: 0.85rem 0.85rem 0 0;"></div>
+                  <div class="p-2 px-3">
+                    <div class="form-check mb-0">
+                      <%= f.radio_button :website_template, key, class: "form-check-input" %>
+                      <%= label_tag "forum_setting_website_template_#{key}", info[:name], class: "form-check-label fw-semibold small" %>
+                    </div>
+                  </div>
+                </label>
+              </div>
+            <% end %>
+          </div>
+
           <div class="mb-3">
             <%= f.label :invoice_prefix, class: "form-label" %>
             <%= f.text_field :invoice_prefix, class: "form-control" %>

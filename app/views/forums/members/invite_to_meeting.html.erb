@@ -1,7 +1,7 @@
 <% content_for :title, "Invite #{@member.display_name} to a Meeting" %>
 
 <div class="page-header">
-  <h1 class="page-title h4">One More Thing — Invite <%= @member.display_name %> to a Meeting</h1>
+  <h1 class="page-title h4">One More Thing — Invite <%= @member.display_name %> to Meetings</h1>
   <p class="page-subtitle mb-0"><%= @chapter.name %> &middot; <%= @current_forum.name %></p>
 </div>
 
@@ -10,22 +10,43 @@
     <div class="card">
       <div class="card-body p-4">
         <p class="text-muted mb-4">
-          Pick an already-scheduled meeting to add <%= @member.display_name %> to. They'll be marked as attending
-          and get the same notification everyone else got when the meeting was first scheduled.
+          Pick which already-scheduled meetings to add <%= @member.display_name %> to — all of them, just one or two,
+          or every meeting on a particular day. They'll be marked as attending and get the same notification everyone
+          else got when each meeting was first scheduled.
         </p>
 
         <% if @meetings.any? %>
+          <% days_present = @meetings.map { |m| m.scheduled_at.strftime("%A") }.uniq %>
           <%= form_with url: send_meeting_invite_forum_chapter_member_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: @member.id),
-                method: :patch, local: true do %>
+                method: :patch, local: true, data: { controller: "attendance-checklist" } do %>
+            <div class="d-flex flex-wrap gap-2 mb-3">
+              <button type="button" class="btn btn-sm btn-outline-primary" data-action="attendance-checklist#markAll">
+                <i class="bi bi-check-all me-1"></i> Select All Meetings
+              </button>
+              <button type="button" class="btn btn-sm btn-outline-secondary" data-action="attendance-checklist#clearAll">Clear Selection</button>
+              <% days_present.each do |day| %>
+                <% count = @meetings.count { |m| m.scheduled_at.strftime("%A") == day } %>
+                <button type="button" class="btn btn-sm btn-outline-info"
+                        data-action="attendance-checklist#markDay" data-attendance-checklist-day-param="<%= day %>">
+                  All <%= day %> Meetings (<%= count %>)
+                </button>
+              <% end %>
+            </div>
+
             <div class="list-group mb-4">
-              <% @meetings.each_with_index do |meeting, index| %>
+              <% @meetings.each do |meeting| %>
                 <label class="list-group-item d-flex align-items-start gap-3">
-                  <input class="form-check-input mt-1" type="radio" name="meeting_id" value="<%= meeting.id %>" <%= "checked" if index.zero? %> required>
+                  <input class="form-check-input mt-1" type="checkbox" name="meeting_ids[]" value="<%= meeting.id %>"
+                         data-attendance-checklist-target="checkbox" data-day="<%= meeting.scheduled_at.strftime("%A") %>">
                   <span>
-                    <span class="fw-semibold d-block"><%= meeting.meeting_type.titleize %> Meeting &middot; <%= meeting.scheduled_at.strftime("%d %b %Y at %I:%M %p") %></span>
+                    <span class="fw-semibold d-block">
+                      <%= meeting.meeting_type.titleize %> Meeting &middot;
+                      <%= meeting.scheduled_at.strftime("%A, %d %b %Y at %I:%M %p") %>
+                    </span>
                     <span class="text-muted small">
                       <% if meeting.venue.present? %>📍 <%= meeting.venue %><% end %>
                       <% if meeting.speaker.present? %> &middot; Speaker: <%= meeting.speaker %><% end %>
+                      <% if meeting.fee_amount.present? %> &middot; Fee: <%= number_to_currency(meeting.fee_amount) %><% end %>
                     </span>
                   </span>
                 </label>

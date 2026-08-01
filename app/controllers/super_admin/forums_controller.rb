@@ -39,6 +39,7 @@ module SuperAdmin
       admin_password = params.dig(:admin, :password)
       logo = params.dig(:forum, :logo)
       theme_color = params.dig(:forum, :theme_color)
+      website_template = params.dig(:forum, :website_template)
 
       ActiveRecord::Base.transaction do
         @forum.save!
@@ -54,6 +55,7 @@ module SuperAdmin
         setting = ForumSetting.new(forum: @forum)
         setting.logo.attach(logo) if logo.present?
         setting.theme_color = theme_color if theme_color.present?
+        setting.website_template = website_template if website_template.present?
         setting.save!
       end
 

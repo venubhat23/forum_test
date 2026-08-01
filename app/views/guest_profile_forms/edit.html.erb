@@ -66,10 +66,18 @@
                 <%= f.label :date_of_birth, class: "form-label" %>
                 <%= f.date_field :date_of_birth, class: "form-control" %>
               </div>
-              <div class="col-12 col-sm-6">
+              <div class="col-12 col-sm-6" data-controller="image-preview">
                 <%= f.label :photo, "Photo", class: "form-label" %>
-                <%= f.file_field :photo, class: "form-control", accept: "image/*" %>
+                <%= f.file_field :photo, class: "form-control", accept: "image/*",
+                      data: { action: "change->image-preview#preview", "image-preview-target": "input" } %>
                 <% if @guest.photo.attached? %><div class="form-text">A photo is already on file — choose a new one only to replace it.</div><% end %>
+                <div class="mt-2 <%= "d-none" unless @guest.photo.attached? %>" data-image-preview-target="wrapper">
+                  <% if @guest.photo.attached? %>
+                    <%= image_tag @guest.photo, data: { "image-preview-target": "image" }, style: "max-height: 120px; border-radius: 8px; object-fit: cover;", alt: "Photo preview" %>
+                  <% else %>
+                    <img data-image-preview-target="image" style="max-height: 120px; border-radius: 8px; object-fit: cover;" alt="Photo preview">
+                  <% end %>
+                </div>
               </div>
             </div>
 
@@ -112,10 +120,18 @@
                 <%= f.text_field :service_area, class: "form-control", placeholder: "e.g. Only Bengaluru" %>
               </div>
             </div>
-            <div class="mb-4">
+            <div class="mb-4" data-controller="image-preview">
               <%= f.label :company_logo, "Company Logo", class: "form-label" %>
-              <%= f.file_field :company_logo, class: "form-control", accept: "image/*" %>
+              <%= f.file_field :company_logo, class: "form-control", accept: "image/*",
+                    data: { action: "change->image-preview#preview", "image-preview-target": "input" } %>
               <% if @guest.company_logo.attached? %><div class="form-text">A logo is already on file — choose a new one only to replace it.</div><% end %>
+              <div class="mt-2 <%= "d-none" unless @guest.company_logo.attached? %>" data-image-preview-target="wrapper">
+                <% if @guest.company_logo.attached? %>
+                  <%= image_tag @guest.company_logo, data: { "image-preview-target": "image" }, style: "max-height: 120px; border-radius: 8px; object-fit: cover;", alt: "Company logo preview" %>
+                <% else %>
+                  <img data-image-preview-target="image" style="max-height: 120px; border-radius: 8px; object-fit: cover;" alt="Company logo preview">
+                <% end %>
+              </div>
             </div>
 
             <h2 class="h6 text-uppercase text-muted mb-3">Address</h2>
@@ -167,7 +183,7 @@
             </div>
 
             <h2 class="h6 text-uppercase text-muted mb-3">Meeting Fee</h2>
-            <div class="mb-4" data-controller="fee-toggle">
+            <div class="mb-4" data-controller="fee-toggle image-preview">
               <% fee_meetings = @invited_meetings.select { |m| m.fee_amount.present? } %>
               <% fee_label = if fee_meetings.size == 1
                    "I have paid the #{number_to_currency(fee_meetings.first.fee_amount)} meeting fee"
@@ -184,8 +200,15 @@
               <div data-fee-toggle-target="amountWrap" class="<%= "d-none" unless @guest.meeting_fee_paid? %>">
                 <%= f.label :meeting_fee_screenshot, "Upload Payment Screenshot", class: "form-label" %>
                 <%= f.file_field :meeting_fee_screenshot, accept: "image/*", class: "form-control",
-                      data: { "fee-toggle-target": "amountField" } %>
+                      data: { action: "change->image-preview#preview", "fee-toggle-target": "amountField", "image-preview-target": "input" } %>
                 <% if @guest.meeting_fee_screenshot.attached? %><div class="form-text">A screenshot is already on file — choose a new one only to replace it.</div><% end %>
+                <div class="mt-2 <%= "d-none" unless @guest.meeting_fee_screenshot.attached? %>" data-image-preview-target="wrapper">
+                  <% if @guest.meeting_fee_screenshot.attached? %>
+                    <%= image_tag @guest.meeting_fee_screenshot, data: { "image-preview-target": "image" }, style: "max-height: 120px; border-radius: 8px; object-fit: cover;", alt: "Payment screenshot preview" %>
+                  <% else %>
+                    <img data-image-preview-target="image" style="max-height: 120px; border-radius: 8px; object-fit: cover;" alt="Payment screenshot preview">
+                  <% end %>
+                </div>
               </div>
             </div>
 

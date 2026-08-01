@@ -1,0 +1,38 @@
+<% content_for :title, "Website Templates" %>
+
+<div class="page-header">
+  <h1 class="page-title h4">Website Templates</h1>
+  <p class="page-subtitle mb-0">Public forum microsite designs — pick one per forum from Forum Management, or a forum admin can change it from their own Settings.</p>
+</div>
+
+<div class="row g-4">
+  <% @templates.each do |key, info| %>
+    <div class="col-12 col-lg-6">
+      <div class="card h-100">
+        <div class="card-body p-0">
+          <div class="ratio ratio-16x9" style="background: linear-gradient(135deg, <%= info[:swatches][0] %> 0%, <%= info[:swatches][1] %> 100%);">
+            <%= link_to preview_super_admin_website_template_path(key), target: "_blank", rel: "noopener", class: "d-flex align-items-center justify-content-center text-decoration-none" do %>
+              <span class="btn btn-light btn-lg shadow-sm"><i class="bi bi-play-circle me-1"></i> Live Preview</span>
+            <% end %>
+          </div>
+          <div class="p-4">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+              <h2 class="h5 mb-0"><%= info[:name] %></h2>
+              <% if key == ForumSetting::DEFAULT_TEMPLATE %>
+                <span class="badge bg-primary-subtle text-primary">Default</span>
+              <% end %>
+            </div>
+            <p class="text-muted small mb-3"><%= info[:tagline] %></p>
+            <div class="d-flex align-items-center gap-2 mb-3">
+              <% info[:swatches].each do |color| %>
+                <span style="display:inline-block;width:22px;height:22px;border-radius:50%;background:<%= color %>;border:1px solid rgba(0,0,0,0.08);"></span>
+              <% end %>
+              <code class="small text-muted ms-1"><%= key %></code>
+            </div>
+            <%= link_to "Open Full Preview", preview_super_admin_website_template_path(key), target: "_blank", rel: "noopener", class: "btn btn-outline-primary btn-sm" %>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>
