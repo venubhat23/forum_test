@@ -16,9 +16,12 @@ module GuestsHelper
 
   # The URL for the guest's own public, no-login profile form. Generates
   # and persists a token on first use so guests added before this feature
-  # existed still get a working link.
+  # existed still get a working link. Uses update_column (skips validations)
+  # because regenerate_profile_token's update! would otherwise re-validate
+  # the whole record — a guest missing an unrelated required field (e.g.
+  # phone) would then take down this page.
   def guest_profile_form_link(guest)
-    guest.regenerate_profile_token if guest.profile_token.blank?
+    guest.update_column(:profile_token, User.generate_unique_secure_token) if guest.profile_token.blank?
     guest_profile_form_url(token: guest.profile_token)
   end
 
