@@ -1,0 +1,13 @@
+<% if document.attached? %>
+  <div class="mt-2 d-flex align-items-center gap-2 p-2 border rounded bg-light-subtle">
+    <% if document.image? %>
+      <%= image_tag document, style: "width: 48px; height: 48px; border-radius: 6px; object-fit: cover; flex-shrink: 0;", alt: document.filename.to_s %>
+    <% else %>
+      <i class="bi bi-file-earmark-check-fill text-success fs-4"></i>
+    <% end %>
+    <div class="flex-grow-1 min-width-0">
+      <%= link_to document.filename.to_s, rails_blob_path(document, disposition: "inline"), target: "_blank", rel: "noopener", class: "small fw-semibold d-block text-truncate" %>
+      <span class="text-muted small">Uploaded &mdash; choose a new file only to replace it.</span>
+    </div>
+  </div>
+<% end %>

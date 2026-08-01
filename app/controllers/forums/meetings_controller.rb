@@ -101,26 +101,22 @@ module Forums
     end
 
     # Self check-in: a member/guest marks themselves as attending or not
-    # attending for their own chapter's meeting, but only on the meeting day
-    # itself. This only records intent — an admin still has to confirm it as
+    # attending for their own chapter's meeting, any time before the meeting.
+    # This only records intent — an admin still has to confirm it as
     # "attended" via record_attendance for it to count as present. Either
     # answer can be changed right up until the admin confirms attendance.
     def check_in
       authorize! :create, Attendance
       raise CanCan::AccessDenied, "You can only check in to your own chapter's meeting." unless @meeting.chapter_id == current_user.chapter_id
 
-      unless @meeting.scheduled_at.to_date == Date.current
-        return redirect_to forum_my_attendance_path(forum_slug: @current_forum.slug), alert: "You can only mark attendance on the day of the meeting."
-      end
-
       record = @meeting.attendances.find_or_initialize_by(user_id: current_user.id)
       record.event_type = :meeting
-      record.occurred_on = Date.current
+      record.occurred_on = @meeting.scheduled_at.to_date
       not_attending = params[:attending] == "0"
       record.status = not_attending ? :absent : :attending unless record.attended?
       record.save!
 
-      notice = not_attending ? "You've marked yourself as not attending today's meeting." : "You've marked yourself as attending today's meeting."
+      notice = not_attending ? "You've marked yourself as not attending the meeting." : "You've marked yourself as attending the meeting."
       redirect_to forum_my_attendance_path(forum_slug: @current_forum.slug), notice: notice
     end
 

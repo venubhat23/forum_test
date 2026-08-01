@@ -16,7 +16,6 @@
       <ul class="list-group list-group-flush">
         <% @upcoming_meetings.each do |meeting| %>
           <% attendance = @meeting_attendances[meeting.id] %>
-          <% is_today = meeting.scheduled_at.to_date == Date.current %>
           <li class="list-group-item d-flex flex-wrap justify-content-between align-items-center gap-2 px-0">
             <div>
               <div class="fw-semibold"><%= meeting.meeting_type.titleize %> Meeting</div>
@@ -27,8 +26,6 @@
             </div>
             <% if attendance&.attended? %>
               <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>You're marked attended</span>
-            <% elsif !is_today %>
-              <span class="badge bg-secondary-subtle text-secondary-emphasis">Scheduled &mdash; check in on the day</span>
             <% else %>
               <div class="d-flex align-items-center gap-2">
                 <% if attendance&.attending? %>

@@ -168,26 +168,62 @@
   <div class="card-header fw-semibold">Uploaded Documents</div>
   <div class="list-group list-group-flush">
     <% if @guest.gst_document.attached? %>
-      <div class="list-group-item d-flex justify-content-between align-items-center">
-        <span><i class="bi bi-file-earmark-text me-1"></i> GST Certificate</span>
+      <div class="list-group-item d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <span class="d-flex align-items-center gap-2">
+          <% if @guest.gst_document.image? %>
+            <%= link_to @guest.gst_document, target: "_blank", rel: "noopener" do %>
+              <%= image_tag @guest.gst_document, style: "height: 48px; width: 48px; border-radius: 6px; object-fit: cover;", alt: "GST Certificate" %>
+            <% end %>
+          <% else %>
+            <i class="bi bi-file-earmark-text"></i>
+          <% end %>
+          GST Certificate
+        </span>
         <%= link_to "View", rails_blob_path(@guest.gst_document, disposition: "attachment"), class: "btn btn-sm btn-outline-secondary" %>
       </div>
     <% end %>
     <% if @guest.pan_document.attached? %>
-      <div class="list-group-item d-flex justify-content-between align-items-center">
-        <span><i class="bi bi-file-earmark-text me-1"></i> PAN Card</span>
+      <div class="list-group-item d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <span class="d-flex align-items-center gap-2">
+          <% if @guest.pan_document.image? %>
+            <%= link_to @guest.pan_document, target: "_blank", rel: "noopener" do %>
+              <%= image_tag @guest.pan_document, style: "height: 48px; width: 48px; border-radius: 6px; object-fit: cover;", alt: "PAN Card" %>
+            <% end %>
+          <% else %>
+            <i class="bi bi-file-earmark-text"></i>
+          <% end %>
+          PAN Card
+        </span>
         <%= link_to "View", rails_blob_path(@guest.pan_document, disposition: "attachment"), class: "btn btn-sm btn-outline-secondary" %>
       </div>
     <% end %>
     <% if @guest.aadhaar_document.attached? %>
-      <div class="list-group-item d-flex justify-content-between align-items-center">
-        <span><i class="bi bi-file-earmark-text me-1"></i> Aadhaar Card</span>
+      <div class="list-group-item d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <span class="d-flex align-items-center gap-2">
+          <% if @guest.aadhaar_document.image? %>
+            <%= link_to @guest.aadhaar_document, target: "_blank", rel: "noopener" do %>
+              <%= image_tag @guest.aadhaar_document, style: "height: 48px; width: 48px; border-radius: 6px; object-fit: cover;", alt: "Aadhaar Card" %>
+            <% end %>
+          <% else %>
+            <i class="bi bi-file-earmark-text"></i>
+          <% end %>
+          Aadhaar Card
+        </span>
         <%= link_to "View", rails_blob_path(@guest.aadhaar_document, disposition: "attachment"), class: "btn btn-sm btn-outline-secondary" %>
       </div>
     <% end %>
     <% @guest.kyc_documents.each do |doc| %>
-      <div class="list-group-item d-flex justify-content-between align-items-center">
-        <span><i class="bi bi-file-earmark me-1"></i> <%= doc.filename %></span>
+      <div class="list-group-item d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <span class="d-flex align-items-center gap-2">
+          <% if doc.image? %>
+            <%= link_to doc, target: "_blank", rel: "noopener" do %>
+              <%= image_tag doc, style: "height: 48px; width: 48px; border-radius: 6px; object-fit: cover;", alt: doc.filename.to_s %>
+            <% end %>
+          <% else %>
+            <i class="bi bi-file-earmark"></i>
+          <% end %>
+          <%= doc.filename %>
+        </span>
         <%= link_to "View", rails_blob_path(doc, disposition: "attachment"), class: "btn btn-sm btn-outline-secondary" %>
       </div>
     <% end %>
