@@ -88,7 +88,7 @@
         <div class="col-12 col-sm-6">
           <%= f.label :payment_qr, "Payment QR Code", class: "form-label" %>
           <%= f.file_field :payment_qr, class: "form-control", accept: "image/*" %>
-          <% if schedule.payment_qr.attached? %>
+          <% if schedule.persisted? && schedule.payment_qr.attached? %>
             <div class="form-text">Current QR code: <%= image_tag schedule.payment_qr, style: "height: 60px; margin-top: 4px;" %></div>
           <% end %>
         </div>

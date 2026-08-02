@@ -71,28 +71,42 @@
   </div>
 <% end %>
 
-<% if @schedule.fee_amount.present? && (@schedule.payment_upi_id.present? || @schedule.payment_qr.attached? || @schedule.payment_bank_details.present?) %>
+<%
+  # Prefer the schedule's own payment fields; fall back to whichever
+  # generated meeting has them set. Meetings already support payment_upi_id/
+  # payment_qr today, so this shows real data immediately even while the
+  # schedule-level columns are still pending migration (see MeetingSchedule).
+  schedule_has_payment_info = @schedule.payment_upi_id.present? || @schedule.payment_qr.attached? || @schedule.payment_bank_details.present?
+  payment_source = schedule_has_payment_info ? @schedule : @occurrences.find { |m| m.payment_upi_id.present? || m.payment_qr.attached? }
+  display_fee = @schedule.fee_amount || @occurrences.find { |m| m.fee_amount.present? }&.fee_amount
+%>
+<% if display_fee.present? && payment_source.present? %>
   <div class="card mb-4">
     <div class="card-header fw-semibold">Fee &amp; Payment Info</div>
     <div class="card-body">
-      <p class="mb-3">Fee: <strong><%= number_to_currency(@schedule.fee_amount) %></strong> per meeting</p>
+      <p class="mb-3">Fee: <strong><%= number_to_currency(display_fee) %></strong> per meeting</p>
+      <% unless schedule_has_payment_info %>
+        <p class="text-muted small mb-3"><i class="bi bi-info-circle me-1"></i> Pulled from <%= payment_source.scheduled_at.strftime("%d %b %Y") %>'s meeting — set it here on the schedule to apply it to every occurrence.</p>
+      <% end %>
       <div class="d-flex flex-wrap gap-4">
-        <% if @schedule.payment_qr.attached? %>
+        <% if payment_source.payment_qr.attached? %>
           <div>
             <div class="text-muted small mb-1">Scan to pay</div>
-            <%= image_tag @schedule.payment_qr, style: "height: 160px;" %>
+            <%= image_tag payment_source.payment_qr, style: "height: 160px;" %>
           </div>
         <% end %>
         <div>
-          <% if @schedule.payment_upi_id.present? %>
-            <div class="mb-2"><span class="text-muted small">UPI / PhonePe:</span> <strong><%= @schedule.payment_upi_id %></strong></div>
+          <% if payment_source.payment_upi_id.present? %>
+            <div class="mb-2"><span class="text-muted small">UPI / PhonePe:</span> <strong><%= payment_source.payment_upi_id %></strong></div>
           <% end %>
-          <% if @schedule.payment_bank_details.present? %>
-            <div><span class="text-muted small">Bank details:</span><br><%= simple_format(@schedule.payment_bank_details) %></div>
+          <% if payment_source.payment_bank_details.present? %>
+            <div><span class="text-muted small">Bank details:</span><br><%= simple_format(payment_source.payment_bank_details) %></div>
           <% end %>
         </div>
       </div>
-      <p class="text-muted small mt-3 mb-0">Applied to every generated meeting in this schedule.</p>
+      <% if schedule_has_payment_info %>
+        <p class="text-muted small mt-3 mb-0">Applied to every generated meeting in this schedule.</p>
+      <% end %>
     </div>
   </div>
 <% end %>
