@@ -6,8 +6,18 @@ class GuestProfileFormsController < ApplicationController
   def edit
     return render :already_converted unless @guest.guest?
 
+    # Being on a recurring schedule's attendee list never creates individual
+    # Attendance rows (MeetingSchedule#notify_attendees only sends a
+    # notification), so those invites are shown separately from one-off
+    # meeting invites, which do go through Attendance.
+    @invited_schedules = @guest.meeting_schedule_attendances.includes(meeting_schedule: :meetings)
+      .map(&:meeting_schedule).uniq
+    schedule_meeting_ids = @invited_schedules.flat_map { |schedule| schedule.meetings.map(&:id) }
+
     @invited_meetings = @guest.attendances.where(event_type: :meeting).where.not(meeting_id: nil)
-      .includes(:meeting).map(&:meeting).compact.uniq.sort_by(&:scheduled_at)
+      .includes(:meeting).map(&:meeting).compact.uniq
+      .reject { |meeting| schedule_meeting_ids.include?(meeting.id) }
+      .sort_by(&:scheduled_at)
   end
 
   def update
