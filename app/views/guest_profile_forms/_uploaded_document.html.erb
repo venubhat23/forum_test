@@ -1,4 +1,8 @@
-<% if document.attached? %>
+<%# `document` is either an Attached::One proxy (gst/pan/aadhaar_document,
+    responds to attached?) or a bare ActiveStorage::Attachment yielded while
+    iterating a has_many_attached collection (kyc_documents) — the latter
+    has no attached? method since just being in the collection means it is. %>
+<% if !document.respond_to?(:attached?) || document.attached? %>
   <div class="mt-2 d-flex align-items-center gap-2 p-2 border rounded bg-light-subtle">
     <% if document.image? %>
       <%= image_tag document, style: "width: 48px; height: 48px; border-radius: 6px; object-fit: cover; flex-shrink: 0;", alt: document.filename.to_s %>
