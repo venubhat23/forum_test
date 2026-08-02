@@ -63,6 +63,7 @@ module Forums
 
     def edit
       authorize! :update, @guest
+      @upcoming_meetings = @chapter.meetings.where("scheduled_at >= ?", Time.current).order(:scheduled_at)
     end
 
     def update
@@ -70,8 +71,10 @@ module Forums
       @guest.assign_attributes(guest_update_params)
       apply_invited_by_selection(@guest)
       if @guest.save
+        invite_to_meeting(@guest)
         redirect_to forum_chapter_guest_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: @guest.id), notice: "#{@guest.display_name} was updated."
       else
+        @upcoming_meetings = @chapter.meetings.where("scheduled_at >= ?", Time.current).order(:scheduled_at)
         flash.now[:alert] = @guest.errors.full_messages.to_sentence
         render :edit, status: :unprocessable_entity
       end
