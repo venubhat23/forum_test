@@ -2,6 +2,11 @@
 
 <% brand_style = @setting.website_template == ForumSetting::DEFAULT_TEMPLATE ? "--brand: #{@setting.theme_color.presence || '#4f46e5'};" : nil %>
 <div class="public-site" data-template="<%= @setting.website_template %>" style="<%= brand_style %>">
+  <% if @preview_mode %>
+    <div class="text-center py-2 small fw-semibold" style="background:#0f172a; color:#fff;">
+      <i class="bi bi-eye me-1"></i> Preview Mode &middot; Demo Data &middot; <%= ForumSetting::TEMPLATES[@setting.website_template][:name] %> Template
+    </div>
+  <% end %>
   <%= render "forums/websites/nav" %>
 
   <section class="ps-profile-hero">
@@ -83,8 +88,9 @@
           <h3>More Members</h3>
           <ul class="ps-related-list">
             <% @related_members.each do |related| %>
+              <% related_path = @preview_mode ? preview_member_super_admin_website_template_path(@setting.website_template, member_token: related.profile_token) : forum_website_member_path(forum_slug: @current_forum.slug, profile_token: related.profile_token) %>
               <li>
-                <%= link_to forum_website_member_path(forum_slug: @current_forum.slug, profile_token: related.profile_token), class: "ps-related-link" do %>
+                <%= link_to related_path, class: "ps-related-link" do %>
                   <% if related.photo.attached? %>
                     <%= image_tag related.photo, class: "ps-related-photo", alt: related.display_name %>
                   <% else %>
@@ -101,7 +107,8 @@
             <% end %>
           </ul>
         <% end %>
-        <%= link_to "← All Members", forum_website_members_path(forum_slug: @current_forum.slug), class: "ps-link" %>
+        <% back_path = @preview_mode ? preview_super_admin_website_template_path(@setting.website_template) : forum_website_members_path(forum_slug: @current_forum.slug) %>
+        <%= link_to "← #{@preview_mode ? "Back to Preview" : "All Members"}", back_path, class: "ps-link" %>
       </aside>
     </div>
   </section>

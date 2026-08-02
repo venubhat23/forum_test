@@ -17,6 +17,7 @@ Rails.application.routes.draw do
     resources :website_templates, only: [ :index ] do
       member do
         get :preview
+        get "preview/members/:member_token", to: "website_templates#preview_member", as: :preview_member
       end
     end
     resources :forums, only: [ :index, :new, :create, :show, :edit, :update, :destroy ] do
@@ -176,6 +177,7 @@ Rails.application.routes.draw do
           patch :activate
           post :reset_password
           post :force_logout
+          post :impersonate
           patch :renew
           patch :update_role
           get :print

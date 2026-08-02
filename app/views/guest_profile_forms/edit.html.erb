@@ -197,6 +197,24 @@
                  else
                    "I have paid the meeting fee"
                  end %>
+
+              <% fee_meetings.select { |m| m.payment_upi_id.present? || m.payment_qr.attached? }.each do |meeting| %>
+                <div class="d-flex flex-wrap align-items-center gap-3 p-3 mb-3 border rounded bg-light-subtle">
+                  <% if meeting.payment_qr.attached? %>
+                    <%= image_tag meeting.payment_qr, style: "height: 100px; width: 100px; object-fit: contain; border-radius: 6px; background: #fff; padding: 4px; border: 1px solid #e2e8f0;", alt: "Payment QR code" %>
+                  <% end %>
+                  <div>
+                    <div class="fw-semibold small text-uppercase text-muted mb-1">How to pay &middot; <%= number_to_currency(meeting.fee_amount) %></div>
+                    <% if meeting.payment_upi_id.present? %>
+                      <div><i class="bi bi-phone me-1"></i> UPI / PhonePe: <strong><%= meeting.payment_upi_id %></strong></div>
+                    <% end %>
+                    <% if meeting.payment_bank_details.present? %>
+                      <div class="text-muted small mt-1"><%= simple_format(meeting.payment_bank_details) %></div>
+                    <% end %>
+                  </div>
+                </div>
+              <% end %>
+
               <div class="form-check mb-2">
                 <%= f.check_box :meeting_fee_paid, class: "form-check-input",
                       data: { action: "fee-toggle#toggle", "fee-toggle-target": "checkbox" } %>

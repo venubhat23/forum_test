@@ -2,7 +2,7 @@ module Forums
   class MyAttendanceController < BaseController
     def show
       @upcoming_meetings = current_user.chapter ?
-        current_user.chapter.meetings.where("scheduled_at >= ?", Date.current.beginning_of_day).order(:scheduled_at).limit(5) :
+        current_user.chapter.meetings.where(scheduled_at: Date.current.beginning_of_day..2.months.from_now).order(:scheduled_at) :
         Meeting.none
       @meeting_attendances = Attendance.where(meeting_id: @upcoming_meetings.map(&:id), user_id: current_user.id).index_by(&:meeting_id)
 

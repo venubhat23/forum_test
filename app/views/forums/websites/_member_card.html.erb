@@ -1,3 +1,4 @@
+<% member_url = local_assigns[:member_path] || forum_website_member_path(forum_slug: @current_forum.slug, profile_token: member.profile_token) %>
 <div class="ps-card">
   <div class="ps-card-top">
     <% if member.photo.attached? %>
@@ -7,7 +8,7 @@
     <% end %>
     <div class="ps-card-heading">
       <h3 class="ps-card-name">
-        <%= link_to member.display_name, forum_website_member_path(forum_slug: @current_forum.slug, profile_token: member.profile_token), class: "ps-card-name-link" %>
+        <%= link_to member.display_name, member_url, class: "ps-card-name-link" %>
       </h3>
       <% if member.designation.present? %>
         <span class="ps-card-designation"><%= member.designation %></span>
@@ -73,5 +74,5 @@
     </div>
   <% end %>
 
-  <%= link_to "View Full Profile →", forum_website_member_path(forum_slug: @current_forum.slug, profile_token: member.profile_token), class: "ps-card-profile-link" %>
+  <%= link_to "View Full Profile →", member_url, class: "ps-card-profile-link" %>
 </div>

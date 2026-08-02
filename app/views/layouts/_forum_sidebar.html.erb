@@ -11,9 +11,9 @@
           <% end %>
         </li>
         <li class="nav-item">
-          <%= link_to forum_people_path(forum_slug: @current_forum.slug), class: "nav-link-modern #{'active' if current_page?(forum_people_path(forum_slug: @current_forum.slug))}", data: { tooltip: "People" } do %>
+          <%= link_to forum_people_path(forum_slug: @current_forum.slug), class: "nav-link-modern #{'active' if current_page?(forum_people_path(forum_slug: @current_forum.slug))}", data: { tooltip: "Members" } do %>
             <div class="nav-icon-modern"><div class="icon-bg gradient-teal"><i class="bi bi-person-lines-fill"></i></div></div>
-            <span class="nav-text">People</span>
+            <span class="nav-text">Members</span>
           <% end %>
         </li>
         <li class="nav-item">

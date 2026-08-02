@@ -1,4 +1,4 @@
-<%= form_with model: schedule, url: forum_chapter_meeting_schedules_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id), method: :post, local: true,
+<%= form_with model: schedule, url: forum_chapter_meeting_schedules_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id), method: :post, local: true, multipart: true,
       data: { controller: "submit-loading", action: "submit->submit-loading#start" } do |f| %>
   <% if schedule.errors.any? %>
     <div class="alert alert-danger"><%= schedule.errors.full_messages.to_sentence %></div>
@@ -78,7 +78,26 @@
       <%= f.label :fee_amount, "Entry Fee Amount", class: "form-label" %>
       <%= f.number_field :fee_amount, step: 0.01, min: 0.01, class: "form-control", style: "max-width: 220px;",
             data: { "fee-toggle-target": "amountField" } %>
-      <div class="form-text">Applied to every generated meeting — each occurrence tracks who's paid, just like a regular meeting.</div>
+      <div class="form-text mb-3">Applied to every generated meeting — each occurrence tracks who's paid, just like a regular meeting.</div>
+
+      <div class="row g-3">
+        <div class="col-12 col-sm-6">
+          <%= f.label :payment_upi_id, "UPI / PhonePe ID", class: "form-label" %>
+          <%= f.text_field :payment_upi_id, class: "form-control", placeholder: "e.g. name@upi" %>
+        </div>
+        <div class="col-12 col-sm-6">
+          <%= f.label :payment_qr, "Payment QR Code", class: "form-label" %>
+          <%= f.file_field :payment_qr, class: "form-control", accept: "image/*" %>
+          <% if schedule.payment_qr.attached? %>
+            <div class="form-text">Current QR code: <%= image_tag schedule.payment_qr, style: "height: 60px; margin-top: 4px;" %></div>
+          <% end %>
+        </div>
+      </div>
+      <div class="mt-3">
+        <%= f.label :payment_bank_details, "Bank Account Details (optional)", class: "form-label" %>
+        <%= f.text_area :payment_bank_details, class: "form-control", rows: 2, placeholder: "Account name, number, IFSC, bank..." %>
+      </div>
+      <div class="form-text mt-1">Saved once here and copied to every generated meeting, so attendees always see how to pay.</div>
     </div>
   </div>
 

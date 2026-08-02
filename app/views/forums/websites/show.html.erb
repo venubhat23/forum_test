@@ -2,6 +2,11 @@
 
 <% brand_style = @setting.website_template == ForumSetting::DEFAULT_TEMPLATE ? "--brand: #{@setting.theme_color.presence || '#4f46e5'};" : nil %>
 <div class="public-site" data-template="<%= @setting.website_template %>" style="<%= brand_style %>">
+  <% if @preview_mode %>
+    <div class="text-center py-2 small fw-semibold" style="background:#0f172a; color:#fff;">
+      <i class="bi bi-eye me-1"></i> Preview Mode &middot; Demo Data &middot; <%= ForumSetting::TEMPLATES[@setting.website_template][:name] %> Template
+    </div>
+  <% end %>
   <%= render "forums/websites/nav" %>
 
   <section class="ps-hero">
@@ -53,7 +58,8 @@
       </div>
       <div class="ps-member-grid">
         <% @featured_members.each do |member| %>
-          <%= render "forums/websites/member_card", member: member %>
+          <% member_path = @preview_mode ? preview_member_super_admin_website_template_path(@setting.website_template, member_token: member.profile_token) : nil %>
+          <%= render "forums/websites/member_card", member: member, member_path: member_path %>
         <% end %>
       </div>
     </section>

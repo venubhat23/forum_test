@@ -3,12 +3,16 @@ class ImpersonationsController < ApplicationController
 
   def destroy
     impersonator_id = session[:impersonator_id]
-    super_admin = impersonator_id && User.find_by(id: impersonator_id, role: :super_admin)
+    impersonator = impersonator_id && User.find_by(id: impersonator_id, role: [ :super_admin, :forum_admin, :chapter_admin ])
 
-    if super_admin
+    if impersonator
       session.delete(:impersonator_id)
-      sign_in(:user, super_admin, event: :authentication)
-      redirect_to super_admin_dashboard_path, notice: "You are back in your Super Admin account."
+      sign_in(:user, impersonator, event: :authentication)
+      if impersonator.super_admin?
+        redirect_to super_admin_dashboard_path, notice: "You are back in your Super Admin account."
+      else
+        redirect_to forum_dashboard_path(forum_slug: impersonator.forum.slug), notice: "You are back in your account."
+      end
     else
       redirect_to root_path, alert: "No impersonation session found."
     end

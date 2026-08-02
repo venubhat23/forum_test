@@ -3,11 +3,14 @@ class ForumSetting < ApplicationRecord
   has_one_attached :logo
 
   TEMPLATES = {
-    "classic" => { name: "Classic", tagline: "Bold purple gradient hero with rounded cards.", swatches: %w[#6366f1 #764ba2 #f8fafc] },
-    "modern"  => { name: "Modern", tagline: "Crisp light layout, navy hero panel, sky-blue accents.", swatches: %w[#0ea5e9 #0f172a #ffffff] },
-    "minimal" => { name: "Minimal", tagline: "Monochrome, generous whitespace, understated type.", swatches: %w[#111827 #6b7280 #ffffff] },
-    "bold"    => { name: "Bold", tagline: "Dark-mode-first, oversized type, vivid rose accent.", swatches: %w[#f43f5e #0b0f19 #fde047] },
-    "elegant" => { name: "Elegant", tagline: "Serif headings, ivory background, gold accent — premium feel.", swatches: %w[#b8860b #fffdf7 #1f2937] }
+    "classic"   => { name: "Classic", tagline: "Bold purple gradient hero with rounded cards.", swatches: %w[#6366f1 #764ba2 #f8fafc] },
+    "modern"    => { name: "Modern", tagline: "Crisp light layout, navy hero panel, sky-blue accents.", swatches: %w[#0ea5e9 #0f172a #ffffff] },
+    "minimal"   => { name: "Minimal", tagline: "Monochrome, generous whitespace, understated type.", swatches: %w[#111827 #6b7280 #ffffff] },
+    "bold"      => { name: "Bold", tagline: "Light background, oversized type, vivid rose-to-orange energy.", swatches: %w[#f43f5e #fb923c #ffffff] },
+    "elegant"   => { name: "Elegant", tagline: "Serif headings, ivory background, gold accent — premium feel.", swatches: %w[#b8860b #fffdf7 #1f2937] },
+    "vibrant"   => { name: "Vibrant", tagline: "Playful multi-color gradient, rounded shapes, high energy.", swatches: %w[#ec4899 #8b5cf6 #fef9c3] },
+    "corporate" => { name: "Corporate", tagline: "Structured, buttoned-up, navy-on-white professional look.", swatches: %w[#1d4ed8 #e2e8f0 #ffffff] },
+    "warm"      => { name: "Warm", tagline: "Terracotta & cream, friendly and community-oriented.", swatches: %w[#ea580c #fef3e2 #7c2d12] }
   }.freeze
   DEFAULT_TEMPLATE = "classic"
 

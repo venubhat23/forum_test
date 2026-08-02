@@ -171,6 +171,8 @@
       <%= button_to "Force Logout", force_logout_forum_chapter_member_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: @member.id), method: :post, class: "btn btn-outline-danger",
             data: { turbo_confirm: "Sign #{@member.email} out of all active sessions?" } %>
       <%= button_to "Renew Membership (+1 year)", renew_forum_chapter_member_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: @member.id), method: :patch, class: "btn btn-outline-primary" %>
+      <%= button_to "Login as Member", impersonate_forum_chapter_member_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: @member.id), method: :post, class: "btn btn-outline-dark",
+            data: { turbo_confirm: "View the app as #{@member.display_name}?" } %>
     </div>
   </div>
 <% end %>
@@ -182,7 +184,14 @@
       <dt class="col-sm-3">Phone</dt><dd class="col-sm-9"><%= @member.phone %></dd>
       <dt class="col-sm-3">Business Category</dt><dd class="col-sm-9"><%= @member.business_category_id ? @member.business_category_ref&.name : @member.business_category %></dd>
       <dt class="col-sm-3">Speciality</dt><dd class="col-sm-9"><%= @member.speciality %></dd>
-      <dt class="col-sm-3">Website</dt><dd class="col-sm-9"><%= @member.website %></dd>
+      <dt class="col-sm-3">Website</dt>
+      <dd class="col-sm-9">
+        <% if @member.website.present? %>
+          <%= link_to @member.website, @member.website, target: "_blank", rel: "noopener" %>
+        <% else %>
+          <%= link_to forum_website_url(forum_slug: @current_forum.slug), forum_website_url(forum_slug: @current_forum.slug), target: "_blank", rel: "noopener" %>
+        <% end %>
+      </dd>
       <dt class="col-sm-3">GST</dt><dd class="col-sm-9"><%= @member.gst_number %></dd>
       <dt class="col-sm-3">PAN</dt><dd class="col-sm-9"><%= @member.pan_number %></dd>
     </dl>

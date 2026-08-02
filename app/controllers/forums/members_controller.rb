@@ -4,7 +4,7 @@ require "roo"
 module Forums
   class MembersController < BaseController
     before_action :set_chapter, except: [ :import, :bulk_import, :all ]
-    before_action :set_member, only: [ :show, :edit, :update, :destroy, :suspend, :activate, :reset_password, :force_logout, :renew, :print, :update_role,
+    before_action :set_member, only: [ :show, :edit, :update, :destroy, :suspend, :activate, :reset_password, :force_logout, :impersonate, :renew, :print, :update_role,
       :invite_to_meeting, :send_meeting_invite ]
 
     def all
@@ -147,6 +147,13 @@ module Forums
       authorize! :update, @member
       @member.force_logout!
       redirect_to forum_chapter_member_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: @member.id), notice: "#{@member.display_name} has been signed out of all active sessions."
+    end
+
+    def impersonate
+      authorize! :update, @member
+      session[:impersonator_id] = current_user.id
+      sign_in(:user, @member, event: :authentication)
+      redirect_to forum_dashboard_path(forum_slug: @current_forum.slug), notice: "You are now viewing as #{@member.display_name}."
     end
 
     def renew

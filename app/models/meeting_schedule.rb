@@ -3,6 +3,8 @@ class MeetingSchedule < ApplicationRecord
   MIN_MONTHS = 2
   MAX_MONTHS = 4
 
+  has_one_attached :payment_qr
+
   belongs_to :chapter
   belongs_to :created_by, class_name: "User"
   # No `dependent:` option here on purpose: dependent callbacks (e.g. :nullify) run
@@ -25,6 +27,29 @@ class MeetingSchedule < ApplicationRecord
 
   def day_name
     DAY_NAMES[day_of_week]
+  end
+
+  # Guarded against payment_upi_id/payment_bank_details not existing yet on
+  # this DB connection (pending migration) — see ForumSetting#website_template
+  # for the same pattern and why it matters on a shared, slow-to-deploy DB.
+  def payment_upi_id
+    return nil unless self.class.column_names.include?("payment_upi_id")
+    super
+  end
+
+  def payment_upi_id=(value)
+    return unless self.class.column_names.include?("payment_upi_id")
+    super
+  end
+
+  def payment_bank_details
+    return nil unless self.class.column_names.include?("payment_bank_details")
+    super
+  end
+
+  def payment_bank_details=(value)
+    return unless self.class.column_names.include?("payment_bank_details")
+    super
   end
 
   def occurrence_dates
@@ -92,7 +117,7 @@ class MeetingSchedule < ApplicationRecord
 
   def generate_meetings!
     occurrence_dates.each do |date|
-      meetings.create!(
+      meeting = meetings.create!(
         chapter: chapter,
         meeting_type: :weekly,
         scheduled_at: Time.zone.local(date.year, date.month, date.day, start_time.hour, start_time.min),
@@ -101,8 +126,11 @@ class MeetingSchedule < ApplicationRecord
         topic: topic,
         speaker: speaker,
         speaker_phone: speaker_phone,
-        fee_amount: fee_amount
+        fee_amount: fee_amount,
+        payment_upi_id: payment_upi_id,
+        payment_bank_details: payment_bank_details
       )
+      meeting.payment_qr.attach(payment_qr.blob) if payment_qr.attached?
     end
   end
 

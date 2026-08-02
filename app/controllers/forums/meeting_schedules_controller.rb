@@ -102,7 +102,7 @@ module Forums
 
     def meeting_schedule_params
       params.require(:meeting_schedule).permit(:title, :topic, :day_of_week, :start_time, :end_time, :start_date, :end_date,
-        :venue, :agenda, :notes, :speaker, :speaker_phone, :fee_amount, attendee_ids: [])
+        :venue, :agenda, :notes, :speaker, :speaker_phone, :fee_amount, :payment_upi_id, :payment_bank_details, :payment_qr, attendee_ids: [])
     end
   end
 end
