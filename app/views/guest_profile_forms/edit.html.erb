@@ -17,22 +17,41 @@
           <div class="card-header fw-semibold"><i class="bi bi-calendar-event me-1"></i> Meeting Invitation<%= "s" if @invited_meetings.size > 1 %></div>
           <div class="card-body">
             <% @invited_meetings.each do |meeting| %>
-              <div class="d-flex flex-wrap justify-content-between align-items-start gap-3<%= " pb-3 mb-3 border-bottom" unless meeting == @invited_meetings.last %>">
-                <div>
-                  <div class="fw-semibold"><%= meeting.topic.presence || "#{meeting.meeting_type.titleize} Meeting" %></div>
-                  <div class="text-muted small">
-                    <i class="bi bi-calendar3 me-1"></i><%= meeting.scheduled_at.strftime("%d %b %Y") %>
-                    &middot; <i class="bi bi-clock me-1"></i><%= meeting.scheduled_at.strftime("%I:%M %p") %>
-                    <% if meeting.venue.present? %>&middot; <i class="bi bi-geo-alt me-1"></i><%= meeting.venue %><% end %>
+              <div class="<%= "pb-3 mb-3 border-bottom" unless meeting == @invited_meetings.last %>">
+                <div class="d-flex flex-wrap justify-content-between align-items-start gap-3">
+                  <div>
+                    <div class="fw-semibold"><%= meeting.topic.presence || "#{meeting.meeting_type.titleize} Meeting" %></div>
+                    <div class="text-muted small">
+                      <i class="bi bi-calendar3 me-1"></i><%= meeting.scheduled_at.strftime("%d %b %Y") %>
+                      &middot; <i class="bi bi-clock me-1"></i><%= meeting.scheduled_at.strftime("%I:%M %p") %>
+                      <% if meeting.venue.present? %>&middot; <i class="bi bi-geo-alt me-1"></i><%= meeting.venue %><% end %>
+                    </div>
+                  </div>
+                  <div class="text-end">
+                    <% if meeting.fee_amount.present? %>
+                      <span class="badge bg-warning-subtle text-warning-emphasis fs-6"><%= number_to_currency(meeting.fee_amount) %> fee</span>
+                    <% else %>
+                      <span class="badge bg-success-subtle text-success">No fee</span>
+                    <% end %>
                   </div>
                 </div>
-                <div class="text-end">
-                  <% if meeting.fee_amount.present? %>
-                    <span class="badge bg-warning-subtle text-warning-emphasis fs-6"><%= number_to_currency(meeting.fee_amount) %> fee</span>
-                  <% else %>
-                    <span class="badge bg-success-subtle text-success">No fee</span>
-                  <% end %>
-                </div>
+
+                <% if meeting.fee_amount.present? && (meeting.payment_upi_id.present? || meeting.payment_qr.attached?) %>
+                  <div class="d-flex flex-wrap align-items-center gap-3 p-3 mt-3 border rounded bg-light-subtle">
+                    <% if meeting.payment_qr.attached? %>
+                      <%= image_tag meeting.payment_qr, style: "height: 100px; width: 100px; object-fit: contain; border-radius: 6px; background: #fff; padding: 4px; border: 1px solid #e2e8f0;", alt: "Payment QR code" %>
+                    <% end %>
+                    <div>
+                      <div class="fw-semibold small text-uppercase text-muted mb-1">How to pay</div>
+                      <% if meeting.payment_upi_id.present? %>
+                        <div><i class="bi bi-phone me-1"></i> UPI / PhonePe: <strong><%= meeting.payment_upi_id %></strong></div>
+                      <% end %>
+                      <% if meeting.payment_bank_details.present? %>
+                        <div class="text-muted small mt-1"><%= simple_format(meeting.payment_bank_details) %></div>
+                      <% end %>
+                    </div>
+                  </div>
+                <% end %>
               </div>
             <% end %>
           </div>
@@ -197,22 +216,8 @@
                  else
                    "I have paid the meeting fee"
                  end %>
-
-              <% fee_meetings.select { |m| m.payment_upi_id.present? || m.payment_qr.attached? }.each do |meeting| %>
-                <div class="d-flex flex-wrap align-items-center gap-3 p-3 mb-3 border rounded bg-light-subtle">
-                  <% if meeting.payment_qr.attached? %>
-                    <%= image_tag meeting.payment_qr, style: "height: 100px; width: 100px; object-fit: contain; border-radius: 6px; background: #fff; padding: 4px; border: 1px solid #e2e8f0;", alt: "Payment QR code" %>
-                  <% end %>
-                  <div>
-                    <div class="fw-semibold small text-uppercase text-muted mb-1">How to pay &middot; <%= number_to_currency(meeting.fee_amount) %></div>
-                    <% if meeting.payment_upi_id.present? %>
-                      <div><i class="bi bi-phone me-1"></i> UPI / PhonePe: <strong><%= meeting.payment_upi_id %></strong></div>
-                    <% end %>
-                    <% if meeting.payment_bank_details.present? %>
-                      <div class="text-muted small mt-1"><%= simple_format(meeting.payment_bank_details) %></div>
-                    <% end %>
-                  </div>
-                </div>
+              <% if fee_meetings.any? { |m| m.payment_upi_id.present? || m.payment_qr.attached? } %>
+                <p class="text-muted small mb-2"><i class="bi bi-info-circle me-1"></i> See the QR code / UPI ID under your meeting invitation above.</p>
               <% end %>
 
               <div class="form-check mb-2">
