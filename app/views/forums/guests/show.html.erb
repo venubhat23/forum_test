@@ -143,7 +143,15 @@
       <dt class="col-sm-3">Business Name</dt><dd class="col-sm-9"><%= @guest.business_name.presence || "—" %></dd>
       <dt class="col-sm-3">Business Category</dt><dd class="col-sm-9"><%= (@guest.business_category_id ? @guest.business_category_ref&.name : @guest.business_category).presence || "—" %></dd>
       <dt class="col-sm-3">Speciality</dt><dd class="col-sm-9"><%= @guest.speciality.presence || "—" %></dd>
-      <dt class="col-sm-3">Website</dt><dd class="col-sm-9"><%= @guest.website.presence || "—" %></dd>
+      <dt class="col-sm-3">Website</dt>
+      <dd class="col-sm-9">
+        <% if @guest.website.present? %>
+          <%= link_to @guest.website, external_url(@guest.website), target: "_blank", rel: "noopener" %>
+        <% else %>
+          <%= link_to forum_website_url(forum_slug: @current_forum.slug), forum_website_url(forum_slug: @current_forum.slug), target: "_blank", rel: "noopener" %>
+          <span class="text-muted small d-block">No personal website on file — showing <%= @current_forum.name %>'s website</span>
+        <% end %>
+      </dd>
       <dt class="col-sm-3">Business Capacity</dt><dd class="col-sm-9"><%= @guest.capacity.presence || "—" %></dd>
       <dt class="col-sm-3">Service Coverage Area</dt><dd class="col-sm-9"><%= @guest.service_area.presence || "—" %></dd>
       <dt class="col-sm-3">Address</dt><dd class="col-sm-9"><%= @guest.address.presence || "—" %></dd>
