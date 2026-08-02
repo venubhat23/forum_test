@@ -7,6 +7,16 @@
 
 <div class="row justify-content-center">
   <div class="col-12 col-lg-8">
+    <% if @coming_attendees.present? %>
+      <div class="alert alert-info d-flex flex-wrap align-items-center gap-2 mb-3" role="alert">
+        <i class="bi bi-hourglass-split fs-5"></i>
+        <div>
+          <strong><%= pluralize(@coming_attendees.size, "member") %> marked themselves attending</strong> and are pre-checked below —
+          <%= @coming_attendees.map(&:display_name).to_sentence %>. Review and hit Save Attendance to confirm.
+        </div>
+      </div>
+    <% end %>
+
     <%= form_with url: record_attendance_forum_chapter_meeting_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: @meeting.id), method: :post, local: true,
           data: { controller: "submit-loading", action: "submit->submit-loading#start" } do %>
       <div class="card mb-3" data-controller="attendance-checklist">

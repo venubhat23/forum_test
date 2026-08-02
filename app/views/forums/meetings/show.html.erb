@@ -248,6 +248,26 @@
   </div>
 <% end %>
 
+<% if can?(:update, @meeting) && @coming_attendees.present? %>
+  <div class="card mb-4">
+    <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+      <span class="fw-semibold"><i class="bi bi-hourglass-split text-info me-1"></i> Members Coming (<%= @coming_attendees.size %>)</span>
+      <%= link_to "Confirm Attendance →", attendance_forum_chapter_meeting_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: @meeting.id), class: "btn btn-sm btn-success" %>
+    </div>
+    <div class="list-group list-group-flush">
+      <% @coming_attendees.each do |person| %>
+        <div class="list-group-item d-flex justify-content-between align-items-center">
+          <span class="d-flex align-items-center gap-2">
+            <span class="row-avatar"><%= person.full_name.first.upcase %></span>
+            <span><%= person.display_name %></span>
+          </span>
+          <span class="badge bg-info text-dark">Marked attending &middot; not yet confirmed</span>
+        </div>
+      <% end %>
+    </div>
+  </div>
+<% end %>
+
 <% if can? :update, @meeting %>
   <div class="card">
     <div class="card-header fw-semibold">Defaulters (no attendance recorded)</div>

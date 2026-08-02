@@ -18,6 +18,7 @@ module Forums
 
     def show
       authorize! :read, @meeting
+      @coming_attendees = @meeting.attendances.where(status: :attending).includes(:user).map(&:user) if can? :update, @meeting
     end
 
     def new
@@ -78,8 +79,9 @@ module Forums
 
     def attendance
       authorize! :update, @meeting
-      @attendance_by_user = @meeting.attendances.index_by(&:user_id)
+      @attendance_by_user = @meeting.attendances.includes(:user).index_by(&:user_id)
       @people = attendable_people
+      @coming_attendees = @attendance_by_user.values.select(&:attending?).map(&:user)
     end
 
     # Admin confirmation: checked people are marked "attended", everyone else
