@@ -135,22 +135,28 @@
             <div class="col-12 col-sm-4">
               <%= f.label :gst_document, "Upload GST Certificate", class: "form-label" %>
               <%= f.file_field :gst_document, class: "form-control" %>
-              <% if @guest.gst_document.attached? %><div class="form-text">Already on file — choose a new one only to replace it.</div><% end %>
+              <%= render "guest_profile_forms/uploaded_document", document: @guest.gst_document %>
             </div>
             <div class="col-12 col-sm-4">
               <%= f.label :pan_document, "Upload PAN Card", class: "form-label" %>
               <%= f.file_field :pan_document, class: "form-control" %>
-              <% if @guest.pan_document.attached? %><div class="form-text">Already on file — choose a new one only to replace it.</div><% end %>
+              <%= render "guest_profile_forms/uploaded_document", document: @guest.pan_document %>
             </div>
             <div class="col-12 col-sm-4">
               <%= f.label :aadhaar_document, "Upload Aadhaar Card", class: "form-label" %>
               <%= f.file_field :aadhaar_document, class: "form-control" %>
-              <% if @guest.aadhaar_document.attached? %><div class="form-text">Already on file — choose a new one only to replace it.</div><% end %>
+              <%= render "guest_profile_forms/uploaded_document", document: @guest.aadhaar_document %>
             </div>
           </div>
           <div class="mb-4">
             <%= f.label :kyc_documents, "Other KYC Documents (optional, multiple allowed)", class: "form-label" %>
             <%= f.file_field :kyc_documents, multiple: true, class: "form-control" %>
+            <% if @guest.kyc_documents.attached? %>
+              <div class="form-text mb-2"><%= pluralize(@guest.kyc_documents.count, "document") %> already on file — new uploads are added, not replaced.</div>
+              <% @guest.kyc_documents.each do |doc| %>
+                <%= render "guest_profile_forms/uploaded_document", document: doc %>
+              <% end %>
+            <% end %>
           </div>
 
           <div class="d-flex flex-wrap gap-2">
