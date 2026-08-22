@@ -245,17 +245,28 @@ class WhatsappTemplate < ApplicationRecord
   validates :body, presence: true
   validates :key, uniqueness: { scope: :forum_id }
 
+  after_commit :expire_cached_body
+
   # Looks up the forum's saved override first, then the platform-wide default
   # set by a super admin, and falls back to today's hardcoded wording when
   # nothing has been customized at either level. Global keys (e.g. invoice
   # sharing, which isn't tied to any one forum) only ever use the platform-wide row.
   def self.resolve_body(forum, key)
     key = key.to_s
-    return where(forum_id: nil, key: key).first&.body.presence || DEFAULTS.fetch(key) if GLOBAL_KEYS.include?(key)
+    return cached_body(nil, key).presence || DEFAULTS.fetch(key) if GLOBAL_KEYS.include?(key)
 
-    where(forum: forum, key: key).first&.body.presence ||
-      where(forum_id: nil, key: key).first&.body.presence ||
+    cached_body(forum.id, key).presence ||
+      cached_body(nil, key).presence ||
       DEFAULTS.fetch(key)
+  end
+
+  # Cached per (forum_id, key) so pages that render a template once per row
+  # (e.g. a member list with a "send WhatsApp" link per member) don't run a
+  # SELECT per row. Invalidated by #expire_cached_body below on any save/destroy.
+  def self.cached_body(forum_id, key)
+    Rails.cache.fetch([ "whatsapp_template_body", forum_id, key ], expires_in: 1.hour) do
+      where(forum_id: forum_id, key: key).first&.body
+    end
   end
 
   # Renders a template with named %{var} placeholders. Uses a forgiving gsub
@@ -264,5 +275,11 @@ class WhatsappTemplate < ApplicationRecord
   def self.render(forum, key, vars = {})
     vars = vars.transform_keys(&:to_s)
     resolve_body(forum, key).gsub(/%\{(\w+)\}/) { vars.fetch($1, "") }
+  end
+
+  private
+
+  def expire_cached_body
+    Rails.cache.delete([ "whatsapp_template_body", forum_id, key ])
   end
 end

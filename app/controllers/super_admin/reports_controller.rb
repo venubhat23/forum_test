@@ -6,7 +6,7 @@ module SuperAdmin
     end
 
     def forums
-      @forums = Forum.includes(:plan, :chapters).order(:name)
+      @forums = Forum.includes(:plan).order(:name)
       respond_to do |format|
         format.html
         format.csv { send_data forums_csv(@forums), filename: "forums-#{Date.current}.csv" }
@@ -52,7 +52,7 @@ module SuperAdmin
       CSV.generate(headers: true) do |csv|
         csv << [ "Name", "Slug", "Plan", "Status", "Chapters", "Created" ]
         forums.each do |f|
-          csv << [ f.name, f.slug, f.plan.name, f.status, f.chapters.size, f.created_at ]
+          csv << [ f.name, f.slug, f.plan.name, f.status, f.chapters_count, f.created_at ]
         end
       end
     end

@@ -6,10 +6,11 @@ module Forums
     def index
       authorize! :read, FeePayment
       base = FeePayment.joins(:user).where(users: { chapter_id: @chapter.id })
-      @total_fees = base.count
-      @paid_fees = base.where(status: :paid).count
-      @pending_fees = base.where(status: :pending).count
-      @partially_paid_fees = base.where(status: :partially_paid).count
+      status_counts = base.group(:status).count
+      @total_fees = status_counts.values.sum
+      @paid_fees = status_counts["paid"] || 0
+      @pending_fees = status_counts["pending"] || 0
+      @partially_paid_fees = status_counts["partially_paid"] || 0
       @total_amount = base.sum(:amount)
 
       @fee_payments = base.includes(:user).order(created_at: :desc)

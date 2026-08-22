@@ -35,7 +35,7 @@ module Forums
       within_a_month = Time.current..1.month.from_now
       items = []
 
-      OneToOneMeeting.where(requested_with_id: current_user.id, status: :requested, scheduled_at: within_a_month).find_each do |meeting|
+      OneToOneMeeting.includes(:requester).where(requested_with_id: current_user.id, status: :requested, scheduled_at: within_a_month).find_each do |meeting|
         items << {
           key: "o2o-#{meeting.id}",
           icon: "bi-person-lines-fill",
@@ -46,7 +46,7 @@ module Forums
         }
       end
 
-      OfficeDarshan.where(visitor_id: current_user.id, status: :invited, scheduled_at: within_a_month).find_each do |darshan|
+      OfficeDarshan.includes(:host).where(visitor_id: current_user.id, status: :invited, scheduled_at: within_a_month).find_each do |darshan|
         items << {
           key: "darshan-#{darshan.id}",
           icon: "bi-building",
@@ -57,7 +57,7 @@ module Forums
         }
       end
 
-      OfficeDarshanAttendance.includes(:office_darshan).where(user_id: current_user.id, rsvp_status: :invited)
+      OfficeDarshanAttendance.includes(office_darshan: :host).where(user_id: current_user.id, rsvp_status: :invited)
         .where(office_darshan: { scheduled_at: within_a_month }).find_each do |attendance|
         darshan = attendance.office_darshan
         items << {
@@ -76,7 +76,9 @@ module Forums
 
     def set_active_announcements
       seen_ids = session[:seen_announcement_ids] ||= []
-      @active_announcements = Announcement.for_forum(@current_forum).reject { |a| seen_ids.include?(a.id) }
+      announcements = Announcement.for_forum(@current_forum)
+      announcements = announcements.where.not(id: seen_ids) if seen_ids.present?
+      @active_announcements = announcements.to_a
       session[:seen_announcement_ids] = seen_ids + @active_announcements.map(&:id)
     end
 

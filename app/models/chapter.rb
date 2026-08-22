@@ -1,7 +1,7 @@
 class Chapter < ApplicationRecord
   enum :status, { active: 0, inactive: 1 }, default: :active
 
-  belongs_to :forum
+  belongs_to :forum, counter_cache: true
   has_many :users, dependent: :nullify
   has_many :members, -> { where(role: :member) }, class_name: "User"
   has_many :guests, -> { where(role: :guest) }, class_name: "User"

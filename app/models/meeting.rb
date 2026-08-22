@@ -65,6 +65,10 @@ class Meeting < ApplicationRecord
   def notify_chapter_members
     message = "A new #{meeting_type} meeting has been scheduled for #{scheduled_at.strftime('%d %b %Y %H:%M')}."
     message += " Fee: #{ActiveSupport::NumberHelper.number_to_currency(fee_amount)} — see the meeting page for payment details." if fee_amount.present?
-    chapter.members.find_each { |member| member.notifications.create!(body: message) }
+    member_ids = chapter.members.pluck(:id)
+    return if member_ids.empty?
+
+    now = Time.current
+    Notification.insert_all(member_ids.map { |user_id| { user_id: user_id, body: message, created_at: now, updated_at: now } })
   end
 end

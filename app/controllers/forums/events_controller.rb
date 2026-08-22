@@ -78,10 +78,11 @@ module Forums
       end
 
       message = "Reminder: #{@event.title} is coming up on #{@event.starts_at.strftime('%d %b %Y at %I:%M %p')}.#{amount_text}"
-      sent_count = recipients.count
-      recipients.find_each { |user| user.notifications.create!(body: message) }
+      recipient_ids = recipients.pluck(:id)
+      now = Time.current
+      Notification.insert_all(recipient_ids.map { |user_id| { user_id: user_id, body: message, created_at: now, updated_at: now } }) if recipient_ids.any?
 
-      redirect_to forum_event_path(forum_slug: @current_forum.slug, id: @event.id), notice: "Reminder sent to #{sent_count} registrant(s)."
+      redirect_to forum_event_path(forum_slug: @current_forum.slug, id: @event.id), notice: "Reminder sent to #{recipient_ids.size} registrant(s)."
     end
 
     def attendance
@@ -92,11 +93,10 @@ module Forums
     def record_attendance
       authorize! :update, @event
       present_ids = Array(params[:present_user_ids]).map(&:to_i)
+      now = Time.current
 
-      @event.event_registrations.find_each do |registration|
-        present = present_ids.include?(registration.user_id)
-        registration.update!(attended: present, attended_at: present ? Time.current : nil)
-      end
+      @event.event_registrations.where(user_id: present_ids).update_all(attended: true, attended_at: now, updated_at: now)
+      @event.event_registrations.where.not(user_id: present_ids).update_all(attended: false, attended_at: nil, updated_at: now)
 
       redirect_to forum_event_path(forum_slug: @current_forum.slug, id: @event.id),
         notice: "Attendance recorded for #{@event.event_registrations.count} registrant(s)."

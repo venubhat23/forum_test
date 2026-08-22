@@ -5,10 +5,11 @@ module Forums
     def index
       authorize! :read, Invoice
       base = Invoice.accessible_by(current_ability).where(forum_id: @current_forum.id).where.not(user_id: nil)
-      @total_invoices = base.count
-      @paid_invoices = base.where(status: :paid).count
-      @pending_invoices = base.where(status: :pending).count
-      @partially_paid_invoices = base.where(status: :partially_paid).count
+      status_counts = base.group(:status).count
+      @total_invoices = status_counts.values.sum
+      @paid_invoices = status_counts["paid"] || 0
+      @pending_invoices = status_counts["pending"] || 0
+      @partially_paid_invoices = status_counts["partially_paid"] || 0
       @overdue_invoices = base.where(status: :overdue).or(base.where("due_date < ? AND status = ?", Date.current, Invoice.statuses[:pending])).count
 
       @invoices = base.includes(:user).order(created_at: :desc)

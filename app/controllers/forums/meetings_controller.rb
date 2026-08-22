@@ -71,10 +71,11 @@ module Forums
       end
 
       message = "Reminder: the #{@meeting.meeting_type} meeting on #{@meeting.scheduled_at.strftime('%d %b %Y at %I:%M %p')} is coming up.#{amount_text}"
-      sent_count = recipients.count
-      recipients.find_each { |member| member.notifications.create!(body: message) }
+      recipient_ids = recipients.pluck(:id)
+      now = Time.current
+      Notification.insert_all(recipient_ids.map { |user_id| { user_id: user_id, body: message, created_at: now, updated_at: now } }) if recipient_ids.any?
 
-      redirect_to forum_chapter_meeting_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: @meeting.id), notice: "Reminder sent to #{sent_count} member(s)."
+      redirect_to forum_chapter_meeting_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: @meeting.id), notice: "Reminder sent to #{recipient_ids.size} member(s)."
     end
 
     def attendance
@@ -89,9 +90,11 @@ module Forums
     def record_attendance
       authorize! :update, @meeting
       attended_ids = Array(params[:present_user_ids]).map(&:to_i)
+      people = attendable_people.to_a
+      existing_by_user_id = @meeting.attendances.where(user_id: people.map(&:id)).index_by(&:user_id)
 
-      attendable_people.each do |person|
-        record = @meeting.attendances.find_or_initialize_by(user_id: person.id)
+      people.each do |person|
+        record = existing_by_user_id[person.id] || @meeting.attendances.build(user_id: person.id)
         record.event_type = :meeting
         record.occurred_on = @meeting.scheduled_at.to_date
         record.status = attended_ids.include?(person.id) ? :attended : :absent
@@ -99,7 +102,7 @@ module Forums
       end
 
       redirect_to forum_chapter_meeting_path(forum_slug: @current_forum.slug, chapter_id: @chapter.id, id: @meeting.id),
-        notice: "Attendance recorded for #{attendable_people.count} people."
+        notice: "Attendance recorded for #{people.size} people."
     end
 
     # Self check-in: a member/guest marks themselves as attending or not

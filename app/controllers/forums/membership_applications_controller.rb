@@ -5,9 +5,10 @@ module Forums
     def index
       authorize! :read, MembershipApplication
       base = @current_forum.membership_applications
-      @pending_applications = base.where(status: :pending).count
-      @approved_applications = base.where(status: :approved).count
-      @rejected_applications = base.where(status: :rejected).count
+      status_counts = base.group(:status).count
+      @pending_applications = status_counts["pending"] || 0
+      @approved_applications = status_counts["approved"] || 0
+      @rejected_applications = status_counts["rejected"] || 0
 
       @applications = base.order(created_at: :desc)
       @applications = @applications.where(status: params[:status]) if params[:status].present?

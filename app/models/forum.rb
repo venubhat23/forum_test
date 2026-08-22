@@ -6,7 +6,7 @@ class Forum < ApplicationRecord
     assets packs cable admin api f new edit create update destroy
   ].freeze
 
-  belongs_to :plan
+  belongs_to :plan, counter_cache: true
 
   has_many :chapters, dependent: :destroy
   has_many :users, dependent: :destroy
@@ -55,7 +55,7 @@ class Forum < ApplicationRecord
   end
 
   def chapter_limit_reached?
-    chapter_limit.present? && chapters.count >= chapter_limit
+    chapter_limit.present? && chapters_count >= chapter_limit
   end
 
   def trial_days_left

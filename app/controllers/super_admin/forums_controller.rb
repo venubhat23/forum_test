@@ -9,7 +9,7 @@ module SuperAdmin
       @trial_forums = Forum.trial.count
       @suspended_forums = Forum.suspended.count
 
-      @forums = Forum.includes(:plan, :chapters)
+      @forums = Forum.includes(:plan)
       @forums = @forums.where("name ILIKE ?", "%#{params[:q]}%") if params[:q].present?
       @forums = @forums.where(status: params[:status]) if params[:status].present?
       @forums = @forums.order(created_at: :desc).page(params[:page])

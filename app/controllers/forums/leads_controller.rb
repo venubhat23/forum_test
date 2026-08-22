@@ -14,11 +14,12 @@ module Forums
         )
       end
 
-      @total_leads = base.count
-      @requested_leads = base.where(stage: :requested).count
-      @accepted_leads = base.where(stage: :accepted).count
-      @converted_leads = base.where(stage: :converted).count
-      @declined_leads = base.where(stage: :declined).count
+      stage_counts = base.group(:stage).count
+      @total_leads = stage_counts.values.sum
+      @requested_leads = stage_counts["requested"] || 0
+      @accepted_leads = stage_counts["accepted"] || 0
+      @converted_leads = stage_counts["converted"] || 0
+      @declined_leads = stage_counts["declined"] || 0
       @thanksgiving_leads = base.where.not(thanksgiving_given_at: nil).count
 
       @leads = base.includes(:created_by, :tagged_users).order(created_at: :desc)

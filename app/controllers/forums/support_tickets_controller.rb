@@ -4,9 +4,10 @@ module Forums
 
     def index
       base = SupportTicket.where(forum: @current_forum, raised_by: current_user)
-      @total_tickets = base.count
-      @open_tickets = base.where(status: [ :open, :in_progress ]).count
-      @closed_tickets = base.where(status: [ :resolved, :closed ]).count
+      status_counts = base.group(:status).count
+      @total_tickets = status_counts.values.sum
+      @open_tickets = (status_counts["open"] || 0) + (status_counts["in_progress"] || 0)
+      @closed_tickets = (status_counts["resolved"] || 0) + (status_counts["closed"] || 0)
 
       @tickets = base.order(created_at: :desc)
       @tickets = @tickets.where(status: params[:status]) if params[:status].present?

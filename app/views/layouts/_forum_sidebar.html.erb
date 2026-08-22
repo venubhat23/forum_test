@@ -211,7 +211,7 @@
             meeting_schedules_target =
               if current_user.chapter_id.present?
                 forum_chapter_meeting_schedules_path(forum_slug: @current_forum.slug, chapter_id: current_user.chapter_id)
-              elsif @current_forum.chapters.count == 1
+              elsif @current_forum.chapters_count == 1
                 forum_chapter_meeting_schedules_path(forum_slug: @current_forum.slug, chapter_id: @current_forum.chapters.first.id)
               else
                 forum_meeting_schedules_path(forum_slug: @current_forum.slug)

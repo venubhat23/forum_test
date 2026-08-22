@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_08_01_030000) do
+ActiveRecord::Schema[8.0].define(version: 2026_08_22_120001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -72,6 +72,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_01_030000) do
     t.bigint "event_id"
     t.integer "status", default: 0, null: false
     t.index ["event_id"], name: "index_attendances_on_event_id"
+    t.index ["meeting_id", "present"], name: "index_attendances_on_meeting_id_and_present"
     t.index ["meeting_id"], name: "index_attendances_on_meeting_id"
     t.index ["user_id", "event_id"], name: "index_attendances_on_user_id_and_event_id", unique: true
     t.index ["user_id", "meeting_id"], name: "index_attendances_on_user_id_and_meeting_id", unique: true
@@ -199,6 +200,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_01_030000) do
     t.string "token"
     t.boolean "thanked", default: false, null: false
     t.datetime "thanked_at"
+    t.index ["event_id", "attended"], name: "index_event_registrations_on_event_id_and_attended"
     t.index ["event_id", "user_id"], name: "index_event_registrations_on_event_id_and_user_id", unique: true
     t.index ["event_id"], name: "index_event_registrations_on_event_id"
     t.index ["invited_by_id"], name: "index_event_registrations_on_invited_by_id"
@@ -271,6 +273,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_01_030000) do
     t.boolean "lifetime", default: false, null: false
     t.index ["feeable_type", "feeable_id"], name: "index_fee_payments_on_feeable"
     t.index ["invoice_number"], name: "index_fee_payments_on_invoice_number", unique: true
+    t.index ["user_id", "status"], name: "index_fee_payments_on_user_id_and_status"
     t.index ["user_id"], name: "index_fee_payments_on_user_id"
   end
 
@@ -308,6 +311,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_01_030000) do
     t.string "bank_ifsc"
     t.string "bank_branch"
     t.string "upi_id"
+    t.string "website_template", default: "classic", null: false
     t.index ["forum_id"], name: "index_forum_settings_on_forum_id", unique: true
   end
 
@@ -326,6 +330,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_01_030000) do
     t.string "gst_number"
     t.text "address"
     t.string "office"
+    t.integer "chapters_count", default: 0, null: false
     t.index ["business_plan_id"], name: "index_forums_on_business_plan_id"
     t.index ["plan_id"], name: "index_forums_on_plan_id"
     t.index ["slug"], name: "index_forums_on_slug", unique: true
@@ -384,6 +389,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_01_030000) do
     t.datetime "updated_at", null: false
     t.index ["accepted_by_id"], name: "index_leads_on_accepted_by_id"
     t.index ["created_by_id"], name: "index_leads_on_created_by_id"
+    t.index ["forum_id", "stage"], name: "index_leads_on_forum_id_and_stage"
     t.index ["forum_id"], name: "index_leads_on_forum_id"
   end
 
@@ -416,6 +422,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_01_030000) do
     t.string "speaker"
     t.string "speaker_phone"
     t.datetime "meetings_generated_at"
+    t.string "payment_upi_id"
+    t.text "payment_bank_details"
     t.index ["chapter_id"], name: "index_meeting_schedules_on_chapter_id"
     t.index ["created_by_id"], name: "index_meeting_schedules_on_created_by_id"
   end
@@ -502,6 +510,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_01_030000) do
     t.datetime "read_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["user_id", "read_at"], name: "index_notifications_on_user_id_and_read_at"
     t.index ["user_id"], name: "index_notifications_on_user_id"
   end
 
@@ -602,6 +611,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_01_030000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "chapter_limit"
+    t.integer "forums_count", default: 0, null: false
     t.index ["key"], name: "index_plans_on_key", unique: true
   end
 
@@ -654,10 +664,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_01_030000) do
     t.bigint "permission_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["permission_id"], name: "idx_role_permissions_permission"
     t.index ["permission_id"], name: "index_role_permissions_on_permission_id"
     t.index ["role_id", "permission_id"], name: "idx_role_permissions_unique", unique: true
-    t.index ["role_id"], name: "idx_role_permissions_role"
     t.index ["role_id"], name: "index_role_permissions_on_role_id"
   end
 
@@ -836,6 +844,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_01_030000) do
     t.datetime "updated_at", null: false
     t.bigint "chapter_id"
     t.index ["chapter_id"], name: "index_support_tickets_on_chapter_id"
+    t.index ["forum_id", "status"], name: "index_support_tickets_on_forum_id_and_status"
     t.index ["forum_id"], name: "index_support_tickets_on_forum_id"
     t.index ["raised_by_id"], name: "index_support_tickets_on_raised_by_id"
   end
@@ -951,14 +960,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_01_030000) do
     t.boolean "meeting_fee_paid", default: false, null: false
     t.index "lower((phone)::text)", name: "index_users_on_lower_phone", unique: true, where: "((phone IS NOT NULL) AND ((phone)::text <> ''::text))"
     t.index ["business_category_id"], name: "index_users_on_business_category_id"
+    t.index ["chapter_id", "role"], name: "index_users_on_chapter_id_and_role"
     t.index ["chapter_id"], name: "index_users_on_chapter_id"
     t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["forum_id", "role"], name: "index_users_on_forum_id_and_role"
     t.index ["forum_id"], name: "index_users_on_forum_id"
     t.index ["invited_by_id"], name: "index_users_on_invited_by_id"
     t.index ["membership_plan_id"], name: "index_users_on_membership_plan_id"
     t.index ["profile_token"], name: "index_users_on_profile_token", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
-    t.index ["role_id"], name: "idx_users_role_id"
     t.index ["role_id"], name: "index_users_on_role_id"
     t.index ["user_role_id"], name: "index_users_on_user_role_id"
     t.index ["user_type"], name: "index_users_on_user_type"

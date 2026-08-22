@@ -7,10 +7,11 @@ module Forums
     def index
       authorize! :read, OfficeDarshan
       base = OfficeDarshan.accessible_by(current_ability).where(forum_id: @current_forum.id)
-      @total_darshans = base.count
-      @invited_darshans = base.where(status: :invited).count
-      @accepted_darshans = base.where(status: :accepted).count
-      @completed_darshans = base.where(status: :completed).count
+      status_counts = base.group(:status).count
+      @total_darshans = status_counts.values.sum
+      @invited_darshans = status_counts["invited"] || 0
+      @accepted_darshans = status_counts["accepted"] || 0
+      @completed_darshans = status_counts["completed"] || 0
 
       @darshans = base.includes(:host, :visitor, :chapter, :attendances).order(scheduled_at: :desc)
       @darshans = @darshans.where(status: params[:status]) if params[:status].present?

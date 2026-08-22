@@ -4,7 +4,7 @@ module Forums
       load_lead_stats
 
       if @lead_stats_scope == :forum
-        @chapters_count = @current_forum.chapters.count
+        @chapters_count = @current_forum.chapters_count
         @members_count = @current_forum.users.member.count
         @guests_count = @current_forum.users.guest.count
         @renewing_this_month = @current_forum.users.member.where(renews_on: Date.current.beginning_of_month..Date.current.end_of_month).count
@@ -31,22 +31,25 @@ module Forums
 
       this_month = Date.current.beginning_of_month..Date.current.end_of_month
       base = Attendance.joins(:user).where(users: { forum_id: @current_forum.id }).where(occurred_on: this_month)
-      @attendance_present_this_month = base.where(present: true).count
-      @attendance_absent_this_month = base.where(present: false).count
+      present_counts = base.group(:present).count
+      @attendance_present_this_month = present_counts[true] || 0
+      @attendance_absent_this_month = present_counts[false] || 0
 
       forum_events = @current_forum.events.where(starts_at: this_month)
       event_registrations = EventRegistration.where(event_id: forum_events.select(:id))
-      @event_attendance_present_this_month = event_registrations.where(attended: true).count
-      @event_attendance_total_this_month = event_registrations.count
+      attended_counts = event_registrations.group(:attended).count
+      @event_attendance_present_this_month = attended_counts[true] || 0
+      @event_attendance_total_this_month = attended_counts.values.sum
     end
 
     def load_lead_stats
       if can?(:manage, Lead)
         @lead_stats_scope = :forum
         base = @current_forum.leads
-        @leads_created_count = base.count
-        @leads_requested_count = base.where(stage: :requested).count
-        @leads_converted_count = base.where(stage: :converted).count
+        stage_counts = base.group(:stage).count
+        @leads_created_count = stage_counts.values.sum
+        @leads_requested_count = stage_counts["requested"] || 0
+        @leads_converted_count = stage_counts["converted"] || 0
         # Forum-wide, every slip's giver and receiver both belong to this
         # forum, so the two totals are always equal — shown separately for
         # symmetry with the personal view below, where they differ.
