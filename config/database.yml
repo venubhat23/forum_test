@@ -88,11 +88,7 @@ test:
 production:
   primary: &primary_production
     <<: *default
-    host: dpg-d94k0vpo3t8c7395ltb0-a.ohio-postgres.render.com
-    port: 5432
-    database: association_test
-    username: association_test_user
-    password: VvovysfqPiJNhh0fx2xpIAyw7nZR6dzD
+    url: <%= ENV.fetch("DATABASE_URL") %>
   cache:
     <<: *primary_production
     migrations_paths: db/cache_migrate
