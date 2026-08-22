@@ -24,12 +24,7 @@ default: &default
 development:
   primary: &primary_production
     <<: *default
-    host: <%= ENV['DB_HOST'] || 'dpg-d94k0vpo3t8c7395ltb0-a.ohio-postgres.render.com' %>
-    port: <%= ENV['DB_PORT'] || 5432 %>
-    sslmode: <%= ENV['DB_SSLMODE'] || 'require' %>
-    database: association_test
-    username: association_test_user
-    password: <%= ENV['DB_PASSWORD'] %>
+    url: <%= ENV['DATABASE_URL'] || 'postgresql://postgres:OjRgQfilKuQzSEBkIkjAhNPYkMDidFok@sakura.proxy.rlwy.net:43087/railway' %>
   cache:
     <<: *primary_production
     migrations_paths: db/cache_migrate
@@ -88,7 +83,7 @@ test:
 production:
   primary: &primary_production
     <<: *default
-    url: <%= ENV.fetch("DATABASE_URL") %>
+    url: <%= ENV['DATABASE_URL'] || 'postgresql://postgres:OjRgQfilKuQzSEBkIkjAhNPYkMDidFok@sakura.proxy.rlwy.net:43087/railway' %>
   cache:
     <<: *primary_production
     migrations_paths: db/cache_migrate
